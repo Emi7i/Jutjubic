@@ -7,32 +7,24 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
+@Setter
+@Getter
 public class Person {
     private int id;
 
     @NotNull
-    @Setter
-    @Getter
     private String name;
 
     @NotEmpty
-    @Setter
-    @Getter
     private String surname;
 
     @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
-    @Setter
-    @Getter
     private String email;
 
     @CustomConstraint(message = "JMBG mora da sadrzi tacno 13 cifara")
-    @Setter
-    @Getter
     private String jmbg;
 
     @Min(value = 18)
-    @Setter
-    @Getter
     private int age;
 
     @Past     // proverava da li je datum u proslosti
