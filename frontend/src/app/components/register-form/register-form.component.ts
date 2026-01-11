@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, AbstractControl } from '@angular/forms';
 import { AuthService, RegisterRequest } from '../../services/auth.service';
 
 @Component({
@@ -15,7 +15,6 @@ export class RegisterFormComponent implements OnInit {
   errorMessage: string | null = null;
   successMessage: string | null = null;
 
-  // Emit form data to parent component when submitted (optional)
   @Output() formSubmitted = new EventEmitter<RegisterRequest>();
 
   constructor(private authService: AuthService) { }
@@ -24,12 +23,27 @@ export class RegisterFormComponent implements OnInit {
     this.registerForm = new FormGroup({
       username: new FormControl('', [Validators.required, Validators.minLength(3)]),
       email: new FormControl('', [Validators.required, Validators.email]),
+      name: new FormControl(''),       // optional
+      surname: new FormControl(''),    // optional
+      address: new FormControl(''),    // optional
       password: new FormControl('', [Validators.required, Validators.minLength(6)]),
-    });
+      confirmPassword: new FormControl('', [Validators.required])
+    }, { validators: this.passwordsMatchValidator });
   }
 
-  get f(): { username: FormControl; email: FormControl; password: FormControl } {
-    return this.registerForm.controls as { username: FormControl; email: FormControl; password: FormControl };
+
+  // Validator to ensure password and confirmPassword match
+  passwordsMatchValidator(group: AbstractControl): { [key: string]: boolean } | null {
+    const password = group.get('password')?.value;
+    const confirm = group.get('confirmPassword')?.value;
+    if (password && confirm && password !== confirm) {
+      return { passwordsMismatch: true };
+    }
+    return null;
+  }
+
+  get f(): any {
+    return this.registerForm.controls;
   }
 
   onSubmit(): void {
@@ -46,15 +60,17 @@ export class RegisterFormComponent implements OnInit {
     const formData: RegisterRequest = {
       username: this.f.username.value,
       email: this.f.email.value,
+      name: this.f.name.value,
+      surname: this.f.surname.value,
+      address: this.f.address.value,
       password: this.f.password.value
     };
 
-    // Call the AuthService to register the user
     this.authService.register(formData).subscribe({
       next: (msg) => {
-        this.successMessage = msg; // show success message
+        this.successMessage = msg;
         this.loading = false;
-        this.formSubmitted.emit(formData); // emit to parent if needed
+        this.formSubmitted.emit(formData);
         this.registerForm.reset();
         this.submitted = false;
       },

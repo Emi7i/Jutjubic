@@ -10,6 +10,11 @@
   margin-bottom: 16px;
 }
 
+.message.success {
+  color: green;
+  margin-top: 8px;
+}
+
 .message.error {
   color: red;
   margin-top: 8px;

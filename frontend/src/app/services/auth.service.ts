@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment'; // <-- import environment
+import { environment } from '../../environments/environment';
 
 export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
+  name?: string;
+  surname?: string;
+  address?: string;
 }
 
 export interface LoginRequest {
@@ -23,7 +26,7 @@ export interface LoginResponse {
 })
 export class AuthService {
 
-  private readonly baseUrl = environment.apiUrl + '/auth'; // use environment variable
+  private readonly baseUrl = environment.apiUrl + '/auth';
 
   constructor(private http: HttpClient) { }
 

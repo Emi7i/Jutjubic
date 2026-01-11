@@ -17,10 +17,32 @@
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full-width">
+    <mat-label>First Name</mat-label>
+    <input matInput formControlName="name" placeholder="Enter first name (optional)">
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Last Name</mat-label>
+    <input matInput formControlName="surname" placeholder="Enter last name (optional)">
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Address</mat-label>
+    <input matInput formControlName="address" placeholder="Enter address (optional)">
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
     <mat-label>Password</mat-label>
     <input matInput type="password" formControlName="password" placeholder="Enter password">
     <mat-error *ngIf="submitted && f.password.errors?.['required']">Password is required</mat-error>
     <mat-error *ngIf="submitted && f.password.errors?.['minlength']">Minimum 6 characters</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Confirm Password</mat-label>
+    <input matInput type="password" formControlName="confirmPassword" placeholder="Confirm password">
+    <mat-error *ngIf="submitted && f.confirmPassword.errors?.['required']">Confirmation is required</mat-error>
+    <mat-error *ngIf="submitted && registerForm.errors?.['passwordsMismatch']">Passwords do not match</mat-error>
   </mat-form-field>
 
   <button mat-raised-button color="primary" type="submit" [disabled]="loading" class="full-width">
@@ -30,4 +52,5 @@
 
   <div *ngIf="successMessage" class="message success">{{ successMessage }}</div>
   <div *ngIf="errorMessage" class="message error">{{ errorMessage }}</div>
+
 </form>
