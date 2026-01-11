@@ -53,6 +53,8 @@ public class AuthService {
     }
 
     public String loginUser(String usernameOrEmail, String password) throws IllegalArgumentException {
+        System.out.println("Login attempt for username/email: " + usernameOrEmail);
+
         // Try to find user by username first, then by email
         Optional<User> existingUserOpt = userRepository.findByUsername(usernameOrEmail);
         if (existingUserOpt.isEmpty()) {
@@ -60,6 +62,7 @@ public class AuthService {
         }
 
         if (existingUserOpt.isEmpty()) {
+            System.out.println("User not found: " + usernameOrEmail);
             throw new IllegalArgumentException("Invalid username/email or password");
         }
 
@@ -69,12 +72,20 @@ public class AuthService {
         }
 
 
+        System.out.println("User found: " + existingUser.getUsername());
+        System.out.println("Stored password hash: " + existingUser.getPassword());
+        System.out.println("Input password: " + password);
+        System.out.println("Password matches: " + passwordEncoder.matches(password, existingUser.getPassword()));
+
         if (!passwordEncoder.matches(password, existingUser.getPassword())) {
+            System.out.println("Password mismatch for user: " + existingUser.getUsername());
             throw new IllegalArgumentException("Invalid username/email or password");
         }
 
         // Generate JWT token
-        return jwtUtil.generateToken(existingUser.getUsername()); // keep JWT based on username
+        String token = jwtUtil.generateToken(existingUser.getUsername());
+        System.out.println("Generated token for user: " + existingUser.getUsername());
+        return token;
     }
 
     public boolean activateUser(String token) {

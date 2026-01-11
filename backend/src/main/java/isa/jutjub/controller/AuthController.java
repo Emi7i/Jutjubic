@@ -4,12 +4,8 @@ import isa.jutjub.model.User;
 import isa.jutjub.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,9 +17,6 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // -------------------------
-    // REGISTER
-    // -------------------------
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
         try {
@@ -35,9 +28,6 @@ public class AuthController {
         }
     }
 
-    // -------------------------
-    // LOGIN
-    // -------------------------
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         try {
@@ -55,9 +45,6 @@ public class AuthController {
         }
     }
 
-    // -------------------------
-    // ACTIVATE ACCOUNT
-    // -------------------------
     @GetMapping("/activate")
     public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
         boolean activated = authService.activateUser(token);
