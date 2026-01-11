@@ -1,0 +1,40 @@
+.container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.tag {
+  background-color: #e0e0e0;
+  padding: 3px 8px;
+  margin-right: 5px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+textarea {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 8px 15px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.comment {
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+  margin: 10px 0;
+}
+
+.comment p {
+  margin: 5px 0;
+}
+
+hr {
+  margin: 20px 0;
+}

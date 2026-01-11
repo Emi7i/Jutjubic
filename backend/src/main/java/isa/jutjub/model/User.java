@@ -4,10 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
 public class User {
 
     @Id
@@ -24,6 +24,5 @@ public class User {
     private String role = "USER"; // simple role
 
     @Column(nullable = false)
-    private String email = "USER";
-
+    private String email;
 }
