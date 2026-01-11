@@ -1,0 +1,26 @@
+.register-form {
+  max-width: 400px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.message.success {
+  color: green;
+  margin-top: 8px;
+}
+
+.message.error {
+  color: red;
+  margin-top: 8px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 24px;
+}

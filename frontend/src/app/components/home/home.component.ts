@@ -14,4 +14,12 @@ export class HomeComponent {
   goToVideos(): void {
     this.router.navigate(['/videos']);
   }
+
+  goToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  goToRegister(): void {
+    this.router.navigate(['/register']);
+  }
 }
