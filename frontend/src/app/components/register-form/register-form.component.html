@@ -1,31 +1,33 @@
-<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
 
-  <div>
-    <label>Username</label>
-    <input type="text" formControlName="username">
-    <div *ngIf="submitted && f.username.errors">
-      <small *ngIf="f.username.errors['required']">Username is required</small>
-      <small *ngIf="f.username.errors['minlength']">Username must be at least 3 characters</small>
-    </div>
-  </div>
+  <h2>User Registration</h2>
 
-  <div>
-    <label>Email</label>
-    <input type="email" formControlName="email">
-    <div *ngIf="submitted && f.email.errors">
-      <small *ngIf="f.email.errors['required']">Email is required</small>
-      <small *ngIf="f.email.errors['email']">Email is invalid</small>
-    </div>
-  </div>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Username</mat-label>
+    <input matInput formControlName="username" placeholder="Enter username">
+    <mat-error *ngIf="submitted && f.username.errors?.['required']">Username is required</mat-error>
+    <mat-error *ngIf="submitted && f.username.errors?.['minlength']">Minimum 3 characters</mat-error>
+  </mat-form-field>
 
-  <div>
-    <label>Password</label>
-    <input type="password" formControlName="password">
-    <div *ngIf="submitted && f.password.errors">
-      <small *ngIf="f.password.errors['required']">Password is required</small>
-      <small *ngIf="f.password.errors['minlength']">Password must be at least 6 characters</small>
-    </div>
-  </div>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="email" placeholder="Enter email">
+    <mat-error *ngIf="submitted && f.email.errors?.['required']">Email is required</mat-error>
+    <mat-error *ngIf="submitted && f.email.errors?.['email']">Invalid email</mat-error>
+  </mat-form-field>
 
-  <button type="submit">Register</button>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Password</mat-label>
+    <input matInput type="password" formControlName="password" placeholder="Enter password">
+    <mat-error *ngIf="submitted && f.password.errors?.['required']">Password is required</mat-error>
+    <mat-error *ngIf="submitted && f.password.errors?.['minlength']">Minimum 6 characters</mat-error>
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="loading" class="full-width">
+    <span *ngIf="!loading">Register</span>
+    <mat-progress-spinner *ngIf="loading" mode="indeterminate" diameter="24"></mat-progress-spinner>
+  </button>
+
+  <div *ngIf="successMessage" class="message success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="message error">{{ errorMessage }}</div>
 </form>

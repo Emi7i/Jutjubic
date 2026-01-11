@@ -1,11 +1,11 @@
 package isa.jutjub.controller;
 
 import isa.jutjub.model.User;
+import isa.jutjub.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import isa.jutjub.service.AuthService;
-import java.util.Map;
 
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,6 +17,9 @@ public class AuthController {
         this.authService = authService;
     }
 
+    // -------------------------
+    // REGISTER
+    // -------------------------
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
         try {
@@ -28,10 +31,20 @@ public class AuthController {
         }
     }
 
+    // -------------------------
+    // LOGIN
+    // -------------------------
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         try {
-            String token = authService.loginUser(user.getUsername(), user.getPassword());
+            String usernameOrEmail = loginRequest.get("usernameOrEmail"); // can be username or email
+            String password = loginRequest.get("password");
+
+            if (usernameOrEmail == null || password == null || usernameOrEmail.isBlank() || password.isBlank()) {
+                return ResponseEntity.badRequest().body("Username/email and password are required");
+            }
+
+            String token = authService.loginUser(usernameOrEmail, password);
             return ResponseEntity.ok(Map.of("token", token));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(401).body(e.getMessage());
