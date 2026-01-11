@@ -1,27 +1,43 @@
+<!-- src/app/components/video-list/video-list.component.html -->
+
 <div class="container">
-  <h2>Videos</h2>
-
-  <div *ngIf="loading">Loading videos...</div>
-  <div *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</div>
-
-  <div *ngIf="!loading && videos.length === 0">
-    <p>No videos available yet.</p>
+  <div class="header">
+    <h2>Videos</h2>
   </div>
 
-  <div *ngFor="let video of videos" class="video-item" (click)="viewVideo(video.id)">
-    <img [src]="video.thumbnailUrl" [alt]="video.title">
-    <div>
-      <h3>{{ video.title }}</h3>
-      <p>{{ video.description }}</p>
-      <small>By {{ video.userName }} - {{ video.createdAt | date }}</small>
-      <div>
-        <span *ngFor="let tag of video.tags" class="tag">{{ tag }}</span>
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading videos...</p>
+  </div>
+
+  <div class="error-box" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && videos.length === 0">
+    <h3>No videos yet</h3>
+    <p>Be the first to upload a video</p>
+    <a routerLink="/upload" class="upload-btn">Upload Video</a>
+  </div>
+
+  <div class="video-grid">
+    <div *ngFor="let video of videos" class="video-card" (click)="viewVideo(video.id)">
+      <div class="thumbnail-wrapper">
+        <img [src]="video.thumbnailUrl" [alt]="video.title" class="thumbnail">
       </div>
-      <div>
-        <button (click)="toggleLike(video, $event)">
-          {{ video.isLiked ? '♥' : '♡' }} {{ video.likes }}
-        </button>
-        <span>💬 {{ video.commentsCount }}</span>
+
+      <div class="video-info">
+        <h3 class="video-title">{{ video.title }}</h3>
+        <p class="video-description">{{ video.description }}</p>
+
+        <div class="video-meta">
+          <span class="author">{{ video.userName }}</span>
+          <span class="date">{{ video.createdAt | date:'short' }}</span>
+        </div>
+
+        <div class="tags-container">
+          <span *ngFor="let tag of video.tags" class="tag">{{ tag }}</span>
+        </div>
       </div>
     </div>
   </div>

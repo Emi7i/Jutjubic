@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { HomeComponent } from './components/home/home.component';
 import { VideoUploadComponent } from './components/video-upload/video-upload.component';
 import { VideoListComponent } from './components/video-list/video-list.component';
 import { VideoDetailComponent } from './components/video-detail/video-detail.component';
@@ -13,6 +14,7 @@ import { VideoService } from './services/video.service';
 @NgModule({
   declarations: [
     AppComponent,
+    HomeComponent,
     VideoUploadComponent,
     VideoListComponent,
     VideoDetailComponent

@@ -58,6 +58,13 @@ export class VideoDetailComponent implements OnInit {
   toggleLike(): void {
     if (!this.video) return;
 
+    // Check if user is logged in
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      alert('You need to log in to like or comment on videos.');
+      return;
+    }
+
     this.videoService.toggleLike(this.video.id).subscribe({
       next: () => {
         if (this.video) {
@@ -73,6 +80,13 @@ export class VideoDetailComponent implements OnInit {
 
   addComment(): void {
     if (!this.video || !this.newComment.trim()) return;
+
+    // Check if user is logged in
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      alert('You need to log in to like or comment on videos.');
+      return;
+    }
 
     this.videoService.addComment(this.video.id, this.newComment).subscribe({
       next: (comment) => {
