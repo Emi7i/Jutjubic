@@ -1,0 +1,28 @@
+<div class="container">
+  <h2>Videos</h2>
+
+  <div *ngIf="loading">Loading videos...</div>
+  <div *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</div>
+
+  <div *ngIf="!loading && videos.length === 0">
+    <p>No videos available yet.</p>
+  </div>
+
+  <div *ngFor="let video of videos" class="video-item" (click)="viewVideo(video.id)">
+    <img [src]="video.thumbnailUrl" [alt]="video.title">
+    <div>
+      <h3>{{ video.title }}</h3>
+      <p>{{ video.description }}</p>
+      <small>By {{ video.userName }} - {{ video.createdAt | date }}</small>
+      <div>
+        <span *ngFor="let tag of video.tags" class="tag">{{ tag }}</span>
+      </div>
+      <div>
+        <button (click)="toggleLike(video, $event)">
+          {{ video.isLiked ? '♥' : '♡' }} {{ video.likes }}
+        </button>
+        <span>💬 {{ video.commentsCount }}</span>
+      </div>
+    </div>
+  </div>
+</div>

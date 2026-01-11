@@ -1,0 +1,45 @@
+.container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.video-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.video-item:hover {
+  background-color: #f5f5f5;
+}
+
+.video-item img {
+  max-width: 200px;
+  height: auto;
+  margin-right: 15px;
+  float: left;
+}
+
+.video-item h3 {
+  margin: 0 0 10px 0;
+}
+
+.video-item p {
+  margin: 0 0 10px 0;
+}
+
+.tag {
+  background-color: #e0e0e0;
+  padding: 3px 8px;
+  margin-right: 5px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+button {
+  margin-right: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
