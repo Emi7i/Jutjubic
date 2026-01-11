@@ -23,7 +23,7 @@ public class SecurityConfig {
                 // H2 Console for development
                 .requestMatchers("/h2-console/**").permitAll()
                 // REST API endpoints for Angular
-                .requestMatchers("/api/**").authenticated()
+                .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)); // For H2 console
