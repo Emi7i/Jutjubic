@@ -30,26 +30,40 @@ public class AuthService {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username already exists");
         }
-
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
 
         return userRepository.findById(savedUser.getId()).isPresent();
     }
 
-    public String loginUser(String username, String password) throws IllegalArgumentException {
-        Optional<User> existingUserOpt = userRepository.findByUsername(username);
+    public String loginUser(String usernameOrEmail, String password) throws IllegalArgumentException {
+        System.out.println("Login attempt for username/email: " + usernameOrEmail);
+        
+        // Try to find user by username first, then by email
+        Optional<User> existingUserOpt = userRepository.findByUsername(usernameOrEmail);
+        if (existingUserOpt.isEmpty()) {
+            existingUserOpt = userRepository.findByEmail(usernameOrEmail);
+        }
 
         if (existingUserOpt.isEmpty()) {
-            throw new IllegalArgumentException("Invalid username or password");
+            System.out.println("User not found: " + usernameOrEmail);
+            throw new IllegalArgumentException("Invalid username/email or password");
         }
 
         User existingUser = existingUserOpt.get();
+        System.out.println("User found: " + existingUser.getUsername());
+        System.out.println("Stored password hash: " + existingUser.getPassword());
+        System.out.println("Input password: " + password);
+        System.out.println("Password matches: " + passwordEncoder.matches(password, existingUser.getPassword()));
+        
         if (!passwordEncoder.matches(password, existingUser.getPassword())) {
-            throw new IllegalArgumentException("Invalid username or password");
+            System.out.println("Password mismatch for user: " + existingUser.getUsername());
+            throw new IllegalArgumentException("Invalid username/email or password");
         }
 
         // Generate JWT token
-        return jwtUtil.generateToken(username);
+        String token = jwtUtil.generateToken(existingUser.getUsername());
+        System.out.println("Generated token for user: " + existingUser.getUsername());
+        return token;
     }
 }

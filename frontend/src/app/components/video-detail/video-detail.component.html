@@ -1,0 +1,51 @@
+<div class="container">
+  <button (click)="goBack()">← Back to Videos</button>
+
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</div>
+
+  <div *ngIf="video">
+    <h2>{{ video.title }}</h2>
+
+    <video [src]="video.videoUrl" controls style="max-width: 100%; margin: 20px 0;"></video>
+
+    <p>{{ video.description }}</p>
+
+    <div>
+      <span *ngFor="let tag of video.tags" class="tag">{{ tag }}</span>
+    </div>
+
+    <p>
+      <small>By {{ video.userName }} - {{ video.createdAt | date }}</small>
+    </p>
+
+    <div *ngIf="video.location">
+      <small>📍 {{ video.location.address || (video.location.latitude + ', ' + video.location.longitude) }}</small>
+    </div>
+
+    <div>
+      <button (click)="toggleLike()">
+        {{ video.isLiked ? '♥' : '♡' }} {{ video.likes }} Likes
+      </button>
+    </div>
+
+    <hr>
+
+    <h3>Comments ({{ video.commentsCount }})</h3>
+
+    <div>
+      <textarea [(ngModel)]="newComment" rows="3" placeholder="Add a comment..."></textarea>
+      <button (click)="addComment()" [disabled]="!newComment.trim()">Post Comment</button>
+    </div>
+
+    <div *ngFor="let comment of comments" class="comment">
+      <strong>{{ comment.userName }}</strong>
+      <small>{{ comment.createdAt | date:'short' }}</small>
+      <p>{{ comment.text }}</p>
+    </div>
+
+    <div *ngIf="comments.length === 0">
+      <p>No comments yet. Be the first to comment!</p>
+    </div>
+  </div>
+</div>
