@@ -1,10 +1,13 @@
 package isa.jutjub.config;
 
 import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.User;
 import isa.jutjub.repository.VideoPostRepository;
+import isa.jutjub.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -13,14 +16,34 @@ import java.util.Set;
 @Configuration
 public class DataInitializer {
 
+    private final PasswordEncoder passwordEncoder;
+
+    public DataInitializer(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Bean
-    public CommandLineRunner initData(VideoPostRepository videoPostRepository) {
+    public CommandLineRunner initData(VideoPostRepository videoPostRepository, UserRepository userRepository) {
         return args -> {
             // Check if data already exists
             if (videoPostRepository.count() == 0) {
                 createSampleVideos(videoPostRepository);
             }
+            
+            // Always create admin user for H2 in-memory database
+            createAdminUser(userRepository);
         };
+    }
+
+    private void createAdminUser(UserRepository userRepository) {
+        User admin = new User();
+        admin.setUsername("admin");
+        admin.setEmail("admin@email.com");
+        admin.setPassword(passwordEncoder.encode("admin123"));
+        admin.setRole("ADMIN");
+        
+        userRepository.save(admin);
+        System.out.println("Admin user created: admin / admin123");
     }
 
     private void createSampleVideos(VideoPostRepository repository) {

@@ -22,4 +22,8 @@ export class HomeComponent {
   goToRegister(): void {
     this.router.navigate(['/register']);
   }
+
+  goToUpload(): void {
+    this.router.navigate(['/upload']);
+  }
 }

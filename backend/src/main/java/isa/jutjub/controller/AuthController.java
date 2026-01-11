@@ -29,9 +29,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         try {
-            String token = authService.loginUser(user.getUsername(), user.getPassword());
+            String usernameOrEmail = loginRequest.get("usernameOrEmail"); // can be username or email
+            String password = loginRequest.get("password");
+
+            if (usernameOrEmail == null || password == null || usernameOrEmail.isBlank() || password.isBlank()) {
+                return ResponseEntity.badRequest().body("Username/email and password are required");
+            }
+
+            String token = authService.loginUser(usernameOrEmail, password);
             return ResponseEntity.ok(Map.of("token", token));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(401).body(e.getMessage());
