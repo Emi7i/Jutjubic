@@ -1,0 +1,35 @@
+.activate-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertically center */
+  align-items: center;     /* horizontally center */
+  height: 100vh;           /* full viewport height */
+}
+
+mat-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.message.success {
+  color: green;
+  margin-top: 8px;
+}
+
+.message.error {
+  color: red;
+  margin-top: 8px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 24px;
+}

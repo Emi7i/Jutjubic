@@ -5,6 +5,10 @@ import isa.jutjub.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.Map;
 
 @RestController
@@ -51,4 +55,16 @@ public class AuthController {
         }
     }
 
+    // -------------------------
+    // ACTIVATE ACCOUNT
+    // -------------------------
+    @GetMapping("/activate")
+    public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
+        boolean activated = authService.activateUser(token);
+        if (activated) {
+            return ResponseEntity.ok("Account activated successfully. You can now log in.");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid or expired activation token.");
+        }
+    }
 }

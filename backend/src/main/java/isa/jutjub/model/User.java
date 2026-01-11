@@ -1,9 +1,14 @@
 package isa.jutjub.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -14,27 +19,23 @@ public class User {
     private String username;
 
     @Column(unique = true, nullable = false)
-    private String email; // new email field
+    private String email;
 
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
-    private String role = "USER"; // simple role
+    private String role = "USER";
 
-    // Getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // Optional fields
+    private String name;
+    private String surname;
+    private String address;
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    // Flag for email activation
+    @Column(nullable = false)
+    private boolean active = false;
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    @Column(unique = true)
+    private String activationToken;
 }

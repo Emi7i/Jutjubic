@@ -37,4 +37,12 @@ export class AuthService {
   login(data: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(this.baseUrl + '/login', data);
   }
+
+  activateAccount(token: string): Observable<string> {
+    // Sends GET request to /activate?token=<token>
+    return this.http.get(this.baseUrl + '/activate', {
+      params: { token },
+      responseType: 'text'
+    });
+  }
 }

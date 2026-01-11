@@ -1,0 +1,15 @@
+<div class="activate-container">
+  <mat-card>
+    <mat-card-content>
+      <h2>Account Activation</h2>
+
+      <div *ngIf="loading">
+        <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+        <p>Activating your account...</p>
+      </div>
+
+      <div *ngIf="message" class="message success">{{ message }}</div>
+      <div *ngIf="error" class="message error">{{ error }}</div>
+    </mat-card-content>
+  </mat-card>
+</div>
