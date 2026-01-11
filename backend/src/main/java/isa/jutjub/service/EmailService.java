@@ -6,10 +6,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 
 @Service
 public class EmailService {
@@ -31,7 +27,8 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(user.getEmail());
         message.setSubject("Activate your account");
-        message.setText("Hi " + (user.getName() != null ? user.getName() : user.getUsername()) + ",\n\n"
+        String userName = (user.getName() != null && !user.getName().isBlank()) ? user.getName() : user.getUsername();
+        message.setText("Hi " + userName + ",\n\n"
                 + "Please activate your account by clicking the link below:\n"
                 + activationLink + "\n\n"
                 + "Thank you!");
