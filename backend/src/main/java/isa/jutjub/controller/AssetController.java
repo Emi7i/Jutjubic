@@ -21,7 +21,7 @@ import java.util.List;
  * nadanotacija za @RestController.
  */
 @RestController
-@RequestMapping("/assets")
+@RequestMapping("/api/assets")
 @Tag(name = "Assets", description = "Asset management endpoints")
 public class AssetController {
 
