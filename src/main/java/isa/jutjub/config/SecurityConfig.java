@@ -22,7 +22,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/assets").permitAll()
                 .requestMatchers("/person").permitAll()
-                .requestMatchers("/").permitAll()
+                .requestMatchers("/**").permitAll() // HACK: make sure to disable this later and enable only specific pages
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)); // For H2 console
