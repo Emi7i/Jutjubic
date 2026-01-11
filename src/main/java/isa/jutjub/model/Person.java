@@ -4,23 +4,35 @@ import isa.jutjub.validation.CustomConstraint;
 
 import java.util.Date;
 import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
 
 public class Person {
     private int id;
 
     @NotNull
+    @Setter
+    @Getter
     private String name;
 
     @NotEmpty
+    @Setter
+    @Getter
     private String surname;
 
     @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+    @Setter
+    @Getter
     private String email;
 
     @CustomConstraint(message = "JMBG mora da sadrzi tacno 13 cifara")
+    @Setter
+    @Getter
     private String jmbg;
 
     @Min(value = 18)
+    @Setter
+    @Getter
     private int age;
 
     @Past     // proverava da li je datum u proslosti
@@ -34,61 +46,5 @@ public class Person {
         this.jmbg = jmbg;
         this.age = age;
         this.dateOfBirth = dateOfBirth;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setJmbg(String jmbg) {
-        this.jmbg = jmbg;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getJmbg() {
-        return jmbg;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
     }
 }
