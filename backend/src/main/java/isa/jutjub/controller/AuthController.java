@@ -30,7 +30,8 @@ public class AuthController {
             user.setName(registerRequest.getName());
             user.setSurname(registerRequest.getSurname());
             user.setAddress(registerRequest.getAddress());
-            
+
+            // TODO: make async
             boolean success = authService.registerUser(user);
             if (success) return ResponseEntity.ok("User registered successfully");
             else return ResponseEntity.status(500).body("Failed to save user");

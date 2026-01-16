@@ -34,8 +34,9 @@ public class SecurityConfig {
                 .requestMatchers("/error").permitAll()
                 // Public auth endpoints (login, register, activate)
                 .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/activate", "/api/auth/manual-activate").permitAll()
+                    .requestMatchers("/api/**").permitAll()
                 // Public video viewing endpoints
-                .requestMatchers(HttpMethod.GET, "/api/video-posts", "/api/video-posts/*", "/api/video-posts/*/video", "/api/video-posts/*/thumbnail", "/api/video-posts/search", "/api/video-posts/recent", "/api/video-posts/popular", "/api/video-posts/tag/*", "/api/video-posts/*/comments").permitAll()
+                //.requestMatchers(HttpMethod.GET, "/api/video-posts", "/api/video-posts/*", "/api/video-posts/*/video", "/api/video-posts/*/thumbnail", "/api/video-posts/search", "/api/video-posts/recent", "/api/video-posts/popular", "/api/video-posts/tag/*", "/api/video-posts/*/comments").permitAll()
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )

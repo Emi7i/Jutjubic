@@ -104,6 +104,8 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      */
     Page<VideoPost> findByVideoFileSizeBetween(Long minSize, Long maxSize, Pageable pageable);
 
+
+    // TODO: check if transaction is needed
     /**
      * Atomically increments the view count for a video post
      * This method is thread-safe and handles concurrent access correctly
