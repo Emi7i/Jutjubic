@@ -4,9 +4,11 @@ import isa.jutjub.model.VideoPost;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -101,4 +103,15 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      * @return page of video posts within file size range
      */
     Page<VideoPost> findByVideoFileSizeBetween(Long minSize, Long maxSize, Pageable pageable);
+
+    /**
+     * Atomically increments the view count for a video post
+     * This method is thread-safe and handles concurrent access correctly
+     * @param id the video post ID
+     * @return number of rows updated (should be 1 if successful)
+     */
+    @Modifying
+    @Transactional
+    @Query("UPDATE VideoPost vp SET vp.viewsCount = vp.viewsCount + 1 WHERE vp.id = :id")
+    int incrementViewsCount(@Param("id") Long id);
 }
