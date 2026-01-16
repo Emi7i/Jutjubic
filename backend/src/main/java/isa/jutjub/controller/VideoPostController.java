@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/api/video-posts")
@@ -352,6 +361,155 @@ public class VideoPostController {
     }
 
     /**
+     * Gets view count statistics for a video post
+     */
+    @Operation(summary = "Get view count statistics", description = "Get current view count and statistics for a video")
+    @GetMapping("/{id}/views")
+    public ResponseEntity<Map<String, Object>> getViewCount(@PathVariable Long id) {
+        try {
+            VideoPost videoPost = videoPostService.getVideoPostById(id);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("videoId", id);
+            response.put("title", videoPost.getTitle());
+            response.put("viewsCount", videoPost.getViewsCount());
+            response.put("lastAccessed", videoPost.getUpdatedAt());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (RuntimeException e) {
+            log.error("Failed to get view count for video post ID {}: {}", id, e.getMessage());
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+
+    /**
+     * Test endpoint to simulate concurrent view increments
+     */
+    @Operation(summary = "Test concurrent views", description = "Simulate concurrent access to test view counting")
+    @PostMapping("/{id}/simulate-views")
+    public ResponseEntity<Map<String, Object>> simulateConcurrentViews(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "10") int threads,
+            @RequestParam(defaultValue = "5") int viewsPerThread) {
+        
+        try {
+            VideoPost videoPost = videoPostService.getVideoPostById(id);
+            long initialViews = videoPost.getViewsCount();
+            
+            ExecutorService executorService = Executors.newFixedThreadPool(threads);
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+            AtomicInteger successfulIncrements = new AtomicInteger(0);
+            AtomicInteger failedIncrements = new AtomicInteger(0);
+            
+            long startTime = System.currentTimeMillis();
+            
+            // Simulate concurrent view increments
+            for (int i = 0; i < threads; i++) {
+                final int threadId = i;
+                
+                CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                    for (int j = 0; j < viewsPerThread; j++) {
+                        try {
+                            videoPostService.incrementViewCount(id);
+                            successfulIncrements.incrementAndGet();
+                            Thread.sleep(1); // Small delay
+                        } catch (Exception e) {
+                            failedIncrements.incrementAndGet();
+                            log.warn("Thread {} increment {} failed: {}", threadId, j, e.getMessage());
+                        }
+                    }
+                }, executorService);
+                
+                futures.add(future);
+            }
+            
+            // Wait for completion
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .get(30, TimeUnit.SECONDS);
+            
+            executorService.shutdown();
+            
+            long endTime = System.currentTimeMillis();
+            
+            // Get final view count
+            VideoPost updatedVideo = videoPostService.getVideoPostById(id);
+            long finalViews = updatedVideo.getViewsCount();
+            long expectedIncrement = (long) threads * viewsPerThread;
+            long actualIncrement = finalViews - initialViews;
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("videoId", id);
+            response.put("title", videoPost.getTitle());
+            response.put("testParameters", Map.of(
+                "threads", threads,
+                "viewsPerThread", viewsPerThread,
+                "totalExpectedIncrements", expectedIncrement
+            ));
+            response.put("results", Map.of(
+                "initialViews", initialViews,
+                "finalViews", finalViews,
+                "actualIncrement", actualIncrement,
+                "successfulIncrements", successfulIncrements.get(),
+                "failedIncrements", failedIncrements.get(),
+                "durationMs", endTime - startTime,
+                "testPassed", actualIncrement == expectedIncrement && failedIncrements.get() == 0
+            ));
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Failed to simulate concurrent views for video post ID {}: {}", id, e.getMessage(), e);
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Failed to simulate concurrent views: " + e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    /**
+     * Test endpoint to verify video file access
+     */
+    @GetMapping("/{id}/video-test")
+    public ResponseEntity<Map<String, Object>> testVideoAccess(@PathVariable Long id) {
+        try {
+            VideoPost videoPost = videoPostService.getVideoPostById(id);
+            Resource videoResource = videoPostService.getVideoFile(videoPost.getVideoPath());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("videoId", id);
+            response.put("videoPath", videoPost.getVideoPath());
+            response.put("resourceExists", videoResource.exists());
+            response.put("resourceReadable", videoResource.isReadable());
+            response.put("resourceFilename", videoResource.getFilename());
+            
+            try {
+                response.put("fileSize", videoResource.contentLength());
+            } catch (IOException e) {
+                response.put("fileSize", "Error: " + e.getMessage());
+            }
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
+    /**
      * Serves video files
      */
     @Operation(summary = "Serve video file", description = "Stream video file for playback")
@@ -364,9 +522,26 @@ public class VideoPostController {
             VideoPost videoPost = videoPostService.getVideoPostById(id);
             Resource videoResource = videoPostService.getVideoFile(videoPost.getVideoPath());
             
+            String contentType = "video/mp4";
+            String filename = videoResource.getFilename();
+            if (filename != null) {
+                if (filename.endsWith(".webm")) {
+                    contentType = "video/webm";
+                } else if (filename.endsWith(".ogg") || filename.endsWith(".ogv")) {
+                    contentType = "video/ogg";
+                } else if (filename.endsWith(".mov") || filename.endsWith(".qt")) {
+                    contentType = "video/quicktime";
+                } else if (filename.endsWith(".avi")) {
+                    contentType = "video/x-msvideo";
+                }
+            }
+            
             return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + videoPost.getTitle() + ".mp4\"")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+                    .header("Access-Control-Allow-Headers", "Range, Content-Type")
                     .body(videoResource);
             
         } catch (RuntimeException e) {
@@ -396,11 +571,89 @@ public class VideoPostController {
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_JPEG)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"thumbnail_" + id + ".jpg\"")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Methods", "GET")
+                    .header("Access-Control-Allow-Headers", "*")
                     .body(thumbnailResource);
             
         } catch (RuntimeException e) {
             log.error("Failed to serve thumbnail for post ID {}: {}", id, e.getMessage());
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * Gets comments for a video post
+     */
+    @Operation(summary = "Get video comments", description = "Retrieve all comments for a video post")
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<Map<String, Object>> getVideoComments(
+            @Parameter(description = "Video post ID", required = true)
+            @PathVariable Long id) {
+        
+        try {
+            // TODO: Implement actual comments retrieval from database
+            // For now, return empty list
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", new Object[0]); // Empty array for now
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Failed to retrieve comments for video post ID {}: {}", id, e.getMessage());
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Failed to retrieve comments: " + e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    /**
+     * Adds a comment to a video post
+     */
+    @Operation(summary = "Add comment", description = "Add a new comment to a video post")
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<Map<String, Object>> addVideoComment(
+            @Parameter(description = "Video post ID", required = true)
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
+        
+        try {
+            String text = request.get("text");
+            if (text == null || text.trim().isEmpty()) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("message", "Comment text is required");
+                return ResponseEntity.badRequest().body(error);
+            }
+            
+            // TODO: Implement actual comment creation in database
+            // For now, return a mock comment
+            Map<String, Object> comment = new HashMap<>();
+            comment.put("id", System.currentTimeMillis());
+            comment.put("videoId", id);
+            comment.put("userId", "1");
+            comment.put("userName", "Anonymous User");
+            comment.put("text", text.trim());
+            comment.put("createdAt", java.time.LocalDateTime.now());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", comment);
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            
+        } catch (Exception e) {
+            log.error("Failed to add comment to video post ID {}: {}", id, e.getMessage());
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Failed to add comment: " + e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 }
