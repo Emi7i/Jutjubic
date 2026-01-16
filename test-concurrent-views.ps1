@@ -118,8 +118,8 @@ function Run-Test {
     $results = $jobs | Wait-Job | Receive-Job
     
     # Aggregate results
-    $totalSuccessful = ($results | Measure-Object -Property Successful -Sum).Sum
-    $totalFailed = ($results | Measure-Object -Property Failed -Sum).Sum
+    $totalSuccessful = ($results | ForEach-Object { $_.Successful } | Measure-Object -Sum).Sum
+    $totalFailed = ($results | ForEach-Object { $_.Failed } | Measure-Object -Sum).Sum
     
     # Clean up jobs
     $jobs | Remove-Job
