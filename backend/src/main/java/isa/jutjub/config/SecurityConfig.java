@@ -9,8 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
@@ -31,8 +29,12 @@ public class SecurityConfig {
                 .requestMatchers("/", "/assets/**", "/static/**", "/favicon.ico", "/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // H2 Console for development
                 .requestMatchers("/h2-console/**").permitAll()
-                // REST API endpoints for Angular
-                .requestMatchers("/api/**").permitAll()
+                // Error endpoint
+                .requestMatchers("/error").permitAll()
+                // Public auth endpoints
+                .requestMatchers("/api/auth/**").permitAll()
+                // Public video endpoints (for viewing)
+                .requestMatchers("/api/video-posts/**").permitAll()
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)); // For H2 console

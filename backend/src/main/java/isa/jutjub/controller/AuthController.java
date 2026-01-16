@@ -1,7 +1,9 @@
 package isa.jutjub.controller;
 
+import isa.jutjub.dto.RegisterRequest;
 import isa.jutjub.model.User;
 import isa.jutjub.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
@@ -18,8 +20,17 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest registerRequest) {
         try {
+            // Convert RegisterRequest to User
+            User user = new User();
+            user.setUsername(registerRequest.getUsername());
+            user.setEmail(registerRequest.getEmail());
+            user.setPassword(registerRequest.getPassword());
+            user.setName(registerRequest.getName());
+            user.setSurname(registerRequest.getSurname());
+            user.setAddress(registerRequest.getAddress());
+            
             boolean success = authService.registerUser(user);
             if (success) return ResponseEntity.ok("User registered successfully");
             else return ResponseEntity.status(500).body("Failed to save user");
@@ -52,6 +63,20 @@ public class AuthController {
             return ResponseEntity.ok("Account activated successfully. You can now log in.");
         } else {
             return ResponseEntity.badRequest().body("Invalid or expired activation token.");
+        }
+    }
+
+    @PostMapping("/manual-activate")
+    public ResponseEntity<String> manualActivate(@RequestParam String username) {
+        try {
+            boolean activated = authService.manualActivateUser(username);
+            if (activated) {
+                return ResponseEntity.ok("Account activated successfully for user: " + username);
+            } else {
+                return ResponseEntity.badRequest().body("User not found: " + username);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to activate user: " + e.getMessage());
         }
     }
 }
