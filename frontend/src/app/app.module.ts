@@ -15,6 +15,7 @@ import { HomeComponent } from './components/home/home.component';
 import { VideoUploadComponent } from './components/video-upload/video-upload.component';
 import { VideoListComponent } from './components/video-list/video-list.component';
 import { VideoDetailComponent } from './components/video-detail/video-detail.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
 import { VideoService } from './services/video.service';
 import { RegisterFormComponent } from './components/register-form/register-form.component';
 import { RegisterComponent } from './pages/register/register.component';
@@ -30,6 +31,7 @@ import { ActivateComponent } from './pages/activate/activate.component';
     VideoUploadComponent,
     VideoListComponent,
     VideoDetailComponent,
+    NavbarComponent,
     RegisterFormComponent,
     RegisterComponent,
     LoginFormComponent,

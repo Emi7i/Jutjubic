@@ -3,7 +3,7 @@
 
   <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
 
-    <div>
+    <div class="form-group">
       <label for="title">Title *</label>
       <input type="text" id="title" formControlName="title">
       <small *ngIf="uploadForm.get('title')?.invalid && uploadForm.get('title')?.touched">
@@ -11,7 +11,7 @@
       </small>
     </div>
 
-    <div>
+    <div class="form-group">
       <label for="description">Description *</label>
       <textarea id="description" formControlName="description" rows="4"></textarea>
       <small *ngIf="uploadForm.get('description')?.invalid && uploadForm.get('description')?.touched">
@@ -19,44 +19,64 @@
       </small>
     </div>
 
-    <div>
+    <div class="form-group">
       <label>Tags *</label>
-      <input type="text" [(ngModel)]="tagInput" [ngModelOptions]="{standalone: true}"
-             (keyup.enter)="addTag()" placeholder="Press Enter to add">
-      <div *ngIf="tags.length > 0">
-        <span *ngFor="let tag of tags" style="margin: 5px; display: inline-block;">
-          {{ tag }} <button type="button" (click)="removeTag(tag)">×</button>
-        </span>
+      <div class="tags-input-container">
+        <input type="text" [(ngModel)]="tagInput" [ngModelOptions]="{standalone: true}"
+               (keyup.enter)="addTag()" placeholder="Press Enter to add">
+        <div class="tags-display" *ngIf="tags.length > 0">
+          <span *ngFor="let tag of tags" class="tag">
+            {{ tag }} <button type="button" (click)="removeTag(tag)">×</button>
+          </span>
+        </div>
       </div>
     </div>
 
-    <div>
+    <div class="form-group">
       <label for="thumbnail">Thumbnail *</label>
-      <input type="file" id="thumbnail" accept="image/*" (change)="onThumbnailSelected($event)">
-      <img *ngIf="thumbnailPreview" [src]="thumbnailPreview" style="max-width: 200px; margin-top: 10px;">
+      <div class="file-input-wrapper">
+        <input type="file" id="thumbnail" accept="image/*" (change)="onThumbnailSelected($event)">
+        <label for="thumbnail" class="file-input-label" [class.has-file]="thumbnailPreview">
+          <div *ngIf="!thumbnailPreview">
+            <div>📷 Click to upload thumbnail</div>
+            <small>JPG, PNG, GIF (Max 5MB)</small>
+          </div>
+          <img *ngIf="thumbnailPreview" [src]="thumbnailPreview" class="thumbnail-preview" alt="Thumbnail preview">
+        </label>
+      </div>
     </div>
 
-    <div>
+    <div class="form-group">
       <label for="video">Video (MP4, max 200MB) *</label>
-      <input type="file" id="video" accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo" (change)="onVideoSelected($event)">
-      <video *ngIf="videoPreview" [src]="videoPreview" controls style="max-width: 400px; margin-top: 10px;"></video>
+      <div class="file-input-wrapper">
+        <input type="file" id="video" accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo" (change)="onVideoSelected($event)">
+        <label for="video" class="file-input-label" [class.has-file]="videoPreview">
+          <div *ngIf="!videoPreview">
+            <div>🎬 Click to upload video</div>
+            <small>MP4, WebM, OGG (Max 200MB)</small>
+          </div>
+          <video *ngIf="videoPreview" [src]="videoPreview" controls class="video-preview"></video>
+        </label>
+      </div>
     </div>
 
-    <div>
-      <label>
-        <input type="checkbox" [(ngModel)]="useLocation" [ngModelOptions]="{standalone: true}" (change)="toggleLocation()">
-        Add location (optional)
-      </label>
-      <div *ngIf="currentLocation">
+    <div class="form-group">
+      <div class="checkbox-group">
+        <input type="checkbox" [(ngModel)]="useLocation" [ngModelOptions]="{standalone: true}" (change)="toggleLocation()" id="location">
+        <label for="location">Add location (optional)</label>
+      </div>
+      <div class="location-info" *ngIf="currentLocation">
         Location: {{ currentLocation.address || (currentLocation.latitude + ', ' + currentLocation.longitude) }}
       </div>
     </div>
 
-    <div *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</div>
+    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-    <div *ngIf="uploadProgress">
-      <p>{{ uploadProgress.message }} - {{ uploadProgress.percentage }}%</p>
-      <progress [value]="uploadProgress.percentage" max="100"></progress>
+    <div class="progress-container" *ngIf="uploadProgress">
+      <div>{{ uploadProgress.message }} - {{ uploadProgress.percentage }}%</div>
+      <div class="progress-bar">
+        <progress [value]="uploadProgress.percentage" max="100"></progress>
+      </div>
     </div>
 
     <!-- Success Toast Message -->
@@ -68,9 +88,11 @@
       </div>
     </div>
 
-    <button type="submit" [disabled]="isUploading || uploadForm.invalid">
-      {{ isUploading ? 'Uploading...' : 'Upload Video' }}
-    </button>
-    <button type="button" (click)="resetForm()" [disabled]="isUploading">Reset</button>
+    <div class="button-group">
+      <button type="submit" class="btn btn-primary" [disabled]="isUploading || uploadForm.invalid">
+        {{ isUploading ? 'Uploading...' : 'Upload Video' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="isUploading">Reset</button>
+    </div>
   </form>
 </div>

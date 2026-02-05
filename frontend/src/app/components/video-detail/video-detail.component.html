@@ -1,55 +1,61 @@
 <div class="container">
-  <button (click)="goBack()">← Back to Videos</button>
+  <button class="back-btn" (click)="goBack()">← Back to Videos</button>
 
-  <div *ngIf="loading">Loading...</div>
-  <div *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</div>
+  <div *ngIf="loading" class="loading-state">Loading video details...</div>
 
   <div *ngIf="video">
-    <h2>{{ video.title }}</h2>
-
-    <video [src]="video.videoUrl" controls style="max-width: 100%; margin: 20px 0;"></video>
-
-    <p>{{ video.description }}</p>
-
-    <div>
-      <span *ngFor="let tag of video.tags" class="tag">{{ tag }}</span>
+    <div class="video-player-wrapper">
+      <video [src]="video.videoUrl" controls style="width: 100%; display: block;"></video>
     </div>
 
-    <p>
-      <small>By {{ video.userName }} - {{ video.createdAt | date }}</small>
-    </p>
+    <div class="video-content">
+      <h2>{{ video.title }}</h2>
 
-    <div>
-      <small>{{ video.viewsCount }} views</small>
-    </div>
+      <div class="video-meta-top">
+        <div class="stats-row">
+          <span><strong>{{ video.viewsCount }}</strong> views</span>
+          <span>Uploaded {{ video.createdAt | date:'mediumDate' }}</span>
+          <span *ngIf="video.location"> {{ video.location.address || 'Location tagged' }}</span>
+        </div>
+        <div class="author-info">
+          By <strong>{{ video.userName }}</strong>
+        </div>
+      </div>
 
-    <div *ngIf="video.location">
-      <small>{{ video.location.address || (video.location.latitude + ', ' + video.location.longitude) }}</small>
-    </div>
+      <p class="video-description">{{ video.description }}</p>
 
-    <div>
-      <button (click)="toggleLike()">
-        {{ video.isLiked ? '♥' : '♡' }} {{ video.likes }} Likes
-      </button>
-    </div>
+      <div class="tags-list">
+        <span *ngFor="let tag of video.tags" class="tag">#{{ tag }}</span>
+      </div>
 
-    <hr>
+      <div class="interaction-bar">
+        <button class="btn-like" [class.liked]="video.isLiked" (click)="toggleLike()">
+          {{ video.isLiked ? '❤️' : '🤍' }} {{ video.likes }} Likes
+        </button>
+      </div>
 
-    <h3>Comments ({{ video.commentsCount }})</h3>
+      <section class="comments-section">
+        <h3>Comments ({{ video.commentsCount }})</h3>
 
-    <div>
-      <textarea [(ngModel)]="newComment" rows="3" placeholder="Add a comment..."></textarea>
-      <button (click)="addComment()" [disabled]="!newComment.trim()">Post Comment</button>
-    </div>
+        <div class="comment-input-group">
+          <textarea [(ngModel)]="newComment" rows="3" placeholder="Write a respectful comment..."></textarea>
+          <button class="btn-primary" (click)="addComment()" [disabled]="!newComment.trim()">
+            Post Comment
+          </button>
+        </div>
 
-    <div *ngFor="let comment of comments" class="comment">
-      <strong>{{ comment.userName }}</strong>
-      <small>{{ comment.createdAt | date:'short' }}</small>
-      <p>{{ comment.text }}</p>
-    </div>
+        <div *ngFor="let comment of comments" class="comment-card">
+          <div class="comment-header">
+            <span class="comment-user">{{ comment.userName }}</span>
+            <span class="comment-date">{{ comment.createdAt | date:'short' }}</span>
+          </div>
+          <p>{{ comment.text }}</p>
+        </div>
 
-    <div *ngIf="comments.length === 0">
-      <p>No comments yet. Be the first to comment!</p>
+        <div *ngIf="comments.length === 0" class="empty-comments">
+          <p>No comments yet. Be the first to start the conversation!</p>
+        </div>
+      </section>
     </div>
   </div>
 </div>

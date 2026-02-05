@@ -1,0 +1,33 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo -->
+    <div class="navbar-brand">
+      <a routerLink="/" class="brand-link">
+        <span class="brand-text">Jutjubić</span>
+      </a>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <div class="navbar-menu desktop-only">
+      <a routerLink="/" class="nav-link" (click)="closeMenu()">Home</a>
+      <a routerLink="/videos" class="nav-link" (click)="closeMenu()">Videos</a>
+      <a routerLink="/upload" class="nav-link" (click)="closeMenu()">Upload</a>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn mobile-only" (click)="toggleMenu()" [class.active]="isMenuOpen">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu mobile-only" [class.open]="isMenuOpen">
+    <div class="mobile-menu-content">
+      <a routerLink="/" class="mobile-nav-link" (click)="closeMenu()">Home</a>
+      <a routerLink="/videos" class="mobile-nav-link" (click)="closeMenu()">Videos</a>
+      <a routerLink="/upload" class="mobile-nav-link" (click)="closeMenu()">Upload</a>
+    </div>
+  </div>
+</nav>
