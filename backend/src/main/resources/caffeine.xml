@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xmlns='http://www.ehcache.org/v3'
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd">
+
+    <!-- Default cache template for entities -->
+    <cache-template name="default-entity-cache">
+        <expiry>
+            <ttl unit="minutes">5</ttl>
+        </expiry>
+        <heap unit="entries">1000</heap>
+    </cache-template>
+
+    <!-- Default cache template for query results -->
+    <cache-template name="default-query-cache">
+        <expiry>
+            <ttl unit="minutes">3</ttl>
+        </expiry>
+        <heap unit="entries">500</heap>
+    </cache-template>
+
+    <!-- VideoPost entity cache -->
+    <cache alias="isa.jutjub.model.VideoPost" uses-template="default-entity-cache">
+        <expiry>
+            <ttl unit="minutes">5</ttl>
+        </expiry>
+        <heap unit="entries">1000</heap>
+    </cache>
+
+    <!-- User entity cache -->
+    <cache alias="isa.jutjub.model.User" uses-template="default-entity-cache">
+        <expiry>
+            <ttl unit="minutes">10</ttl>
+        </expiry>
+        <heap unit="entries">500</heap>
+    </cache>
+
+    <!-- Query results cache -->
+    <cache alias="default-query-results-region" uses-template="default-query-cache"/>
+
+    <!-- Update timestamps cache (required by Hibernate) -->
+    <cache alias="default-update-timestamps-region">
+        <expiry>
+            <none/>
+        </expiry>
+        <heap unit="entries">5000</heap>
+    </cache>
+
+</config>

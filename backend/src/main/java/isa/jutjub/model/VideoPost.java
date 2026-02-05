@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -14,6 +16,8 @@ import java.util.Set;
 @Table(name = "video_posts")
 @Getter
 @Setter
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "isa.jutjub.model.VideoPost")
 public class VideoPost extends BaseEntity {
 
     @NotBlank(message = "Title is required")
@@ -29,6 +33,7 @@ public class VideoPost extends BaseEntity {
     @ElementCollection
     @CollectionTable(name = "video_post_tags", joinColumns = @JoinColumn(name = "video_post_id"))
     @Column(name = "tag")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<String> tags = new HashSet<>();
 
     @Column(name = "thumbnail_path")

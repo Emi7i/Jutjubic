@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Configuration
@@ -25,9 +27,15 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initData(VideoPostRepository videoPostRepository, UserRepository userRepository) {
         return args -> {
+            long videoCount = videoPostRepository.count();
+            System.out.println("Current video post count: " + videoCount);
+            
             // Check if data already exists
-            if (videoPostRepository.count() == 0) {
+            if (videoCount == 0) {
+                System.out.println("Creating sample videos...");
                 createSampleVideos(videoPostRepository);
+            } else {
+                System.out.println("Video posts already exist, skipping sample data creation");
             }
             
             // Always create admin user for H2 in-memory database
@@ -42,25 +50,28 @@ public class DataInitializer {
         admin.setPassword(passwordEncoder.encode("admin123"));
         admin.setRole("ADMIN");
         admin.setActive(true);
-        
+
         userRepository.save(admin);
         System.out.println("Admin user created: admin / admin123");
     }
 
     private void createSampleVideos(VideoPostRepository repository) {
-        // Sample Video 1
+        try {
+            System.out.println("Starting sample video creation...");
+            
+            // Sample Video 1
         VideoPost video1 = new VideoPost();
         video1.setTitle("Amazing Nature Documentary");
         video1.setVideoDescription("Explore the breathtaking beauty of nature in this stunning documentary. From majestic mountains to serene oceans, witness the wonders of our planet.");
-        video1.setVideoPath("/videos/nature_documentary.mp4");
-        video1.setThumbnailPath("/thumbnails/nature_thumb.jpg");
+        video1.setVideoPath("./uploads/videos/video_20260205_190754_09b0261e.mp4");
+        video1.setThumbnailPath("./uploads/thumbnails/nature_thumb.jpg");
         video1.setVideoFileSize(102400000L); // ~100MB
         video1.setUploadDurationMs(5000L);
         video1.setLocation("Yellowstone National Park, Wyoming");
         video1.setLikesCount(1250L);
         video1.setCommentsCount(89L);
         video1.setViewsCount(5432L);
-        
+
         Set<String> tags1 = new HashSet<>();
         tags1.add("nature");
         tags1.add("documentary");
@@ -80,7 +91,7 @@ public class DataInitializer {
         video2.setLikesCount(892L);
         video2.setCommentsCount(156L);
         video2.setViewsCount(3210L);
-        
+
         Set<String> tags2 = new HashSet<>();
         tags2.add("cooking");
         tags2.add("italian");
@@ -100,7 +111,7 @@ public class DataInitializer {
         video3.setLikesCount(2103L);
         video3.setCommentsCount(234L);
         video3.setViewsCount(8765L);
-        
+
         Set<String> tags3 = new HashSet<>();
         tags3.add("technology");
         tags3.add("smartphone");
@@ -120,7 +131,7 @@ public class DataInitializer {
         video4.setLikesCount(567L);
         video4.setCommentsCount(78L);
         video4.setViewsCount(2341L);
-        
+
         Set<String> tags4 = new HashSet<>();
         tags4.add("yoga");
         tags4.add("fitness");
@@ -140,7 +151,7 @@ public class DataInitializer {
         video5.setLikesCount(1834L);
         video5.setCommentsCount(198L);
         video5.setViewsCount(6543L);
-        
+
         Set<String> tags5 = new HashSet<>();
         tags5.add("urban");
         tags5.add("exploration");
@@ -149,12 +160,16 @@ public class DataInitializer {
         video5.setTags(tags5);
 
         // Save all videos
-        repository.save(video1);
-        repository.save(video2);
-        repository.save(video3);
-        repository.save(video4);
-        repository.save(video5);
+            repository.save(video1);
+            repository.save(video2);
+            repository.save(video3);
+            repository.save(video4);
+            repository.save(video5);
 
-        System.out.println("Sample video data has been initialized!");
+            System.out.println("Sample video data has been initialized!");
+        } catch (Exception e) {
+            System.err.println("Error creating sample videos: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
