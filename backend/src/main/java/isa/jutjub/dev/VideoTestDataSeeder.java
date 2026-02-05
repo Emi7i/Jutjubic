@@ -46,10 +46,9 @@ public class VideoTestDataSeeder implements CommandLineRunner {
 
             if (savedPost.hasValidCoordinates()) {
                 try {
-                    log.info("Auto-adding video {} to tiles based on coordinates: {}",
-                            savedPost.getId(), savedPost.getLocation());
+                    //log.info("Auto-adding video {} to tiles based on coordinates: {}", savedPost.getId(), savedPost.getLocation());
                     tileService.addVideoToTile(savedPost);
-                    log.info("Successfully added video {} to tiles", savedPost.getId());
+                    //log.info("Successfully added video {} to tiles", savedPost.getId());
                 } catch (Exception e) {
                     log.warn("Failed to auto-add video {} to tiles: {}", savedPost.getId(), e.getMessage());
                     // Don't fail the video creation if tile assignment fails
