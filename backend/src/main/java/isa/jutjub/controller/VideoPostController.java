@@ -35,6 +35,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 @RestController
 @RequestMapping("/api/video-posts")
@@ -93,9 +96,9 @@ public class VideoPostController {
     }
 
     /**
-     * Gets all video posts with pagination
+     * Gets all video posts with pagination and optional date filtering
      */
-    @Operation(summary = "Get all video posts", description = "Retrieve paginated list of video posts")
+    @Operation(summary = "Get all video posts", description = "Retrieve paginated list of video posts with optional date filtering")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Video posts retrieved successfully"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -112,14 +115,60 @@ public class VideoPostController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             
             @Parameter(description = "Sort direction") 
-            @RequestParam(defaultValue = "desc") String sortDir) {
+            @RequestParam(defaultValue = "desc") String sortDir,
+            
+            @Parameter(description = "From date (ISO format: YYYY-MM-DDTHH:mm:ss.sssZ)") 
+            @RequestParam(required = false) String from,
+            
+            @Parameter(description = "To date (ISO format: YYYY-MM-DDTHH:mm:ss.sssZ)") 
+            @RequestParam(required = false) String to) {
         
         try {
             Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? 
                 Sort.Direction.DESC : Sort.Direction.ASC;
             Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
             
-            Page<VideoPost> videoPosts = videoPostService.getAllVideoPosts(pageable);
+            Page<VideoPost> videoPosts;
+            
+            // Handle date filtering if parameters are provided
+            if (from != null || to != null) {
+                LocalDateTime fromDate = null;
+                LocalDateTime toDate = null;
+                
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+                
+                if (from != null && !from.trim().isEmpty()) {
+                    try {
+                        fromDate = LocalDateTime.parse(from, formatter);
+                    } catch (DateTimeParseException e) {
+                        Map<String, Object> error = new HashMap<>();
+                        error.put("success", false);
+                        error.put("message", "Invalid 'from' date format. Use: YYYY-MM-DDTHH:mm:ss.sssZ");
+                        return ResponseEntity.badRequest().body(error);
+                    }
+                }
+                
+                if (to != null && !to.trim().isEmpty()) {
+                    try {
+                        toDate = LocalDateTime.parse(to, formatter);
+                    } catch (DateTimeParseException e) {
+                        Map<String, Object> error = new HashMap<>();
+                        error.put("success", false);
+                        error.put("message", "Invalid 'to' date format. Use: YYYY-MM-DDTHH:mm:ss.sssZ");
+                        return ResponseEntity.badRequest().body(error);
+                    }
+                }
+                
+                if (fromDate != null && toDate != null) {
+                    videoPosts = videoPostService.getVideoPostsByDateRange(fromDate, toDate, pageable);
+                } else if (fromDate != null) {
+                    videoPosts = videoPostService.getVideoPostsAfterDate(fromDate, pageable);
+                } else {
+                    videoPosts = videoPostService.getVideoPostsBeforeDate(toDate, pageable);
+                }
+            } else {
+                videoPosts = videoPostService.getAllVideoPosts(pageable);
+            }
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -128,6 +177,18 @@ public class VideoPostController {
             response.put("totalItems", videoPosts.getTotalElements());
             response.put("totalPages", videoPosts.getTotalPages());
             response.put("pageSize", videoPosts.getSize());
+            
+            // Add filter info if date filtering is applied
+            if (from != null || to != null) {
+                Map<String, Object> filterInfo = new HashMap<>();
+                if (from != null) {
+                    filterInfo.put("from", from);
+                }
+                if (to != null) {
+                    filterInfo.put("to", to);
+                }
+                response.put("filter", filterInfo);
+            }
             
             return ResponseEntity.ok(response);
             

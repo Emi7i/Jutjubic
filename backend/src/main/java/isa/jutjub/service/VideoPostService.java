@@ -270,6 +270,46 @@ public class VideoPostService {
     }
 
     /**
+     * Gets video posts created after specified date
+     * @param fromDate date to search from
+     * @param pageable pagination information
+     * @return page of video posts created after specified date
+     */
+    @Transactional(readOnly = true)
+    @Cacheable(value = "videoPostsAfterDate", key = "#fromDate + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    public Page<VideoPost> getVideoPostsAfterDate(LocalDateTime fromDate, Pageable pageable) {
+        log.debug("Fetching video posts after date '{}': page {}, size {}", fromDate, pageable.getPageNumber(), pageable.getPageSize());
+        return videoPostRepository.findByCreatedAtAfter(fromDate, pageable);
+    }
+
+    /**
+     * Gets video posts created before specified date
+     * @param toDate date to search until
+     * @param pageable pagination information
+     * @return page of video posts created before specified date
+     */
+    @Transactional(readOnly = true)
+    @Cacheable(value = "videoPostsBeforeDate", key = "#toDate + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    public Page<VideoPost> getVideoPostsBeforeDate(LocalDateTime toDate, Pageable pageable) {
+        log.debug("Fetching video posts before date '{}': page {}, size {}", toDate, pageable.getPageNumber(), pageable.getPageSize());
+        return videoPostRepository.findByCreatedAtBefore(toDate, pageable);
+    }
+
+    /**
+     * Gets video posts created within date range
+     * @param fromDate start date
+     * @param toDate end date
+     * @param pageable pagination information
+     * @return page of video posts created within date range
+     */
+    @Transactional(readOnly = true)
+    @Cacheable(value = "videoPostsDateRange", key = "#fromDate + '-' + #toDate + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    public Page<VideoPost> getVideoPostsByDateRange(LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable) {
+        log.debug("Fetching video posts between dates '{}' and '{}': page {}, size {}", fromDate, toDate, pageable.getPageNumber(), pageable.getPageSize());
+        return videoPostRepository.findByCreatedAtBetween(fromDate, toDate, pageable);
+    }
+
+    /**
      * Increments the view count for a video post in a thread-safe manner
      * Uses atomic update to handle concurrent access correctly
      * @param id the video post ID

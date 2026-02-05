@@ -4308,3 +4308,455 @@ java.lang.RuntimeException: Video file not found: /videos/italian_pasta.mp4
 2026-02-05 23:08:21.121 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [tile_videos], timestamp: 7251268817391620
 2026-02-05 23:08:21.121 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251268817391620
 2026-02-05 23:08:21.121 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251268817391620
+2026-02-05 23:14:13.199 [Thread-12] INFO  i.j.service.ThumbnailCacheService - Shutting down ThumbnailCacheService...
+2026-02-05 23:14:13.199 [Thread-12] INFO  i.jutjub.service.FileUploadService - Shutting down FileUploadService...
+2026-02-05 23:14:13.666 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:14:13.667 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:14:13.667 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000025: Second-level cache region factory [org.hibernate.cache.jcache.internal.JCacheRegionFactory]
+2026-02-05 23:14:13.698 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.User]
+2026-02-05 23:14:13.698 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.Tile.videos]
+2026-02-05 23:14:13.698 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.Tile]
+2026-02-05 23:14:13.699 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.VideoPost]
+2026-02-05 23:14:13.699 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.VideoPost.tags]
+2026-02-05 23:14:13.789 [restartedMain] DEBUG o.h.s.internal.StatisticsInitiator - Statistics initialized [enabled=true]
+2026-02-05 23:14:14.863 [restartedMain] DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: select count(*) from VideoPost x, time: 0ms, rows: 1
+2026-02-05 23:14:14.867 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251270512095232
+2026-02-05 23:14:14.868 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#1` (timeout=7251270512099328, version=null)
+2026-02-05 23:14:14.868 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:14:14.868 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251270512099329
+2026-02-05 23:14:14.868 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:14:14.868 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251270266339331
+2026-02-05 23:14:14.868 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251270266339331
+2026-02-05 23:14:14.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251270512103424
+2026-02-05 23:14:14.869 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#2` (timeout=7251270512103425, version=null)
+2026-02-05 23:14:14.869 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:14:14.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251270512103426
+2026-02-05 23:14:14.869 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:14:14.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251270266343428
+2026-02-05 23:14:14.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251270266343428
+2026-02-05 23:14:14.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251270512111616
+2026-02-05 23:14:14.871 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#3` (timeout=7251270512111617, version=null)
+2026-02-05 23:14:14.871 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:14:14.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251270512111618
+2026-02-05 23:14:14.871 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:14:14.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251270266351620
+2026-02-05 23:14:14.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251270266351620
+2026-02-05 23:14:14.872 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251270512115712
+2026-02-05 23:14:14.872 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#4` (timeout=7251270512115713, version=null)
+2026-02-05 23:14:14.872 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:14:14.872 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251270512115714
+2026-02-05 23:14:14.872 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:14:14.872 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251270266355716
+2026-02-05 23:14:14.872 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251270266355716
+2026-02-05 23:14:14.873 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251270512119809
+2026-02-05 23:14:14.873 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#5` (timeout=7251270512119810, version=null)
+2026-02-05 23:14:14.873 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:14:14.874 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251270512123904
+2026-02-05 23:14:14.874 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:14:14.874 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251270266363906
+2026-02-05 23:14:14.874 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251270266363906
+2026-02-05 23:14:14.934 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [users], timestamp: 7251270512369664
+2026-02-05 23:14:14.934 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [users], timestamp: 7251270266609665
+2026-02-05 23:14:16.484 [Thread-16] INFO  i.j.service.ThumbnailCacheService - Shutting down ThumbnailCacheService...
+2026-02-05 23:14:16.484 [Thread-16] INFO  i.jutjub.service.FileUploadService - Shutting down FileUploadService...
+2026-02-05 23:14:16.902 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:14:16.902 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:14:16.902 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000025: Second-level cache region factory [org.hibernate.cache.jcache.internal.JCacheRegionFactory]
+2026-02-05 23:14:16.932 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.VideoPost.tags]
+2026-02-05 23:14:16.932 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.Tile]
+2026-02-05 23:14:16.932 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.User]
+2026-02-05 23:14:16.933 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.VideoPost]
+2026-02-05 23:14:16.933 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.Tile.videos]
+2026-02-05 23:14:17.019 [restartedMain] DEBUG o.h.s.internal.StatisticsInitiator - Statistics initialized [enabled=true]
+2026-02-05 23:14:17.842 [restartedMain] DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: select count(*) from VideoPost x, time: 0ms, rows: 1
+2026-02-05 23:14:17.845 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251270524293120
+2026-02-05 23:14:17.845 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#1` (timeout=7251270524293121, version=null)
+2026-02-05 23:14:17.845 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:14:17.845 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251270524293122
+2026-02-05 23:14:17.845 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:14:17.846 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251270278537217
+2026-02-05 23:14:17.846 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251270278537217
+2026-02-05 23:14:17.847 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251270524301312
+2026-02-05 23:14:17.847 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#2` (timeout=7251270524301313, version=null)
+2026-02-05 23:14:17.847 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:14:17.847 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251270524301314
+2026-02-05 23:14:17.847 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:14:17.847 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251270278541316
+2026-02-05 23:14:17.847 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251270278541316
+2026-02-05 23:14:17.848 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251270524305409
+2026-02-05 23:14:17.848 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#3` (timeout=7251270524305410, version=null)
+2026-02-05 23:14:17.848 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:14:17.848 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251270524305411
+2026-02-05 23:14:17.848 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:14:17.848 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251270278545413
+2026-02-05 23:14:17.848 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251270278545413
+2026-02-05 23:14:17.849 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251270524309504
+2026-02-05 23:14:17.849 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#4` (timeout=7251270524309505, version=null)
+2026-02-05 23:14:17.849 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:14:17.849 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251270524309506
+2026-02-05 23:14:17.850 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:14:17.850 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251270278553601
+2026-02-05 23:14:17.850 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251270278553601
+2026-02-05 23:14:17.851 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251270524317696
+2026-02-05 23:14:17.851 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#5` (timeout=7251270524317697, version=null)
+2026-02-05 23:14:17.851 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:14:17.851 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251270524317698
+2026-02-05 23:14:17.851 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:14:17.851 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251270278557700
+2026-02-05 23:14:17.851 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251270278557700
+2026-02-05 23:14:17.906 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [users], timestamp: 7251270524542978
+2026-02-05 23:14:17.907 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [users], timestamp: 7251270278787072
+2026-02-05 23:21:43.139 [Thread-20] INFO  i.j.service.ThumbnailCacheService - Shutting down ThumbnailCacheService...
+2026-02-05 23:21:43.139 [Thread-20] INFO  i.jutjub.service.FileUploadService - Shutting down FileUploadService...
+2026-02-05 23:21:43.741 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:21:43.741 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:21:43.741 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000025: Second-level cache region factory [org.hibernate.cache.jcache.internal.JCacheRegionFactory]
+2026-02-05 23:21:43.777 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.Tile]
+2026-02-05 23:21:43.777 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.VideoPost]
+2026-02-05 23:21:43.778 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.User]
+2026-02-05 23:21:43.778 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.Tile.videos]
+2026-02-05 23:21:43.778 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.VideoPost.tags]
+2026-02-05 23:21:43.893 [restartedMain] DEBUG o.h.s.internal.StatisticsInitiator - Statistics initialized [enabled=true]
+2026-02-05 23:21:44.863 [restartedMain] DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: select count(*) from VideoPost x, time: 0ms, rows: 1
+2026-02-05 23:21:44.866 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251272355291136
+2026-02-05 23:21:44.866 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#1` (timeout=7251272355291137, version=null)
+2026-02-05 23:21:44.867 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:21:44.867 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251272355295232
+2026-02-05 23:21:44.867 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:21:44.868 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251272109539329
+2026-02-05 23:21:44.868 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251272109539329
+2026-02-05 23:21:44.868 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251272355299332
+2026-02-05 23:21:44.868 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#2` (timeout=7251272355299333, version=null)
+2026-02-05 23:21:44.869 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:21:44.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251272355303424
+2026-02-05 23:21:44.869 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:21:44.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251272109543426
+2026-02-05 23:21:44.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251272109543426
+2026-02-05 23:21:44.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251272355303429
+2026-02-05 23:21:44.869 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#3` (timeout=7251272355303430, version=null)
+2026-02-05 23:21:44.870 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:21:44.870 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251272355307520
+2026-02-05 23:21:44.870 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:21:44.870 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251272109547522
+2026-02-05 23:21:44.870 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251272109547522
+2026-02-05 23:21:44.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251272355311616
+2026-02-05 23:21:44.871 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#4` (timeout=7251272355311617, version=null)
+2026-02-05 23:21:44.871 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:21:44.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251272355311618
+2026-02-05 23:21:44.871 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:21:44.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251272109551620
+2026-02-05 23:21:44.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251272109551620
+2026-02-05 23:21:44.872 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251272355315712
+2026-02-05 23:21:44.872 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#5` (timeout=7251272355315713, version=null)
+2026-02-05 23:21:44.872 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:21:44.872 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251272355315714
+2026-02-05 23:21:44.872 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:21:44.873 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251272109555716
+2026-02-05 23:21:44.873 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251272109555716
+2026-02-05 23:21:44.930 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [users], timestamp: 7251272355553280
+2026-02-05 23:21:44.930 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [users], timestamp: 7251272109793281
+2026-02-05 23:21:46.520 [Thread-24] INFO  i.j.service.ThumbnailCacheService - Shutting down ThumbnailCacheService...
+2026-02-05 23:21:46.520 [Thread-24] INFO  i.jutjub.service.FileUploadService - Shutting down FileUploadService...
+2026-02-05 23:21:46.978 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:21:46.978 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:21:46.978 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000025: Second-level cache region factory [org.hibernate.cache.jcache.internal.JCacheRegionFactory]
+2026-02-05 23:21:47.011 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.Tile]
+2026-02-05 23:21:47.012 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.VideoPost.tags]
+2026-02-05 23:21:47.012 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.VideoPost]
+2026-02-05 23:21:47.012 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.User]
+2026-02-05 23:21:47.012 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.Tile.videos]
+2026-02-05 23:21:47.093 [restartedMain] DEBUG o.h.s.internal.StatisticsInitiator - Statistics initialized [enabled=true]
+2026-02-05 23:21:48.059 [restartedMain] DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: select count(*) from VideoPost x, time: 0ms, rows: 1
+2026-02-05 23:21:48.061 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251272368377856
+2026-02-05 23:21:48.061 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#1` (timeout=7251272368377857, version=null)
+2026-02-05 23:21:48.061 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:21:48.061 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251272368377858
+2026-02-05 23:21:48.062 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:21:48.062 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251272122621953
+2026-02-05 23:21:48.062 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251272122621953
+2026-02-05 23:21:48.063 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251272368386048
+2026-02-05 23:21:48.063 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#2` (timeout=7251272368386049, version=null)
+2026-02-05 23:21:48.063 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:21:48.063 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251272368386050
+2026-02-05 23:21:48.063 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:21:48.063 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251272122626052
+2026-02-05 23:21:48.063 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251272122626052
+2026-02-05 23:21:48.064 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251272368390146
+2026-02-05 23:21:48.064 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#3` (timeout=7251272368390147, version=null)
+2026-02-05 23:21:48.064 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:21:48.064 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251272368390148
+2026-02-05 23:21:48.064 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:21:48.064 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251272122630150
+2026-02-05 23:21:48.064 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251272122630150
+2026-02-05 23:21:48.066 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251272368398336
+2026-02-05 23:21:48.066 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#4` (timeout=7251272368398337, version=null)
+2026-02-05 23:21:48.066 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:21:48.066 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251272368398338
+2026-02-05 23:21:48.066 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:21:48.066 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251272122638340
+2026-02-05 23:21:48.066 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251272122638340
+2026-02-05 23:21:48.067 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251272368402432
+2026-02-05 23:21:48.067 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#5` (timeout=7251272368402433, version=null)
+2026-02-05 23:21:48.067 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:21:48.067 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251272368402434
+2026-02-05 23:21:48.067 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:21:48.067 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251272122642436
+2026-02-05 23:21:48.067 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251272122642436
+2026-02-05 23:21:48.124 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [users], timestamp: 7251272368635904
+2026-02-05 23:21:48.125 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [users], timestamp: 7251272122880000
+2026-02-05 23:25:56.209 [Thread-28] INFO  i.j.service.ThumbnailCacheService - Shutting down ThumbnailCacheService...
+2026-02-05 23:25:56.209 [Thread-28] INFO  i.jutjub.service.FileUploadService - Shutting down FileUploadService...
+2026-02-05 23:25:56.704 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:25:56.704 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:25:56.704 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000025: Second-level cache region factory [org.hibernate.cache.jcache.internal.JCacheRegionFactory]
+2026-02-05 23:25:56.737 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.Tile.videos]
+2026-02-05 23:25:56.737 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.VideoPost.tags]
+2026-02-05 23:25:56.737 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.Tile]
+2026-02-05 23:25:56.738 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.VideoPost]
+2026-02-05 23:25:56.738 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.User]
+2026-02-05 23:25:56.820 [restartedMain] DEBUG o.h.s.internal.StatisticsInitiator - Statistics initialized [enabled=true]
+2026-02-05 23:25:57.642 [restartedMain] DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: select count(*) from VideoPost x, time: 0ms, rows: 1
+2026-02-05 23:25:57.645 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273390673920
+2026-02-05 23:25:57.645 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#1` (timeout=7251273390673921, version=null)
+2026-02-05 23:25:57.645 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:25:57.645 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273390673922
+2026-02-05 23:25:57.646 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:25:57.646 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273144918017
+2026-02-05 23:25:57.646 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273144918017
+2026-02-05 23:25:57.646 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273390678020
+2026-02-05 23:25:57.646 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#2` (timeout=7251273390678021, version=null)
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273390682112
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273144922114
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273144922114
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273390682117
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#3` (timeout=7251273390682118, version=null)
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273390682119
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273144922121
+2026-02-05 23:25:57.647 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273144922121
+2026-02-05 23:25:57.649 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273390690306
+2026-02-05 23:25:57.649 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#4` (timeout=7251273390690307, version=null)
+2026-02-05 23:25:57.649 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:25:57.649 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273390690308
+2026-02-05 23:25:57.650 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:25:57.650 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273144934401
+2026-02-05 23:25:57.650 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273144934401
+2026-02-05 23:25:57.651 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273390698496
+2026-02-05 23:25:57.651 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#5` (timeout=7251273390698497, version=null)
+2026-02-05 23:25:57.651 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:25:57.651 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273390698498
+2026-02-05 23:25:57.651 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:25:57.651 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273144938500
+2026-02-05 23:25:57.651 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273144938500
+2026-02-05 23:25:57.706 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [users], timestamp: 7251273390923778
+2026-02-05 23:25:57.707 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [users], timestamp: 7251273145167872
+2026-02-05 23:26:10.457 [SpringApplicationShutdownHook] INFO  i.j.service.ThumbnailCacheService - Shutting down ThumbnailCacheService...
+2026-02-05 23:26:10.457 [SpringApplicationShutdownHook] INFO  i.jutjub.service.FileUploadService - Shutting down FileUploadService...
+2026-02-05 23:26:13.468 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:26:13.468 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:26:13.468 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000025: Second-level cache region factory [org.hibernate.cache.jcache.internal.JCacheRegionFactory]
+2026-02-05 23:26:14.045 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.User]
+2026-02-05 23:26:14.048 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.VideoPost]
+2026-02-05 23:26:14.049 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.Tile.videos]
+2026-02-05 23:26:14.049 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.VideoPost.tags]
+2026-02-05 23:26:14.050 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.Tile]
+2026-02-05 23:26:14.585 [restartedMain] DEBUG o.h.s.internal.StatisticsInitiator - Statistics initialized [enabled=true]
+2026-02-05 23:26:16.308 [restartedMain] DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: select count(*) from VideoPost x, time: 5ms, rows: 1
+2026-02-05 23:26:16.345 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273467269120
+2026-02-05 23:26:16.352 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#1` (timeout=7251273467297792, version=null)
+2026-02-05 23:26:16.356 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:26:16.357 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273467318272
+2026-02-05 23:26:16.357 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:26:16.359 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273221566464
+2026-02-05 23:26:16.359 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273221566464
+2026-02-05 23:26:16.361 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273467334656
+2026-02-05 23:26:16.361 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#2` (timeout=7251273467334657, version=null)
+2026-02-05 23:26:16.361 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:26:16.361 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273467334658
+2026-02-05 23:26:16.361 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:26:16.361 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273221574660
+2026-02-05 23:26:16.361 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273221574660
+2026-02-05 23:26:16.363 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273467342850
+2026-02-05 23:26:16.364 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#3` (timeout=7251273467346944, version=null)
+2026-02-05 23:26:16.365 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:26:16.365 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273467351040
+2026-02-05 23:26:16.365 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:26:16.365 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273221591042
+2026-02-05 23:26:16.365 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273221591042
+2026-02-05 23:26:16.365 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273467351045
+2026-02-05 23:26:16.365 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#4` (timeout=7251273467351046, version=null)
+2026-02-05 23:26:16.366 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:26:16.366 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273467355136
+2026-02-05 23:26:16.366 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:26:16.366 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273221595138
+2026-02-05 23:26:16.366 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273221595138
+2026-02-05 23:26:16.367 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273467359233
+2026-02-05 23:26:16.367 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#5` (timeout=7251273467359234, version=null)
+2026-02-05 23:26:16.367 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:26:16.367 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273467359235
+2026-02-05 23:26:16.369 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:26:16.369 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273221607425
+2026-02-05 23:26:16.369 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273221607425
+2026-02-05 23:26:16.428 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [users], timestamp: 7251273467609088
+2026-02-05 23:26:16.429 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [users], timestamp: 7251273221853184
+2026-02-05 23:26:53.915 [http-nio-8080-exec-1] INFO  isa.jutjub.service.VideoPostService - Starting video post creation for title: ssssssssssssss
+2026-02-05 23:26:53.915 [http-nio-8080-exec-1] INFO  i.jutjub.service.FileUploadService - Starting video file upload: gato-joia.mp4
+2026-02-05 23:26:53.915 [http-nio-8080-exec-1] INFO  i.jutjub.service.FileUploadService - Uploading video file: gato-joia.mp4, size: 1366205 bytes, content type: video/mp4
+2026-02-05 23:26:53.920 [pool-2-thread-1] INFO  i.jutjub.service.FileUploadService - Successfully uploaded video file to: .\uploads\videos\video_20260205_232653_4208a6dc.mp4
+2026-02-05 23:26:53.921 [pool-2-thread-1] INFO  i.jutjub.service.FileUploadService - Video file validation passed: 1366205 bytes
+2026-02-05 23:26:53.921 [http-nio-8080-exec-1] INFO  i.jutjub.service.FileUploadService - Starting thumbnail file upload: pexels-the-iop-86002042-34647000.jpg
+2026-02-05 23:26:53.932 [http-nio-8080-exec-1] INFO  i.jutjub.service.FileUploadService - Successfully uploaded thumbnail file to: .\uploads\thumbnails\thumbnail_20260205_232653_d4467319.jpg
+2026-02-05 23:26:53.933 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273621229568
+2026-02-05 23:26:53.933 [http-nio-8080-exec-1] INFO  isa.jutjub.service.VideoPostService - Successfully created video post with ID: 6, upload duration: 17ms
+2026-02-05 23:26:53.934 [http-nio-8080-exec-1] INFO  isa.jutjub.service.VideoPostService - Video 6 location: '{"latitude":45.242187222401554,"longitude":19.838926850202466}', parsed coordinates: (19, 45)
+2026-02-05 23:26:53.934 [http-nio-8080-exec-1] INFO  isa.jutjub.service.VideoPostService - Auto-adding video 6 to tiles based on coordinates: {"latitude":45.242187222401554,"longitude":19.838926850202466}
+2026-02-05 23:26:53.934 [http-nio-8080-exec-1] DEBUG isa.jutjub.service.TileService - Adding video 6 with coordinates (19, 45) to tile
+2026-02-05 23:26:53.954 [http-nio-8080-exec-1] DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: [CRITERIA] select t1_0.id,t1_0.created_at,t1_0.deleted,t1_0.latitude,t1_0.longitude,t1_0.updated_at,t1_0.video_count from tiles t1_0 where t1_0.longitude=? and t1_0.latitude=?, time: 4ms, rows: 0
+2026-02-05 23:26:53.962 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [tiles], timestamp: 7251273621348352
+2026-02-05 23:26:53.962 [http-nio-8080-exec-1] INFO  isa.jutjub.service.TileService - Created new tile with ID: 1 for coordinates (19, 45)
+2026-02-05 23:26:53.964 [http-nio-8080-exec-1] INFO  isa.jutjub.service.TileService - Added video 6 to tile 1 at coordinates (19, 45)
+2026-02-05 23:26:53.965 [http-nio-8080-exec-1] INFO  isa.jutjub.service.VideoPostService - Successfully added video 6 to tiles
+2026-02-05 23:26:53.966 [http-nio-8080-exec-1] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#6` (timeout=7251273621364736, version=null)
+2026-02-05 23:26:53.967 [http-nio-8080-exec-1] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.Tile.videos` (AccessType[read-write])] : `isa.jutjub.model.Tile.videos#1` (timeout=7251273621368832, version=null)
+2026-02-05 23:26:53.967 [http-nio-8080-exec-1] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.Tile` (AccessType[read-write])] : `isa.jutjub.model.Tile#1` (timeout=7251273621368833, version=null)
+2026-02-05 23:26:53.972 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [tiles], timestamp: 7251273621389312
+2026-02-05 23:26:53.972 [http-nio-8080-exec-1] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#6
+2026-02-05 23:26:53.972 [http-nio-8080-exec-1] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.Tile.videos#1
+2026-02-05 23:26:53.972 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [tile_videos], timestamp: 7251273621389313
+2026-02-05 23:26:53.972 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273621389313
+2026-02-05 23:26:53.976 [http-nio-8080-exec-1] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#6
+2026-02-05 23:26:53.976 [http-nio-8080-exec-1] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.Tile.videos` (AccessType[read-write])] : isa.jutjub.model.Tile.videos#1
+2026-02-05 23:26:53.977 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [tiles], timestamp: 7251273375649793
+2026-02-05 23:26:53.977 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [tile_videos], timestamp: 7251273375649793
+2026-02-05 23:26:53.977 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273375649793
+2026-02-05 23:26:53.977 [http-nio-8080-exec-1] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273375649793
+2026-02-05 23:28:20.169 [Thread-5] INFO  i.j.service.ThumbnailCacheService - Shutting down ThumbnailCacheService...
+2026-02-05 23:28:20.169 [Thread-5] INFO  i.jutjub.service.FileUploadService - Shutting down FileUploadService...
+2026-02-05 23:28:20.772 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:28:20.773 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:28:20.773 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000025: Second-level cache region factory [org.hibernate.cache.jcache.internal.JCacheRegionFactory]
+2026-02-05 23:28:20.811 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.VideoPost.tags]
+2026-02-05 23:28:20.811 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.Tile]
+2026-02-05 23:28:20.811 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.Tile.videos]
+2026-02-05 23:28:20.811 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.User]
+2026-02-05 23:28:20.812 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.VideoPost]
+2026-02-05 23:28:20.903 [restartedMain] DEBUG o.h.s.internal.StatisticsInitiator - Statistics initialized [enabled=true]
+2026-02-05 23:28:21.864 [restartedMain] DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: select count(*) from VideoPost x, time: 0ms, rows: 1
+2026-02-05 23:28:21.867 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273981407232
+2026-02-05 23:28:21.867 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#1` (timeout=7251273981407233, version=null)
+2026-02-05 23:28:21.869 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:28:21.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273981415424
+2026-02-05 23:28:21.869 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:28:21.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273735655426
+2026-02-05 23:28:21.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273735655426
+2026-02-05 23:28:21.869 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273981415429
+2026-02-05 23:28:21.869 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#2` (timeout=7251273981415430, version=null)
+2026-02-05 23:28:21.870 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:28:21.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273981423616
+2026-02-05 23:28:21.871 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:28:21.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273735663618
+2026-02-05 23:28:21.871 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273735663618
+2026-02-05 23:28:21.872 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273981427712
+2026-02-05 23:28:21.872 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#3` (timeout=7251273981427713, version=null)
+2026-02-05 23:28:21.872 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:28:21.872 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273981427714
+2026-02-05 23:28:21.872 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:28:21.872 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273735667716
+2026-02-05 23:28:21.872 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273735667716
+2026-02-05 23:28:21.874 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273981435904
+2026-02-05 23:28:21.874 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#4` (timeout=7251273981435905, version=null)
+2026-02-05 23:28:21.874 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:28:21.874 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273981435906
+2026-02-05 23:28:21.874 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:28:21.874 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273735675908
+2026-02-05 23:28:21.874 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273735675908
+2026-02-05 23:28:21.875 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273981440000
+2026-02-05 23:28:21.875 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#5` (timeout=7251273981440001, version=null)
+2026-02-05 23:28:21.875 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:28:21.875 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273981440002
+2026-02-05 23:28:21.875 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:28:21.875 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273735680004
+2026-02-05 23:28:21.875 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273735680004
+2026-02-05 23:28:21.932 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [users], timestamp: 7251273981673472
+2026-02-05 23:28:21.932 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [users], timestamp: 7251273735913473
+2026-02-05 23:28:23.498 [Thread-7] INFO  i.j.service.ThumbnailCacheService - Shutting down ThumbnailCacheService...
+2026-02-05 23:28:23.498 [Thread-7] INFO  i.jutjub.service.FileUploadService - Shutting down FileUploadService...
+2026-02-05 23:28:23.947 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:28:23.947 [restartedMain] DEBUG o.h.c.i.StrategyCreatorRegionFactoryImpl - RegionFactory impl [org.hibernate.cache.jcache.internal.JCacheRegionFactory] did not provide constructor accepting Properties
+2026-02-05 23:28:23.947 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000025: Second-level cache region factory [org.hibernate.cache.jcache.internal.JCacheRegionFactory]
+2026-02-05 23:28:23.979 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.User]
+2026-02-05 23:28:23.979 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.VideoPost]
+2026-02-05 23:28:23.980 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating entity cache access [read-write] : NavigableRole[isa.jutjub.model.Tile]
+2026-02-05 23:28:23.980 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.Tile.videos]
+2026-02-05 23:28:23.981 [restartedMain] DEBUG o.h.c.s.s.DomainDataRegionTemplate - Generating collection cache access : NavigableRole[isa.jutjub.model.VideoPost.tags]
+2026-02-05 23:28:24.074 [restartedMain] DEBUG o.h.s.internal.StatisticsInitiator - Statistics initialized [enabled=true]
+2026-02-05 23:28:25.020 [restartedMain] DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: select count(*) from VideoPost x, time: 0ms, rows: 1
+2026-02-05 23:28:25.024 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273994338304
+2026-02-05 23:28:25.024 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#1` (timeout=7251273994338305, version=null)
+2026-02-05 23:28:25.025 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:28:25.025 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273994342400
+2026-02-05 23:28:25.025 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#1
+2026-02-05 23:28:25.025 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273748582402
+2026-02-05 23:28:25.025 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273748582402
+2026-02-05 23:28:25.026 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273994346496
+2026-02-05 23:28:25.026 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#2` (timeout=7251273994346497, version=null)
+2026-02-05 23:28:25.027 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:28:25.027 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273994350592
+2026-02-05 23:28:25.027 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#2
+2026-02-05 23:28:25.027 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273748590594
+2026-02-05 23:28:25.027 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273748590594
+2026-02-05 23:28:25.027 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273994350597
+2026-02-05 23:28:25.028 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#3` (timeout=7251273994354688, version=null)
+2026-02-05 23:28:25.028 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:28:25.028 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273994354689
+2026-02-05 23:28:25.028 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#3
+2026-02-05 23:28:25.028 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273748594691
+2026-02-05 23:28:25.028 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273748594691
+2026-02-05 23:28:25.029 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273994358784
+2026-02-05 23:28:25.029 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#4` (timeout=7251273994358785, version=null)
+2026-02-05 23:28:25.029 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:28:25.029 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273994358786
+2026-02-05 23:28:25.029 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#4
+2026-02-05 23:28:25.029 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273748598788
+2026-02-05 23:28:25.029 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273748598788
+2026-02-05 23:28:25.030 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_posts], timestamp: 7251273994362882
+2026-02-05 23:28:25.030 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Locking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : `isa.jutjub.model.VideoPost.tags#5` (timeout=7251273994362883, version=null)
+2026-02-05 23:28:25.030 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Skipping #remove call in read-write access to maintain SoftLock : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:28:25.030 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [video_post_tags], timestamp: 7251273994362884
+2026-02-05 23:28:25.030 [restartedMain] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Unlocking cache item [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : isa.jutjub.model.VideoPost.tags#5
+2026-02-05 23:28:25.030 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_posts], timestamp: 7251273748602886
+2026-02-05 23:28:25.030 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [video_post_tags], timestamp: 7251273748602886
+2026-02-05 23:28:25.087 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Pre-invalidating space [users], timestamp: 7251273994596354
+2026-02-05 23:28:25.087 [restartedMain] DEBUG o.h.c.i.TimestampsCacheEnabledImpl - Invalidating space [users], timestamp: 7251273748836355
+2026-02-05 23:28:34.856 [http-nio-8080-exec-4] DEBUG isa.jutjub.service.VideoPostService - Fetching all video posts with pagination: page 0, size 10
+2026-02-05 23:28:34.861 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Caching data from load [region=`isa.jutjub.model.VideoPost` (AccessType[read-write])] : key[isa.jutjub.model.VideoPost#5] -> value[CacheEntry(isa.jutjub.model.VideoPost)]
+2026-02-05 23:28:34.861 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Caching data from load [region=`isa.jutjub.model.VideoPost` (AccessType[read-write])] : key[isa.jutjub.model.VideoPost#4] -> value[CacheEntry(isa.jutjub.model.VideoPost)]
+2026-02-05 23:28:34.861 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Caching data from load [region=`isa.jutjub.model.VideoPost` (AccessType[read-write])] : key[isa.jutjub.model.VideoPost#3] -> value[CacheEntry(isa.jutjub.model.VideoPost)]
+2026-02-05 23:28:34.861 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Caching data from load [region=`isa.jutjub.model.VideoPost` (AccessType[read-write])] : key[isa.jutjub.model.VideoPost#2] -> value[CacheEntry(isa.jutjub.model.VideoPost)]
+2026-02-05 23:28:34.861 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Caching data from load [region=`isa.jutjub.model.VideoPost` (AccessType[read-write])] : key[isa.jutjub.model.VideoPost#1] -> value[CacheEntry(isa.jutjub.model.VideoPost)]
+2026-02-05 23:28:34.861 [http-nio-8080-exec-4] DEBUG o.h.stat.internal.StatisticsImpl - HHH000117: HQL: [CRITERIA] select vp1_0.id,vp1_0.comments_count,vp1_0.created_at,vp1_0.deleted,vp1_0.likes_count,vp1_0.location,vp1_0.thumbnail_path,vp1_0.title,vp1_0.updated_at,vp1_0.upload_duration_ms,vp1_0.video_description,vp1_0.video_file_size,vp1_0.video_path,vp1_0.views_count from video_posts vp1_0 order by vp1_0.created_at desc offset ? rows fetch first ? rows only, time: 2ms, rows: 5
+2026-02-05 23:28:34.869 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Getting cached data from region [`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] by key [isa.jutjub.model.VideoPost.tags#5]
+2026-02-05 23:28:34.869 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Cache hit, but item is unreadable/invalid : region = `isa.jutjub.model.VideoPost.tags`, key = `isa.jutjub.model.VideoPost.tags#5`
+2026-02-05 23:28:34.871 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Caching data from load [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : key[isa.jutjub.model.VideoPost.tags#5] -> value[CollectionCacheEntry[exploration,urban,city,travel]]
+2026-02-05 23:28:34.871 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Checking writeability of read-write cache lock [timeout=`7251273994362883`, lockId=`4`, version=`null`, sourceUuid=9414d2dd-9392-4591-ac12-564cf00beec1, multiplicity=`0`, unlockTimestamp=`7251273748602885`] : txTimestamp=`7251273788850176`, newVersion=`null`
+2026-02-05 23:28:34.871 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Getting cached data from region [`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] by key [isa.jutjub.model.VideoPost.tags#4]
+2026-02-05 23:28:34.871 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Cache hit, but item is unreadable/invalid : region = `isa.jutjub.model.VideoPost.tags`, key = `isa.jutjub.model.VideoPost.tags#4`
+2026-02-05 23:28:34.871 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Caching data from load [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : key[isa.jutjub.model.VideoPost.tags#4] -> value[CollectionCacheEntry[fitness,wellness,yoga,beginners]]
+2026-02-05 23:28:34.871 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Checking writeability of read-write cache lock [timeout=`7251273994358785`, lockId=`3`, version=`null`, sourceUuid=9414d2dd-9392-4591-ac12-564cf00beec1, multiplicity=`0`, unlockTimestamp=`7251273748598787`] : txTimestamp=`7251273788850176`, newVersion=`null`
+2026-02-05 23:28:34.871 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Getting cached data from region [`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] by key [isa.jutjub.model.VideoPost.tags#3]
+2026-02-05 23:28:34.871 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Cache hit, but item is unreadable/invalid : region = `isa.jutjub.model.VideoPost.tags`, key = `isa.jutjub.model.VideoPost.tags#3`
+2026-02-05 23:28:34.872 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Caching data from load [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : key[isa.jutjub.model.VideoPost.tags#3] -> value[CollectionCacheEntry[tech,smartphone,review,technology]]
+2026-02-05 23:28:34.872 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Checking writeability of read-write cache lock [timeout=`7251273994354688`, lockId=`2`, version=`null`, sourceUuid=9414d2dd-9392-4591-ac12-564cf00beec1, multiplicity=`0`, unlockTimestamp=`7251273748594690`] : txTimestamp=`7251273788850176`, newVersion=`null`
+2026-02-05 23:28:34.872 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Getting cached data from region [`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] by key [isa.jutjub.model.VideoPost.tags#2]
+2026-02-05 23:28:34.872 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Cache hit, but item is unreadable/invalid : region = `isa.jutjub.model.VideoPost.tags`, key = `isa.jutjub.model.VideoPost.tags#2`
+2026-02-05 23:28:34.873 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Caching data from load [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : key[isa.jutjub.model.VideoPost.tags#2] -> value[CollectionCacheEntry[pasta,recipe,italian,cooking]]
+2026-02-05 23:28:34.873 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Checking writeability of read-write cache lock [timeout=`7251273994346497`, lockId=`1`, version=`null`, sourceUuid=9414d2dd-9392-4591-ac12-564cf00beec1, multiplicity=`0`, unlockTimestamp=`7251273748590593`] : txTimestamp=`7251273788850176`, newVersion=`null`
+2026-02-05 23:28:34.873 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Getting cached data from region [`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] by key [isa.jutjub.model.VideoPost.tags#1]
+2026-02-05 23:28:34.873 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Cache hit, but item is unreadable/invalid : region = `isa.jutjub.model.VideoPost.tags`, key = `isa.jutjub.model.VideoPost.tags#1`
+2026-02-05 23:28:34.873 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Caching data from load [region=`isa.jutjub.model.VideoPost.tags` (AccessType[read-write])] : key[isa.jutjub.model.VideoPost.tags#1] -> value[CollectionCacheEntry[nature,travel,documentary,wildlife]]
+2026-02-05 23:28:34.873 [http-nio-8080-exec-4] DEBUG o.h.c.s.s.AbstractReadWriteAccess - Checking writeability of read-write cache lock [timeout=`7251273994338305`, lockId=`0`, version=`null`, sourceUuid=9414d2dd-9392-4591-ac12-564cf00beec1, multiplicity=`0`, unlockTimestamp=`7251273748582401`] : txTimestamp=`7251273788850176`, newVersion=`null`
+2026-02-05 23:30:45.369 [SpringApplicationShutdownHook] INFO  i.j.service.ThumbnailCacheService - Shutting down ThumbnailCacheService...
+2026-02-05 23:30:45.369 [SpringApplicationShutdownHook] INFO  i.jutjub.service.FileUploadService - Shutting down FileUploadService...

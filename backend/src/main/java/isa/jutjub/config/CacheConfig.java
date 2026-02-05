@@ -94,6 +94,9 @@ public class CacheConfig {
                 "popularVideoPosts",
                 "videoSearch",
                 "videoPostsByTag",
+                "videoPostsAfterDate",
+                "videoPostsBeforeDate",
+                "videoPostsDateRange",
                 "tiles"
         ));
         return cacheManager;

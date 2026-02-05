@@ -50,6 +50,26 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
     Page<VideoPost> findByCreatedAtAfter(LocalDateTime date, Pageable pageable);
 
     /**
+     * Find video posts created before specified date
+     * @param date date to search until
+     * @param pageable pagination information
+     * @return page of video posts created before specified date
+     */
+    Page<VideoPost> findByCreatedAtBefore(LocalDateTime date, Pageable pageable);
+
+    /**
+     * Find video posts created between two dates
+     * @param startDate start date
+     * @param endDate end date
+     * @param pageable pagination information
+     * @return page of video posts created within date range
+     */
+    @Query("SELECT vp FROM VideoPost vp WHERE vp.createdAt BETWEEN :startDate AND :endDate")
+    Page<VideoPost> findByCreatedAtBetween(@Param("startDate") LocalDateTime startDate, 
+                                          @Param("endDate") LocalDateTime endDate, 
+                                          Pageable pageable);
+
+    /**
      * Find most popular video posts ordered by likes count
      * @param pageable pagination information
      * @return page of most popular video posts
