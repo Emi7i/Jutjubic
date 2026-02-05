@@ -2,6 +2,8 @@ package isa.jutjub.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Table(name = "users")
@@ -9,6 +11,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "isa.jutjub.model.User")
 public class User {
 
     @Id

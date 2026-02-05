@@ -2,8 +2,11 @@ package isa.jutjub.service;
 
 import isa.jutjub.model.VideoPost;
 import isa.jutjub.repository.VideoPostRepository;
+import isa.jutjub.service.TileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,11 +25,15 @@ public class VideoPostService {
 
     private final VideoPostRepository videoPostRepository;
     private final FileUploadService fileUploadService;
+    private final VideoPostCacheService videoPostCacheService;
+    private final TileService tileService;
 
     @Autowired
-    public VideoPostService(VideoPostRepository videoPostRepository, FileUploadService fileUploadService) {
+    public VideoPostService(VideoPostRepository videoPostRepository, FileUploadService fileUploadService, VideoPostCacheService videoPostCacheService, TileService tileService) {
         this.videoPostRepository = videoPostRepository;
         this.fileUploadService = fileUploadService;
+        this.videoPostCacheService = videoPostCacheService;
+        this.tileService = tileService;
     }
 
     /**
@@ -83,6 +90,26 @@ public class VideoPostService {
             log.info("Successfully created video post with ID: {}, upload duration: {}ms", 
                     savedPost.getId(), videoPost.getUploadDurationMs());
             
+            // Automatically add video to tiles if it has valid coordinates
+            Integer longitude = savedPost.getLongitude();
+            Integer latitude = savedPost.getLatitude();
+            log.info("Video {} location: '{}', parsed coordinates: ({}, {})", 
+                    savedPost.getId(), savedPost.getLocation(), longitude, latitude);
+            
+            if (savedPost.hasValidCoordinates()) {
+                try {
+                    log.info("Auto-adding video {} to tiles based on coordinates: {}", 
+                            savedPost.getId(), savedPost.getLocation());
+                    tileService.addVideoToTile(savedPost);
+                    log.info("Successfully added video {} to tiles", savedPost.getId());
+                } catch (Exception e) {
+                    log.warn("Failed to auto-add video {} to tiles: {}", savedPost.getId(), e.getMessage());
+                    // Don't fail the video creation if tile assignment fails
+                }
+            } else {
+                log.info("Video {} has no valid coordinates, skipping tile assignment", savedPost.getId());
+            }
+            
             return savedPost;
             
         } catch (Exception e) {
@@ -107,7 +134,10 @@ public class VideoPostService {
      * @return the updated video post
      */
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "videoPosts", key = "#id")
     public VideoPost updateVideoPost(Long id, VideoPost videoPost) {
+        log.debug("Updating video post {} and invalidating cache", id);
+        
         VideoPost existingPost = videoPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Video post not found with ID: " + id));
         
@@ -117,6 +147,9 @@ public class VideoPostService {
         existingPost.setLocation(videoPost.getLocation());
         existingPost.setTags(videoPost.getTags());
         
+        // Also invalidate the LoadingCache
+        videoPostCacheService.invalidateVideoPost(id);
+        
         return videoPostRepository.save(existingPost);
     }
 
@@ -125,7 +158,10 @@ public class VideoPostService {
      * @param id the video post ID
      */
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "videoPosts", key = "#id")
     public void deleteVideoPost(Long id) {
+        log.debug("Deleting video post {} and invalidating cache", id);
+        
         VideoPost videoPost = videoPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Video post not found with ID: " + id));
         
@@ -140,6 +176,9 @@ public class VideoPostService {
         // Delete from database
         videoPostRepository.delete(videoPost);
         
+        // Also invalidate the LoadingCache
+        videoPostCacheService.invalidateVideoPost(id);
+        
         log.info("Successfully deleted video post with ID: {}", id);
     }
 
@@ -149,9 +188,12 @@ public class VideoPostService {
      * @return the video post
      */
     @Transactional(readOnly = true)
+    // @Cacheable(value = "videoPosts", key = "#id")
     public VideoPost getVideoPostById(Long id) {
+        log.debug("Fetching video post by ID: {} without cache", id);
+        
         return videoPostRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Video post not found with ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Video post not found: " + id));
     }
 
     /**
@@ -160,7 +202,9 @@ public class VideoPostService {
      * @return page of video posts
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "videoPostsPage", key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort.toString()")
     public Page<VideoPost> getAllVideoPosts(Pageable pageable) {
+        log.debug("Fetching all video posts with pagination: page {}, size {}", pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findAll(pageable);
     }
 
@@ -170,7 +214,9 @@ public class VideoPostService {
      * @return page of most recent video posts
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "recentVideoPosts", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<VideoPost> getMostRecentVideoPosts(Pageable pageable) {
+        log.debug("Fetching most recent video posts: page {}, size {}", pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findMostRecent(pageable);
     }
 
@@ -180,7 +226,9 @@ public class VideoPostService {
      * @return page of most popular video posts
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "popularVideoPosts", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<VideoPost> getMostPopularVideoPosts(Pageable pageable) {
+        log.debug("Fetching most popular video posts: page {}, size {}", pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findMostPopular(pageable);
     }
 
@@ -191,7 +239,9 @@ public class VideoPostService {
      * @return page of video posts matching search criteria
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "videoSearch", key = "#keyword + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<VideoPost> searchVideoPosts(String keyword, Pageable pageable) {
+        log.debug("Searching video posts with keyword '{}': page {}, size {}", keyword, pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.searchByKeyword(keyword, pageable);
     }
 
@@ -202,7 +252,9 @@ public class VideoPostService {
      * @return page of video posts with specified tag
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "videoPostsByTag", key = "#tag + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<VideoPost> getVideoPostsByTag(String tag, Pageable pageable) {
+        log.debug("Fetching video posts by tag '{}': page {}, size {}", tag, pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findByTag(tag, pageable);
     }
 

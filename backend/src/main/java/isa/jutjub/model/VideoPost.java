@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -14,6 +16,8 @@ import java.util.Set;
 @Table(name = "video_posts")
 @Getter
 @Setter
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "isa.jutjub.model.VideoPost")
 public class VideoPost extends BaseEntity {
 
     @NotBlank(message = "Title is required")
@@ -29,6 +33,7 @@ public class VideoPost extends BaseEntity {
     @ElementCollection
     @CollectionTable(name = "video_post_tags", joinColumns = @JoinColumn(name = "video_post_id"))
     @Column(name = "tag")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private Set<String> tags = new HashSet<>();
 
     @Column(name = "thumbnail_path")
@@ -104,5 +109,114 @@ public class VideoPost extends BaseEntity {
                 addTag(tag);
             }
         }
+    }
+
+    /**
+     * Parse longitude from location string
+     * Expected format: "longitude,latitude" or {"longitude":X,"latitude":Y}
+     * @return longitude as Integer, or null if not found
+     */
+    public Integer getLongitude() {
+        if (location == null || location.trim().isEmpty()) {
+            return null;
+        }
+        
+        try {
+            // Try JSON format first
+            if (location.contains("\"longitude\"") && location.contains("\"latitude\"")) {
+                // Extract longitude using regex-like approach
+                String pattern = "\"longitude\":";
+                int index = location.indexOf(pattern);
+                if (index != -1) {
+                    int start = index + pattern.length();
+                    // Skip whitespace
+                    while (start < location.length() && location.charAt(start) == ' ') {
+                        start++;
+                    }
+                    // Find the end of the number
+                    int end = start;
+                    while (end < location.length() && 
+                           (Character.isDigit(location.charAt(end)) || location.charAt(end) == '-' || location.charAt(end) == '.')) {
+                        end++;
+                    }
+                    if (end > start) {
+                        String lonStr = location.substring(start, end).trim();
+                        return (int) Math.floor(Double.parseDouble(lonStr));
+                    }
+                }
+            }
+            
+            // Try comma-separated format: "longitude,latitude"
+            String[] parts = location.split(",");
+            if (parts.length >= 2) {
+                return Integer.parseInt(parts[0].trim());
+            }
+        } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+            // Return null if parsing fails
+        }
+        return null;
+    }
+
+    /**
+     * Parse latitude from location string
+     * Expected format: "longitude,latitude" or {"longitude":X,"latitude":Y}
+     * @return latitude as Integer, or null if not found
+     */
+    public Integer getLatitude() {
+        if (location == null || location.trim().isEmpty()) {
+            return null;
+        }
+        
+        try {
+            // Try JSON format first
+            if (location.contains("\"longitude\"") && location.contains("\"latitude\"")) {
+                // Extract latitude using regex-like approach
+                String pattern = "\"latitude\":";
+                int index = location.indexOf(pattern);
+                if (index != -1) {
+                    int start = index + pattern.length();
+                    // Skip whitespace
+                    while (start < location.length() && location.charAt(start) == ' ') {
+                        start++;
+                    }
+                    // Find the end of the number
+                    int end = start;
+                    while (end < location.length() && 
+                           (Character.isDigit(location.charAt(end)) || location.charAt(end) == '-' || location.charAt(end) == '.')) {
+                        end++;
+                    }
+                    if (end > start) {
+                        String latStr = location.substring(start, end).trim();
+                        return (int) Math.floor(Double.parseDouble(latStr));
+                    }
+                }
+            }
+            
+            // Try comma-separated format: "longitude,latitude"
+            String[] parts = location.split(",");
+            if (parts.length >= 2) {
+                return Integer.parseInt(parts[1].trim());
+            }
+        } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+            // Return null if parsing fails
+        }
+        return null;
+    }
+
+    /**
+     * Set location from longitude and latitude coordinates
+     * @param longitude longitude coordinate
+     * @param latitude latitude coordinate
+     */
+    public void setLocationFromCoordinates(Integer longitude, Integer latitude) {
+        this.location = longitude + "," + latitude;
+    }
+
+    /**
+     * Check if video has valid coordinates
+     * @return true if both longitude and latitude can be parsed
+     */
+    public boolean hasValidCoordinates() {
+        return getLongitude() != null && getLatitude() != null;
     }
 }
