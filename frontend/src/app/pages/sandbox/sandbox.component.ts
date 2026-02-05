@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MapComponent } from '../../components/map/map.component';
 import { VideoService } from '../../services/video.service';
 import { Video } from '../../models/video-upload';
+import { DateInterval } from  '../../shared/timeframe-selector/timeframe-selector.component';
 
 @Component({
   selector: 'app-sandbox',
@@ -17,7 +18,7 @@ export class SandboxComponent implements AfterViewInit {
   selectedVideo?: Video;
   videoOpen = false;
   filtersOpen = false;
-
+  currentInterval: DateInterval = { from: null, to: null };
 
   constructor(private videoService: VideoService) {} // inject the service
 
@@ -50,12 +51,6 @@ export class SandboxComponent implements AfterViewInit {
     this.zoom = newZoom;
   }
 
-  onMapMoved(bounds: { sw: [number, number], ne: [number, number] }) {
-    // Fetch videos in the visible bounds
-    if(!this.selectedVideo)
-      this.visibleVideos = this.videoService.getVideosInBounds(bounds);
-  }
-
   onVideoSelected(video: Video) {
     this.selectedVideo = video;
     this.videoOpen = true;
@@ -80,5 +75,38 @@ export class SandboxComponent implements AfterViewInit {
 
   toggleFilters(): void {
     this.filtersOpen = !this.filtersOpen;
+  }
+
+  // --- Update the current filter interval ---
+  onIntervalChange(interval: DateInterval) {
+    this.currentInterval = interval;
+    // Refetch videos for current map view
+    this.refreshVisibleVideos();
+  }
+
+  onMapMoved(bounds: { sw: [number, number], ne: [number, number] }) {
+    // Fetch videos in the visible bounds
+    this.refreshVisibleVideos(bounds.sw, bounds.ne);
+  }
+
+  private refreshVisibleVideos(
+    sw?: [number, number],
+    ne?: [number, number]
+  ) {
+    // Default to current map bounds if not provided
+    if (!sw || !ne) {
+      const bounds = this.mapComp.getVisibleArea();
+      sw = bounds.sw;
+      ne = bounds.ne;
+    }
+
+    this.videoService.getVideosInBoundingBoxTuples(
+      sw,
+      ne,
+      this.currentInterval.from ?? undefined,
+      this.currentInterval.to ?? undefined
+    ).subscribe(videos => {
+      this.visibleVideos = videos;
+    });
   }
 }

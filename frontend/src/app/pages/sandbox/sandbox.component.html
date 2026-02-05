@@ -29,7 +29,9 @@
 
       <div class="filter-section">
         <label class="filter-label">Time range</label>
-        <app-timeframe-selector></app-timeframe-selector>
+        <app-timeframe-selector
+          (intervalChange)="onIntervalChange($event)"
+        ></app-timeframe-selector>
       </div>
 
       <button class="close-filter" (click)="toggleFilters()">×</button>
