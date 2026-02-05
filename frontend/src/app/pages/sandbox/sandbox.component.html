@@ -13,9 +13,26 @@
     </div>
 
     <!-- Video card on left -->
-    <div class="video-card-container" *ngIf="selectedVideo">
-      <app-video-card [video]="selectedVideo"></app-video-card>
+    <div class="video-card-container" [class.hidden]="!videoOpen">
+      <app-video-card *ngIf="selectedVideo" [video]="selectedVideo"></app-video-card>
       <button class="close-card" (click)="closeVideoCard()">×</button>
+    </div>
+
+    <!-- Filter toggle button -->
+    <button class="filter-toggle" (click)="toggleFilters()">
+      Filters
+    </button>
+
+    <!-- Filter popup -->
+    <div class="filter-container" [class.hidden]="!filtersOpen">
+      <h3 class="filter-title">Filters</h3>
+
+      <div class="filter-section">
+        <label class="filter-label">Time range</label>
+        <app-timeframe-selector></app-timeframe-selector>
+      </div>
+
+      <button class="close-filter" (click)="toggleFilters()">×</button>
     </div>
 
     <!-- Controls -->

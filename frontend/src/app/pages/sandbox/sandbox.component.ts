@@ -15,6 +15,8 @@ export class SandboxComponent implements AfterViewInit {
   zoom = 13; // initial zoom
   visibleVideos: Video[] = [];
   selectedVideo?: Video;
+  videoOpen = false;
+  filtersOpen = false;
 
 
   constructor(private videoService: VideoService) {} // inject the service
@@ -55,24 +57,28 @@ export class SandboxComponent implements AfterViewInit {
   }
 
   onVideoSelected(video: Video) {
-    console.log('Clicked video:', video);
     this.selectedVideo = video;
+    this.videoOpen = true;
 
-    // Focus map on video
     if (video.location) {
-      this.mapComp.focusLocation(video.location.latitude, video.location.longitude);
+      this.mapComp.focusLocation(
+        video.location.latitude,
+        video.location.longitude
+      );
     }
   }
 
   onPopupClosed(): void {
-    this.selectedVideo = undefined;
+    this.videoOpen = false;
   }
 
   closeVideoCard(): void {
-
-    this.selectedVideo = undefined;
-
+    this.videoOpen = false;
     this.mapComp.closeAnyPopup();
   }
 
+
+  toggleFilters(): void {
+    this.filtersOpen = !this.filtersOpen;
+  }
 }

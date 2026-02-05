@@ -22,6 +22,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
   private markerLayer = L.layerGroup(); // holds all video markers
   private tileLayer!: L.TileLayer;
   private videoMarkers = new Map<string, L.Marker>(); // map video.id -> marker
+  icon = new L.Icon.Default();
 
   ngAfterViewInit(): void {
     // Initialize map
@@ -31,6 +32,8 @@ export class MapComponent implements AfterViewInit, OnChanges {
       zoomControl: false,          // remove default buttons
       attributionControl: true,    // optional: hide attribution
     });
+
+    this.icon.options.shadowSize = [0, 0];
 
     this.map.on("zoomend", () => {
       this.zoomChange.emit(this.map.getZoom());
@@ -140,7 +143,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
     // Add new markers
     this.videos.forEach(video => {
       if (!this.videoMarkers.has(video.id) && video.location) {
-        const marker = L.marker([video.location.latitude, video.location.longitude])
+        const marker = L.marker([video.location.latitude, video.location.longitude], {icon: this.icon})
           .bindPopup(`<b>${video.title}</b><br>${video.userName}`);
 
         // marker click emits video

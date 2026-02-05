@@ -27,6 +27,7 @@ import { MapComponent } from './components/map/map.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { VideoCardComponent } from './components/video-card/video-card.component';
 import { ExpandableDirective } from './shared/expandable.directive';
+import { TimeframeSelectorComponent } from './shared/timeframe-selector/timeframe-selector.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { ExpandableDirective } from './shared/expandable.directive';
     MapComponent,
     VideoCardComponent,
     ExpandableDirective,
+    TimeframeSelectorComponent,
   ],
   imports: [
     BrowserModule,
