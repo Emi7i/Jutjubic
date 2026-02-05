@@ -2,8 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { VideoUpload, Video, Comment, UploadProgress } from '../models/video-upload';
+import { VideoUpload, Video, Comment, UploadProgress, GeographicLocation } from '../models/video-upload';
 import { environment } from 'src/environments/environment';
+
+// for testing purposes
+import { FakeVideoService } from './fake-video.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +14,7 @@ import { environment } from 'src/environments/environment';
 export class VideoService {
  private apiUrl = environment.apiUrl + '/video-posts';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private fakeVideoService: FakeVideoService) { }
 
   uploadVideo(videoData: VideoUpload): Observable<UploadProgress> {
     const formData = new FormData();
@@ -26,7 +29,7 @@ export class VideoService {
 
     formData.append('videoPost', new Blob([JSON.stringify(videoPost)], { type: 'application/json' }));
     formData.append('videoFile', videoData.video, videoData.video.name);
-    
+
     if (videoData.thumbnail) {
       formData.append('thumbnailFile', videoData.thumbnail, videoData.thumbnail.name);
     }
@@ -186,5 +189,16 @@ export class VideoService {
 
   deleteVideo(videoId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${videoId}`);
+  }
+
+  getVideosInBounds(bounds: { sw: [number, number], ne: [number, number] }): Video[] {
+
+    const videos = this.fakeVideoService.generateVideos(15, bounds.sw, bounds.ne);
+
+    // shuffle them to simulate randomness
+    const shuffled = [...videos].sort(() => Math.random() - 0.5);
+
+    // return only the requested count
+    return shuffled;
   }
 }

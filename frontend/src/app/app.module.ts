@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -24,6 +24,9 @@ import { LoginFormComponent } from './components/login-form/login-form.component
 import { ActivateComponent } from './pages/activate/activate.component';
 import { SandboxComponent } from './pages/sandbox/sandbox.component';
 import { MapComponent } from './components/map/map.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { VideoCardComponent } from './components/video-card/video-card.component';
+import { ExpandableDirective } from './shared/expandable.directive';
 
 @NgModule({
   declarations: [
@@ -39,6 +42,8 @@ import { MapComponent } from './components/map/map.component';
     ActivateComponent,
     SandboxComponent,
     MapComponent,
+    VideoCardComponent,
+    ExpandableDirective,
   ],
   imports: [
     BrowserModule,
@@ -52,6 +57,12 @@ import { MapComponent } from './components/map/map.component';
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [VideoService],
   bootstrap: [AppComponent]

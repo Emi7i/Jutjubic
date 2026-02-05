@@ -1,5 +1,7 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MapComponent } from '../../components/map/map.component';
+import { VideoService } from '../../services/video.service';
+import { Video } from '../../models/video-upload';
 
 @Component({
   selector: 'app-sandbox',
@@ -11,6 +13,11 @@ export class SandboxComponent implements AfterViewInit {
   @ViewChild(MapComponent) mapComp!: MapComponent;
 
   zoom = 13; // initial zoom
+  visibleVideos: Video[] = [];
+  selectedVideo?: Video;
+
+
+  constructor(private videoService: VideoService) {} // inject the service
 
   ngAfterViewInit(): void {
     // sync initial zoom from map
@@ -40,4 +47,32 @@ export class SandboxComponent implements AfterViewInit {
   onMapZoomChange(newZoom: number): void {
     this.zoom = newZoom;
   }
+
+  onMapMoved(bounds: { sw: [number, number], ne: [number, number] }) {
+    // Fetch videos in the visible bounds
+    if(!this.selectedVideo)
+      this.visibleVideos = this.videoService.getVideosInBounds(bounds);
+  }
+
+  onVideoSelected(video: Video) {
+    console.log('Clicked video:', video);
+    this.selectedVideo = video;
+
+    // Focus map on video
+    if (video.location) {
+      this.mapComp.focusLocation(video.location.latitude, video.location.longitude);
+    }
+  }
+
+  onPopupClosed(): void {
+    this.selectedVideo = undefined;
+  }
+
+  closeVideoCard(): void {
+
+    this.selectedVideo = undefined;
+
+    this.mapComp.closeAnyPopup();
+  }
+
 }

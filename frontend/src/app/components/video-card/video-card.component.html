@@ -1,0 +1,36 @@
+<div class="video-card">
+  <!-- Video player -->
+  <video #videoElement
+         [src]="video.videoUrl"
+         [poster]="video.thumbnailUrl"
+         controls
+         class="video-player">
+  </video>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button (click)="toggleLike()">
+      {{ video.isLiked ? 'Unlike' : 'Like' }} ({{ video.likes }})
+    </button>
+    <button (click)="togglePlayPause()">Play/Pause</button>
+  </div>
+
+  <!-- Comments -->
+  <div class="comments-container">
+    <div class="comments-list" *ngIf="!loadingComments">
+      <div class="comment" *ngFor="let comment of comments">
+        <b>{{ comment.userName }}:</b> {{ comment.text }}
+      </div>
+    </div>
+
+    <div *ngIf="loadingComments">Loading comments...</div>
+
+    <div class="add-comment">
+      <input type="text"
+             placeholder="Add a comment..."
+             [(ngModel)]="newComment"
+             (keyup.enter)="addComment()">
+      <button (click)="addComment()">Post</button>
+    </div>
+  </div>
+</div>
