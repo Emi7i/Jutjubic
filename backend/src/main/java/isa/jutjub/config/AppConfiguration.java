@@ -4,8 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import isa.jutjub.service.AssetService;
-import isa.jutjub.service.AssetServiceImpl;
 
 @Configuration
 /*
@@ -25,10 +23,6 @@ public class AppConfiguration {
 	 * Alternativno se komponente mogu registrovati kao beanovi unutar jedne ili
 	 * vise konfiguracionih klasa (klase su anotirane sa @Configuration)
 	 */
-
-	 /*@Bean
-	 public AssetService getAssetService() { return new AssetServiceImpl();
-	 }*/
 
 
 }
