@@ -18,6 +18,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/api/tiles")
@@ -244,5 +254,81 @@ public class TileController {
         log.info("Getting tiles in bounding box: ({}, {}) to ({}, {})", minLon, minLat, maxLon, maxLat);
         List<Tile> tiles = tileService.getTilesInBoundingBox(minLon, minLat, maxLon, maxLat);
         return ResponseEntity.ok(tiles);
+    }
+
+    @GetMapping("/videos")
+    @Operation(summary = "Get videos in bounding box with date filtering",
+            description = "Retrieve all videos within a bounding box defined by query parameters, with optional date filtering.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Videos retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid date format or parameters"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<List<VideoPost>> getVideosInBoundingBoxFiltered(
+            @Parameter(description = "Minimum longitude (integer degree)")
+            @RequestParam Integer minLon,
+            @Parameter(description = "Minimum latitude (integer degree)")
+            @RequestParam Integer minLat,
+            @Parameter(description = "Maximum longitude (integer degree)")
+            @RequestParam Integer maxLon,
+            @Parameter(description = "Maximum latitude (integer degree)")
+            @RequestParam Integer maxLat,
+            @Parameter(description = "From date (ISO format: YYYY-MM-DDTHH:mm:ss.sssZ)")
+            @RequestParam(required = false) String from,
+            @Parameter(description = "To date (ISO format: YYYY-MM-DDTHH:mm:ss.sssZ)")
+            @RequestParam(required = false) String to) {
+
+        try {
+            // Get all tiles in the bounding box
+            List<Tile> tiles = tileService.getTilesInBoundingBox(minLon, minLat, maxLon, maxLat);
+
+            // Collect all videos from these tiles into a Set to avoid duplicates
+            // (in case a video service logic ever allowed a video in multiple tiles)
+            Set<VideoPost> allVideos = new java.util.HashSet<>();
+            for (Tile tile : tiles) {
+                allVideos.addAll(tile.getVideos());
+            }
+
+            List<VideoPost> filteredVideos = new ArrayList<>(allVideos);
+
+            // Apply date filtering if parameters are provided
+            if (from != null || to != null) {
+                LocalDateTime fromDate = null;
+                LocalDateTime toDate = null;
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+
+                try {
+                    if (from != null && !from.trim().isEmpty()) {
+                        fromDate = LocalDateTime.parse(from, formatter);
+                    }
+                    if (to != null && !to.trim().isEmpty()) {
+                        toDate = LocalDateTime.parse(to, formatter);
+                    }
+                } catch (DateTimeParseException e) {
+                    log.error("Invalid date format: {}", e.getMessage());
+                    return ResponseEntity.badRequest().build();
+                }
+
+                final LocalDateTime finalFrom = fromDate;
+                final LocalDateTime finalTo = toDate;
+
+                filteredVideos = filteredVideos.stream()
+                        .filter(v -> (finalFrom == null || !v.getCreatedAt().isBefore(finalFrom)))
+                        .filter(v -> (finalTo == null || !v.getCreatedAt().isAfter(finalTo)))
+                        .collect(java.util.stream.Collectors.toList());
+            }
+
+            // Sort by date descending by default
+            filteredVideos.sort((v1, v2) -> v2.getCreatedAt().compareTo(v1.getCreatedAt()));
+
+            return ResponseEntity.ok(filteredVideos);
+
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid request: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            log.error("Failed to retrieve videos in bounding box: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
