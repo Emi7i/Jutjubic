@@ -93,7 +93,8 @@ public class CacheConfig {
                 "recentVideoPosts",
                 "popularVideoPosts",
                 "videoSearch",
-                "videoPostsByTag"
+                "videoPostsByTag",
+                "tiles"
         ));
         return cacheManager;
     }

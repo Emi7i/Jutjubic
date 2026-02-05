@@ -2,6 +2,7 @@ package isa.jutjub.service;
 
 import isa.jutjub.model.VideoPost;
 import isa.jutjub.repository.VideoPostRepository;
+import isa.jutjub.service.TileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,12 +26,14 @@ public class VideoPostService {
     private final VideoPostRepository videoPostRepository;
     private final FileUploadService fileUploadService;
     private final VideoPostCacheService videoPostCacheService;
+    private final TileService tileService;
 
     @Autowired
-    public VideoPostService(VideoPostRepository videoPostRepository, FileUploadService fileUploadService, VideoPostCacheService videoPostCacheService) {
+    public VideoPostService(VideoPostRepository videoPostRepository, FileUploadService fileUploadService, VideoPostCacheService videoPostCacheService, TileService tileService) {
         this.videoPostRepository = videoPostRepository;
         this.fileUploadService = fileUploadService;
         this.videoPostCacheService = videoPostCacheService;
+        this.tileService = tileService;
     }
 
     /**
@@ -86,6 +89,26 @@ public class VideoPostService {
             
             log.info("Successfully created video post with ID: {}, upload duration: {}ms", 
                     savedPost.getId(), videoPost.getUploadDurationMs());
+            
+            // Automatically add video to tiles if it has valid coordinates
+            Integer longitude = savedPost.getLongitude();
+            Integer latitude = savedPost.getLatitude();
+            log.info("Video {} location: '{}', parsed coordinates: ({}, {})", 
+                    savedPost.getId(), savedPost.getLocation(), longitude, latitude);
+            
+            if (savedPost.hasValidCoordinates()) {
+                try {
+                    log.info("Auto-adding video {} to tiles based on coordinates: {}", 
+                            savedPost.getId(), savedPost.getLocation());
+                    tileService.addVideoToTile(savedPost);
+                    log.info("Successfully added video {} to tiles", savedPost.getId());
+                } catch (Exception e) {
+                    log.warn("Failed to auto-add video {} to tiles: {}", savedPost.getId(), e.getMessage());
+                    // Don't fail the video creation if tile assignment fails
+                }
+            } else {
+                log.info("Video {} has no valid coordinates, skipping tile assignment", savedPost.getId());
+            }
             
             return savedPost;
             
