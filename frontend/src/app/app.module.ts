@@ -22,6 +22,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginComponent } from './pages/login/login.component';
 import { LoginFormComponent } from './components/login-form/login-form.component';
 import { ActivateComponent } from './pages/activate/activate.component';
+import { SandboxComponent } from './pages/sandbox/sandbox.component';
+import { MapComponent } from './components/map/map.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +37,8 @@ import { ActivateComponent } from './pages/activate/activate.component';
     LoginFormComponent,
     LoginComponent,
     ActivateComponent,
+    SandboxComponent,
+    MapComponent,
   ],
   imports: [
     BrowserModule,
