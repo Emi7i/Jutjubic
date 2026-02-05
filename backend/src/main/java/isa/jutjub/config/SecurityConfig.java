@@ -2,6 +2,7 @@ package isa.jutjub.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -9,8 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
@@ -31,8 +30,14 @@ public class SecurityConfig {
                 .requestMatchers("/", "/assets/**", "/static/**", "/favicon.ico", "/api-docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // H2 Console for development
                 .requestMatchers("/h2-console/**").permitAll()
-                // REST API endpoints for Angular
-                .requestMatchers("/api/**").permitAll()
+                // Error endpoint
+                .requestMatchers("/error").permitAll()
+                // Public auth endpoints (login, register, activate)
+                .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/activate", "/api/auth/manual-activate").permitAll()
+                    .requestMatchers("/api/**").permitAll()
+                // Public video viewing endpoints
+                //.requestMatchers(HttpMethod.GET, "/api/video-posts", "/api/video-posts/*", "/api/video-posts/*/video", "/api/video-posts/*/thumbnail", "/api/video-posts/search", "/api/video-posts/recent", "/api/video-posts/popular", "/api/video-posts/tag/*", "/api/video-posts/*/comments").permitAll()
+                // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)); // For H2 console

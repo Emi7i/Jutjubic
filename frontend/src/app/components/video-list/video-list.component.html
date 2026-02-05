@@ -35,6 +35,11 @@
           <span class="date">{{ video.createdAt | date:'short' }}</span>
         </div>
 
+        <div class="video-stats">
+          <span class="views">{{ video.viewsCount }} views</span>
+          <span class="likes">♥ {{ video.likes }} likes</span>
+        </div>
+
         <div class="tags-container">
           <span *ngFor="let tag of video.tags" class="tag">{{ tag }}</span>
         </div>

@@ -19,8 +19,12 @@
       <small>By {{ video.userName }} - {{ video.createdAt | date }}</small>
     </p>
 
+    <div>
+      <small>{{ video.viewsCount }} views</small>
+    </div>
+
     <div *ngIf="video.location">
-      <small>📍 {{ video.location.address || (video.location.latitude + ', ' + video.location.longitude) }}</small>
+      <small>{{ video.location.address || (video.location.latitude + ', ' + video.location.longitude) }}</small>
     </div>
 
     <div>

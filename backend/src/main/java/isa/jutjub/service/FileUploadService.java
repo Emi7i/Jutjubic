@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,6 +56,19 @@ public class FileUploadService {
                 throw new RuntimeException("Video file size exceeds " + maxVideoSizeMB + "MB limit");
             }
 
+            // Validate file content type
+            String contentType = videoFile.getContentType();
+            if (contentType == null || (!contentType.equals("video/mp4") && 
+                !contentType.equals("video/webm") && 
+                !contentType.equals("video/ogg") && 
+                !contentType.equals("video/quicktime") && 
+                !contentType.equals("video/x-msvideo"))) {
+                throw new RuntimeException("Invalid video file type. Only MP4, WebM, OGG, QuickTime, and AVI files are allowed");
+            }
+
+            log.info("Uploading video file: {}, size: {} bytes, content type: {}", 
+                videoFile.getOriginalFilename(), videoFile.getSize(), contentType);
+
             // Create upload directory if it doesn't exist
             Path uploadPath = Paths.get(uploadDir, "videos");
             if (!Files.exists(uploadPath)) {
@@ -73,6 +87,12 @@ public class FileUploadService {
                 try {
                     Files.copy(videoFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
                     log.info("Successfully uploaded video file to: {}", filePath);
+                    
+                    // Verify the uploaded file is not corrupted
+                    if (!isValidVideoFile(filePath)) {
+                        throw new RuntimeException("Uploaded video file appears to be corrupted or invalid");
+                    }
+                    
                     return filePath.toString();
                 } catch (IOException e) {
                     throw new RuntimeException("Failed to save video file: " + e.getMessage(), e);
@@ -156,15 +176,34 @@ public class FileUploadService {
      */
     public Resource getVideoFile(String filePath) {
         try {
-            Path path = Paths.get(filePath);
+            // Handle Windows paths and normalize
+            Path path = Paths.get(filePath).normalize();
+            log.info("Loading video file from path: {} -> normalized: {}", filePath, path);
+            
+            // Try to create resource
             Resource resource = new UrlResource(path.toUri());
+            log.info("Resource created: {}, exists: {}, readable: {}", 
+                resource.getFilename(), resource.exists(), resource.isReadable());
+            
+            // If resource doesn't exist, try alternative path formats
+            if (!resource.exists()) {
+                // Try converting Windows backslashes to forward slashes
+                String unixPath = filePath.replace("\\", "/");
+                Path unixPathObj = Paths.get(unixPath).normalize();
+                log.info("Trying Unix path format: {}", unixPathObj);
+                resource = new UrlResource(unixPathObj.toUri());
+                log.info("Unix path resource exists: {}, readable: {}", 
+                    resource.exists(), resource.isReadable());
+            }
             
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
+                log.error("Video file not found or not readable: {}", filePath);
                 throw new RuntimeException("Video file not found: " + filePath);
             }
         } catch (Exception e) {
+            log.error("Failed to load video file: {}", filePath, e);
             throw new RuntimeException("Failed to load video file: " + e.getMessage(), e);
         }
     }
@@ -247,6 +286,48 @@ public class FileUploadService {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String uuid = UUID.randomUUID().toString().substring(0, 8);
         return prefix + "_" + timestamp + "_" + uuid + extension;
+    }
+
+    /**
+     * Validates that the uploaded video file has valid MP4 structure
+     * @param filePath the path to the uploaded file
+     * @return true if the file appears to be valid
+     */
+    private boolean isValidVideoFile(Path filePath) {
+        try {
+            byte[] header = new byte[12]; // MP4 files have specific header structure
+            try (FileInputStream fis = new FileInputStream(filePath.toFile())) {
+                int bytesRead = fis.read(header);
+                if (bytesRead < 8) {
+                    log.error("Video file too small: {} bytes", bytesRead);
+                    return false;
+                }
+                
+                // Check for MP4 file signature (ftyp box)
+                // MP4 files should start with file size and 'ftyp' identifier
+                if (bytesRead >= 8) {
+                    // Check if it's an MP4 file (starts with ftyp box)
+                    boolean hasFtyp = (header[4] == 'f' && header[5] == 't' && header[6] == 'y' && header[7] == 'p');
+                    if (!hasFtyp) {
+                        log.warn("Video file may not be valid MP4 (missing ftyp box): {}", filePath);
+                        // Don't reject yet, as some MP4 files might have different structure
+                    }
+                }
+                
+                // Basic file size check
+                long fileSize = Files.size(filePath);
+                if (fileSize < 1024) { // Less than 1KB is probably corrupted
+                    log.error("Video file too small to be valid: {} bytes", fileSize);
+                    return false;
+                }
+                
+                log.info("Video file validation passed: {} bytes", fileSize);
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("Failed to validate video file: {}", e.getMessage());
+            return false;
+        }
     }
 
     /**

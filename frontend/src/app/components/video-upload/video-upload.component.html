@@ -38,7 +38,7 @@
 
     <div>
       <label for="video">Video (MP4, max 200MB) *</label>
-      <input type="file" id="video" accept="video/mp4" (change)="onVideoSelected($event)">
+      <input type="file" id="video" accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo" (change)="onVideoSelected($event)">
       <video *ngIf="videoPreview" [src]="videoPreview" controls style="max-width: 400px; margin-top: 10px;"></video>
     </div>
 
@@ -57,6 +57,15 @@
     <div *ngIf="uploadProgress">
       <p>{{ uploadProgress.message }} - {{ uploadProgress.percentage }}%</p>
       <progress [value]="uploadProgress.percentage" max="100"></progress>
+    </div>
+
+    <!-- Success Toast Message -->
+    <div *ngIf="showSuccessMessage" class="success-toast">
+      <div class="toast-content">
+        <span class="toast-icon">✓</span>
+        <span class="toast-message">Video uploaded successfully!</span>
+        <button type="button" class="toast-close" (click)="hideSuccessMessage()">×</button>
+      </div>
     </div>
 
     <button type="submit" [disabled]="isUploading || uploadForm.invalid">

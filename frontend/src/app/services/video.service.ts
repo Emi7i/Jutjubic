@@ -16,14 +16,19 @@ export class VideoService {
   uploadVideo(videoData: VideoUpload): Observable<UploadProgress> {
     const formData = new FormData();
 
-    formData.append('title', videoData.title);
-    formData.append('description', videoData.description);
-    formData.append('tags', JSON.stringify(videoData.tags));
-    formData.append('thumbnail', videoData.thumbnail, videoData.thumbnail.name);
-    formData.append('video', videoData.video, videoData.video.name);
+    // Create VideoPost object for the backend
+    const videoPost = {
+      title: videoData.title,
+      videoDescription: videoData.description,
+      tags: videoData.tags,
+      location: videoData.location ? JSON.stringify(videoData.location) : null
+    };
 
-    if (videoData.location) {
-      formData.append('location', JSON.stringify(videoData.location));
+    formData.append('videoPost', new Blob([JSON.stringify(videoPost)], { type: 'application/json' }));
+    formData.append('videoFile', videoData.video, videoData.video.name);
+    
+    if (videoData.thumbnail) {
+      formData.append('thumbnailFile', videoData.thumbnail, videoData.thumbnail.name);
     }
 
     return this.http.post<any>(`${this.apiUrl}/upload`, formData, {
@@ -67,19 +72,83 @@ export class VideoService {
 
   getAllVideos(): Observable<Video[]> {
     return this.http.get<any>(this.apiUrl).pipe(
-      map(response => response.data || []),
+      map(response => {
+        console.log('Raw backend response:', response);
+        const videos = response.data || [];
+        // Transform backend response to frontend Video model
+        return videos.map((video: any) => ({
+          id: video.id.toString(),
+          title: video.title,
+          description: video.videoDescription,
+          tags: Array.isArray(video.tags) ? video.tags : (video.tags ? Object.values(video.tags) : []),
+          thumbnailUrl: `${this.apiUrl}/${video.id}/thumbnail`,
+          videoUrl: `${this.apiUrl}/${video.id}/video`,
+          location: video.location ? this.parseLocation(video.location) : undefined,
+          createdAt: new Date(video.createdAt),
+          userId: video.userId?.toString() || '',
+          userName: video.userName || 'Anonymous',
+          likes: video.likesCount || 0,
+          commentsCount: video.commentsCount || 0,
+          viewsCount: video.viewsCount || 0,
+          isLiked: false
+        }));
+      }),
       catchError(error => {
         console.error('Failed to fetch videos:', error);
+        console.error('Error response:', error.error);
         return throwError(() => error);
       })
     );
   }
 
+  private parseLocation(locationString: string): any {
+    try {
+      // If it's already JSON, parse it
+      if (locationString.startsWith('{')) {
+        return JSON.parse(locationString);
+      }
+      // If it's plain text, return as address string
+      return {
+        address: locationString,
+        latitude: null,
+        longitude: null
+      };
+    } catch (e) {
+      console.warn('Failed to parse location:', locationString);
+      return {
+        address: locationString,
+        latitude: null,
+        longitude: null
+      };
+    }
+  }
+
   getVideoById(id: string): Observable<Video> {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-      map(response => response.data),
+      map(response => {
+        console.log('Raw video response:', response);
+        const video = response.data;
+        // Transform backend response to frontend Video model
+        return {
+          id: video.id.toString(),
+          title: video.title,
+          description: video.videoDescription,
+          tags: Array.isArray(video.tags) ? video.tags : (video.tags ? Object.values(video.tags) : []),
+          thumbnailUrl: `${this.apiUrl}/${video.id}/thumbnail`,
+          videoUrl: `${this.apiUrl}/${video.id}/video`,
+          location: video.location ? this.parseLocation(video.location) : undefined,
+          createdAt: new Date(video.createdAt),
+          userId: video.userId?.toString() || '',
+          userName: video.userName || 'Anonymous',
+          likes: video.likesCount || 0,
+          commentsCount: video.commentsCount || 0,
+          viewsCount: video.viewsCount || 0,
+          isLiked: false
+        };
+      }),
       catchError(error => {
         console.error('Failed to fetch video:', error);
+        console.error('Error response:', error.error);
         return throwError(() => error);
       })
     );
@@ -90,11 +159,29 @@ export class VideoService {
   }
 
   addComment(videoId: string, text: string): Observable<Comment> {
-    return this.http.post<Comment>(`${this.apiUrl}/${videoId}/comments`, { text });
+    return this.http.post<any>(`${this.apiUrl}/${videoId}/comments`, { text }).pipe(
+      map(response => {
+        console.log('Raw add comment response:', response);
+        return response.data;
+      }),
+      catchError(error => {
+        console.error('Failed to add comment:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   getComments(videoId: string): Observable<Comment[]> {
-    return this.http.get<Comment[]>(`${this.apiUrl}/${videoId}/comments`);
+    return this.http.get<any>(`${this.apiUrl}/${videoId}/comments`).pipe(
+      map(response => {
+        console.log('Raw comments response:', response);
+        return response.data || [];
+      }),
+      catchError(error => {
+        console.error('Failed to fetch comments:', error);
+        return [];
+      })
+    );
   }
 
   deleteVideo(videoId: string): Observable<any> {

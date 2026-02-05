@@ -47,7 +47,14 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        emailService.sendActivationEmail(savedUser);
+        try {
+            emailService.sendActivationEmail(savedUser);
+            System.out.println("Activation email sent to: " + user.getEmail());
+        } catch (Exception e) {
+            System.err.println("Failed to send activation email: " + e.getMessage());
+            // Continue without email - user can be activated manually
+            System.out.println("User registered but email failed. User can be activated manually.");
+        }
 
         return userRepository.findById(savedUser.getId()).isPresent();
     }
@@ -96,6 +103,18 @@ public class AuthService {
         user.setActive(true);
         user.setActivationToken(null); // remove token after activation
         userRepository.save(user);
+        return true;
+    }
+
+    public boolean manualActivateUser(String username) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) return false;
+
+        User user = userOpt.get();
+        user.setActive(true);
+        user.setActivationToken(null); // remove token after activation
+        userRepository.save(user);
+        System.out.println("Manually activated user: " + username);
         return true;
     }
 

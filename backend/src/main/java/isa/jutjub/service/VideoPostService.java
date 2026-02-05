@@ -218,14 +218,21 @@ public class VideoPostService {
     }
 
     /**
-     * Increments the view count for a video post
+     * Increments the view count for a video post in a thread-safe manner
+     * Uses atomic update to handle concurrent access correctly
      * @param id the video post ID
      */
     @Transactional(rollbackFor = Exception.class)
     public void incrementViewCount(Long id) {
-        VideoPost videoPost = getVideoPostById(id);
-        videoPost.setViewsCount(videoPost.getViewsCount() + 1);
-        videoPostRepository.save(videoPost);
+        // Use native SQL update for atomic operation - this handles concurrent access safely
+        int updated = videoPostRepository.incrementViewsCount(id);
+        
+        if (updated == 0) {
+            // If no rows were updated, the video post doesn't exist
+            throw new RuntimeException("Video post not found with ID: " + id);
+        }
+        
+        log.info("Incremented view count for video post ID: {}", id);
     }
 
     /**

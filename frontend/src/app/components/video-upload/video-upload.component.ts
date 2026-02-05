@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { VideoService } from '../../services/video.service';
+import { VideoUpload } from '../../models/video-upload';
 
 @Component({
   selector: 'app-video-upload',
@@ -17,8 +19,13 @@ export class VideoUploadComponent implements OnInit {
   currentLocation: any = null;
   errorMessage: string | null = null;
   uploadProgress: { message: string; percentage: number } | null = null;
+  showSuccessMessage = false;
+  
+  // File references for upload
+  thumbnailFile: File | null = null;
+  videoFile: File | null = null;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private videoService: VideoService) {}
 
   ngOnInit(): void {
     this.uploadForm = this.fb.group({
@@ -32,30 +39,50 @@ export class VideoUploadComponent implements OnInit {
       return;
     }
 
+    // Validate that both files are selected
+    if (!this.thumbnailFile || !this.videoFile) {
+      this.errorMessage = 'Please select both thumbnail and video files.';
+      return;
+    }
+
     this.isUploading = true;
     this.errorMessage = null;
     
-    // TODO: Implement actual upload logic
-    console.log('Form submitted:', {
-      ...this.uploadForm.value,
+    // Prepare video upload data
+    const videoData: VideoUpload = {
+      title: this.uploadForm.value.title,
+      description: this.uploadForm.value.description,
       tags: this.tags,
-      thumbnail: this.thumbnailPreview,
-      video: this.videoPreview,
+      thumbnail: this.thumbnailFile,
+      video: this.videoFile,
       location: this.useLocation ? this.currentLocation : null
-    });
+    };
 
-    // Simulate upload progress
-    this.uploadProgress = { message: 'Uploading...', percentage: 0 };
-    const interval = setInterval(() => {
-      if (this.uploadProgress && this.uploadProgress.percentage < 100) {
-        this.uploadProgress.percentage += 10;
-      } else {
-        clearInterval(interval);
+    // Call the actual upload service
+    this.videoService.uploadVideo(videoData).subscribe({
+      next: (progress) => {
+        this.uploadProgress = {
+          message: progress.message || 'Uploading...',
+          percentage: progress.percentage
+        };
+        
+        if (progress.status === 'complete') {
+          this.isUploading = false;
+          this.showSuccessMessage = true;
+          // Auto-hide success message after 5 seconds
+          setTimeout(() => {
+            this.hideSuccessMessage();
+          }, 5000);
+          this.resetForm();
+        }
+      },
+      error: (error) => {
+        console.error('Upload error:', error);
+        this.errorMessage = 'Failed to upload video: ' + (error.error?.message || error.message || 'Unknown error');
         this.isUploading = false;
         this.uploadProgress = null;
-        this.resetForm();
       }
-    }, 500);
+    });
   }
 
   addTag(): void {
@@ -73,6 +100,10 @@ export class VideoUploadComponent implements OnInit {
   onThumbnailSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
+      // Store the file reference for upload
+      this.thumbnailFile = file;
+      
+      // Generate preview
       const reader = new FileReader();
       reader.onload = (e) => {
         this.thumbnailPreview = e.target?.result as string;
@@ -84,6 +115,25 @@ export class VideoUploadComponent implements OnInit {
   onVideoSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
+      // Validate that the file is a video
+      if (!file.type.startsWith('video/')) {
+        this.errorMessage = 'Please select a valid video file. Images are not allowed.';
+        event.target.value = ''; // Clear the input
+        return;
+      }
+      
+      // Check for specific video formats
+      const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'];
+      if (!allowedTypes.includes(file.type)) {
+        this.errorMessage = 'Unsupported video format. Please use MP4, WebM, OGG, QuickTime, or AVI files.';
+        event.target.value = ''; // Clear the input
+        return;
+      }
+      
+      // Store the file reference for upload
+      this.videoFile = file;
+      
+      this.errorMessage = null; // Clear any previous errors
       const reader = new FileReader();
       reader.onload = (e) => {
         this.videoPreview = e.target?.result as string;
@@ -126,9 +176,15 @@ export class VideoUploadComponent implements OnInit {
     this.tagInput = '';
     this.thumbnailPreview = null;
     this.videoPreview = null;
+    this.thumbnailFile = null;
+    this.videoFile = null;
     this.useLocation = false;
     this.currentLocation = null;
     this.errorMessage = null;
     this.uploadProgress = null;
+  }
+
+  hideSuccessMessage(): void {
+    this.showSuccessMessage = false;
   }
 }
