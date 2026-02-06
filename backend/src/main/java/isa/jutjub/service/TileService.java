@@ -235,4 +235,93 @@ public class TileService {
     public Long countTilesWithVideos() {
         return tileRepository.countTilesWithVideos();
     }
+
+    /**
+     * Sift through all videos and assign them to their correct tiles based on location
+     * This function should ONLY be called by the scheduler at 3 AM
+     * Never called by the regular application
+     */
+    @CacheEvict(value = "tiles", allEntries = true)
+    public int SiftThroughVideos() {
+        log.info("Starting SiftThroughVideos - redistributing all videos to correct tiles");
+        
+        // Clear all existing tile-video associations
+        List<Tile> allTiles = tileRepository.findAll();
+        for (Tile tile : allTiles) {
+            tile.getVideos().clear();
+            tileRepository.save(tile);
+        }
+        
+        // Get all videos and redistribute them to correct tiles
+        List<VideoPost> allVideos = videoPostRepository.findAll();
+        int redistributedCount = 0;
+        
+        for (VideoPost video : allVideos) {
+            try {
+                if (video.hasValidCoordinates()) {
+                    // Get or create the correct tile for this video
+                    Integer longitude = video.getLongitude();
+                    Integer latitude = video.getLatitude();
+                    Tile correctTile = getOrCreateTile(longitude, latitude);
+                    
+                    // Add video to its correct tile
+                    correctTile.addVideo(video);
+                    tileRepository.save(correctTile);
+                    redistributedCount++;
+                    
+                    log.debug("Redistributed video {} to tile ({}, {})", 
+                            video.getId(), longitude, latitude);
+                } else {
+                    log.warn("Video {} has invalid coordinates, skipping", video.getId());
+                }
+            } catch (Exception e) {
+                log.error("Error redistributing video {}: {}", video.getId(), e.getMessage());
+            }
+        }
+        
+        log.info("Completed SiftThroughVideos. Redistributed {} videos to {} tiles", 
+                redistributedCount, allTiles.size());
+        return redistributedCount;
+    }
+
+    /**
+     * Cleanup inactive tiles - used by scheduler for weekly maintenance
+     * Goes through each video and reassigns it to the correct tile
+     */
+    @CacheEvict(value = "tiles", allEntries = true)
+    public int cleanupInactiveTiles() {
+        log.info("Starting inactive tile cleanup - reassigning all videos");
+        
+        // Get all videos and reassign them to correct tiles
+        List<VideoPost> allVideos = videoPostRepository.findAll();
+        int reassignedCount = 0;
+        
+        for (VideoPost video : allVideos) {
+            try {
+                if (video.hasValidCoordinates()) {
+                    // Get or create the correct tile for this video
+                    Integer longitude = video.getLongitude();
+                    Integer latitude = video.getLatitude();
+                    Tile correctTile = getOrCreateTile(longitude, latitude);
+                    
+                    // Add video to its correct tile if not already present
+                    if (!correctTile.getVideos().contains(video)) {
+                        correctTile.addVideo(video);
+                        tileRepository.save(correctTile);
+                        reassignedCount++;
+                        
+                        log.debug("Reassigned video {} to tile ({}, {})", 
+                                video.getId(), longitude, latitude);
+                    }
+                } else {
+                    log.warn("Video {} has invalid coordinates, skipping", video.getId());
+                }
+            } catch (Exception e) {
+                log.error("Error reassigning video {}: {}", video.getId(), e.getMessage());
+            }
+        }
+        
+        log.info("Completed inactive tile cleanup. Reassigned {} videos", reassignedCount);
+        return reassignedCount;
+    }
 }
