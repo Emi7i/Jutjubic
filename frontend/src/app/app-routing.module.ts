@@ -8,6 +8,7 @@ import { RegisterComponent } from './pages/register/register.component';
 import { LoginComponent } from "./pages/login/login.component";
 import { ActivateComponent } from "./pages/activate/activate.component";
 import { SandboxComponent } from "./pages/sandbox/sandbox.component";
+import { VideoMapComponent } from "./pages/video-map/video-map.component";
 
 
 const routes: Routes = [
@@ -15,6 +16,7 @@ const routes: Routes = [
   { path: 'videos', component: VideoListComponent },
   { path: 'videos/:id', component: VideoDetailComponent },
   { path: 'upload', component: VideoUploadComponent },
+  { path: 'map', component: VideoMapComponent },
   // authorization stuff: registration, login, etc.
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },

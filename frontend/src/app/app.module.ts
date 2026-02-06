@@ -28,6 +28,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { VideoCardComponent } from './components/video-card/video-card.component';
 import { ExpandableDirective } from './shared/expandable.directive';
 import { TimeframeSelectorComponent } from './shared/timeframe-selector/timeframe-selector.component';
+import { VideoMapComponent } from './pages/video-map/video-map.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { TimeframeSelectorComponent } from './shared/timeframe-selector/timefram
     VideoCardComponent,
     ExpandableDirective,
     TimeframeSelectorComponent,
+    VideoMapComponent,
   ],
   imports: [
     BrowserModule,
