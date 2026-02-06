@@ -24,7 +24,7 @@ public class VideoTestDataSeeder implements CommandLineRunner {
     public void run(String... args) {
         if (videoPostRepository.count() > 0) return;
 
-        String sharedVideoPath = "/uploads/videos/sample.mp4";
+        String sharedVideoPath = "./uploads/videos/sample.mp4";
         String sharedThumbnail = "./uploads/thumbnails/sample.png";
 
         Random rnd = new Random();
