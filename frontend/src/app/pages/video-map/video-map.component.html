@@ -1,0 +1,66 @@
+<div class="page">
+  <div class="video-map">
+
+    <!-- Map -->
+    <div class="map-container">
+      <app-map
+        [darkMode]="false"
+        [videos]="visibleVideos"
+        (zoomChange)="onMapZoomChange($event)"
+        (mapMoved)="onMapMoved($event)"
+        (markerClick)="onVideoSelected($event)"
+        (markerPopupClosed)="closeVideoCard()">
+      </app-map>
+    </div>
+
+    <!-- Video card -->
+    <div class="video-card-container" [class.hidden]="!videoOpen" *ngIf="selectedVideo">
+      <app-video-card [video]="selectedVideo"></app-video-card>
+
+      <!-- Likes -->
+      <div class="likes-section">
+        <button (click)="toggleLike(selectedVideo)">
+          {{ selectedVideo.isLiked ? '♥' : '♡' }} {{ selectedVideo.likes }}
+        </button>
+      </div>
+
+      <!-- Comments -->
+      <div class="comments-section">
+        <div *ngFor="let comment of comments" class="comment">
+          <strong>{{ comment.userName }}:</strong> {{ comment.text }}
+        </div>
+        <input
+          type="text"
+          placeholder="Add a comment..."
+          [(ngModel)]="newCommentText"
+          (keyup.enter)="addComment()">
+        <button (click)="addComment()">Send</button>
+      </div>
+
+      <button class="close-card" (click)="closeVideoCard()">×</button>
+    </div>
+
+    <!-- Filter toggle button -->
+    <button class="filter-toggle" (click)="toggleFilters()">Filters</button>
+
+    <!-- Filter popup -->
+    <div class="filter-container" [class.hidden]="!filtersOpen">
+      <h3 class="filter-title">Filters</h3>
+      <div class="filter-section">
+        <label class="filter-label">Time range</label>
+        <app-timeframe-selector (intervalChange)="onIntervalChange($event)"></app-timeframe-selector>
+      </div>
+      <button class="close-filter" (click)="toggleFilters()">×</button>
+    </div>
+
+    <!-- Controls -->
+    <div class="bottom-center-controls">
+      <button (click)="zoomOut()">-</button>
+      <input type="range" min="1" max="20" [value]="zoom" (input)="onSliderChange($event)">
+      <button (click)="zoomIn()">+</button>
+      <span class="zoom-label">{{ zoom }}</span>
+      <button (click)="darkMode()">dark mode</button>
+    </div>
+
+  </div>
+</div>
