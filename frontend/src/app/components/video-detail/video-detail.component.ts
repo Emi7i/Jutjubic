@@ -59,7 +59,7 @@ export class VideoDetailComponent implements OnInit {
     if (!this.video) return;
 
     // Check if user is logged in
-    const currentUser = localStorage.getItem('currentUser');
+    const currentUser = localStorage.getItem('userId');
     if (!currentUser) {
       alert('You need to log in to like or comment on videos.');
       return;
@@ -82,7 +82,7 @@ export class VideoDetailComponent implements OnInit {
     if (!this.video || !this.newComment.trim()) return;
 
     // Check if user is logged in
-    const currentUser = localStorage.getItem('currentUser');
+    const currentUser = localStorage.getItem('userId');
     if (!currentUser) {
       alert('You need to log in to like or comment on videos.');
       return;

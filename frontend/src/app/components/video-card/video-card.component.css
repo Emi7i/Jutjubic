@@ -1,0 +1,68 @@
+.video-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;        /* full height of parent */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;    /* prevents child overflow outside card */
+}
+
+/* Video player at top */
+.video-player {
+  width: 100%;
+  max-height: 40%;     /* limit video height */
+  object-fit: contain;
+}
+
+/* Controls below the video */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  background-color: #f5f5f5;
+  flex-shrink: 0;      /* don't shrink */
+}
+
+/* Comments section stretches */
+.comments-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;      /* stretch */
+  min-height: 0;       /* allow flex shrink properly */
+  overflow: hidden;
+}
+
+/* Scrollable comments list */
+.comments-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding-right: 4px;   /* prevent scrollbar overlapping text */
+}
+
+/* Each comment */
+.comment {
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* Add comment input */
+.add-comment {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.add-comment input {
+  flex: 1;
+  padding: 4px 8px;
+}
+
+.add-comment button {
+  padding: 4px 12px;
+}
+
+/* Optional: smooth scroll behavior */
+.comments-list {
+  scroll-behavior: smooth;
+}
