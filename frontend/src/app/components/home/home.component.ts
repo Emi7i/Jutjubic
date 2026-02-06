@@ -26,4 +26,8 @@ export class HomeComponent {
   goToUpload(): void {
     this.router.navigate(['/upload']);
   }
+
+  goToMap(): void {
+    this.router.navigate(['/map']);
+  }
 }
