@@ -1,0 +1,27 @@
+<div class="timeframe">
+  <select [(ngModel)]="selected" (change)="onSelectionChange()">
+    <option value="all">All time</option>
+    <option value="lastYear">Last year</option>
+    <option value="lastMonth">Last month</option>
+    <option value="thisYear">This year</option>
+    <option value="custom">Custom</option>
+  </select>
+
+  <div class="custom-range" *ngIf="selected == 'custom'">
+    <label>
+      From
+      <input
+        type="date"
+        [(ngModel)]="customFrom"
+        (change)="emitCustom()" />
+    </label>
+
+    <label>
+      To
+      <input
+        type="date"
+        [(ngModel)]="customTo"
+        (change)="emitCustom()" />
+    </label>
+  </div>
+</div>

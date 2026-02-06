@@ -1,0 +1,10 @@
+.map {
+  height: 100%;
+  width: 100%;
+  flex: 1;
+}
+
+.leaflet-marker-icon {
+  image-rendering: auto;   /* smooth scaling */
+  background: none !important; /* remove any background artifacts */
+}
