@@ -16,7 +16,7 @@ public interface TileRepository extends JpaRepository<Tile, Long> {
     /**
      * Find tile by exact longitude and latitude coordinates
      */
-    Optional<Tile> findByLongitudeAndLatitude(Integer longitude, Integer latitude);
+    Optional<Tile> findByLongitudeAndLatitude(Double longitude, Double latitude);
 
     /**
      * Find tiles with at least one video

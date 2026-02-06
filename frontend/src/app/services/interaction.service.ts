@@ -13,7 +13,7 @@ export class InteractionService {
 
   /** Toggle like for a video by ID */
   toggleLike(videoId: string): Observable<Video> {
-    const currentUser = localStorage.getItem('currentUser');
+    const currentUser = localStorage.getItem('userId');
     if (!currentUser) {
       return throwError(() => new Error('User not logged in'));
     }
@@ -28,7 +28,7 @@ export class InteractionService {
 
   /** Add a comment to a video by ID */
   addComment(videoId: string, text: string): Observable<Comment> {
-    const currentUser = localStorage.getItem('currentUser');
+    const currentUser = localStorage.getItem('userId');
     if (!currentUser) {
       return throwError(() => new Error('User not logged in'));
     }

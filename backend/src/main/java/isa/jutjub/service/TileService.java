@@ -46,7 +46,7 @@ public class TileService {
     @Cacheable(value = "tiles", key = "'coords-' + #longitude + '-' + #latitude")
     public Optional<Tile> getTileByCoordinates(Integer longitude, Integer latitude) {
         log.debug("Fetching tile by coordinates: ({}, {})", longitude, latitude);
-        return tileRepository.findByLongitudeAndLatitude(longitude, latitude);
+        return tileRepository.findByLongitudeAndLatitude(longitude.doubleValue(), latitude.doubleValue());
     }
 
     /**
@@ -55,7 +55,7 @@ public class TileService {
      */
     @CacheEvict(value = "tiles", allEntries = true)
     public Tile getOrCreateTile(Integer longitude, Integer latitude) {
-        return tileRepository.findByLongitudeAndLatitude(longitude, latitude)
+        return tileRepository.findByLongitudeAndLatitude(longitude.doubleValue(), latitude.doubleValue())
                 .orElseGet(() -> {
                     Tile newTile = new Tile();
                     newTile.setLongitude(longitude);
@@ -73,7 +73,7 @@ public class TileService {
      */
     @CacheEvict(value = "tiles", allEntries = true)
     public Tile createTile(Integer longitude, Integer latitude) {
-        if (tileRepository.findByLongitudeAndLatitude(longitude, latitude).isPresent()) {
+        if (tileRepository.findByLongitudeAndLatitude(longitude.doubleValue(), latitude.doubleValue()).isPresent()) {
             throw new IllegalArgumentException("Tile already exists for coordinates: " + longitude + ", " + latitude);
         }
 
@@ -100,14 +100,14 @@ public class TileService {
         }
 
         // Round the video coordinates to integers
-        Integer longitude = video.getLongitude();
-        Integer latitude = video.getLatitude();
+        Double longitude = video.getLongitude();
+        Double latitude = video.getLatitude();
 
         log.debug("Adding video {} with coordinates ({}, {}) to tile",
                 video.getId(), longitude, latitude);
 
         // Get or create the tile for these rounded coordinates
-        Tile tile = getOrCreateTile(longitude, latitude);
+        Tile tile = getOrCreateTile(longitude.intValue(), latitude.intValue());
 
         // Add video to tile if not already present
         if (!tile.getVideos().contains(video)) {
@@ -161,8 +161,8 @@ public class TileService {
             throw new IllegalArgumentException("Video must have valid location coordinates");
         }
 
-        Integer longitude = video.getLongitude();
-        Integer latitude = video.getLatitude();
+        Double longitude = video.getLongitude();
+        Double latitude = video.getLatitude();
 
         Tile tile = tileRepository.findByLongitudeAndLatitude(longitude, latitude)
                 .orElseThrow(() -> new RuntimeException("Tile not found for video coordinates"));
@@ -185,9 +185,9 @@ public class TileService {
         List<Tile> tiles = new ArrayList<>();
 
         // Iterate through all grid cells in the bounding box
-        for (int lon = minLon; lon <= maxLon; lon++) {
-            for (int lat = minLat; lat <= maxLat; lat++) {
-                tileRepository.findByLongitudeAndLatitude(lon, lat).ifPresent(tiles::add);
+        for (Integer lon = minLon; lon <= maxLon; lon++) {
+            for (Integer lat = minLat; lat <= maxLat; lat++) {
+                tileRepository.findByLongitudeAndLatitude(lon.doubleValue(), lat.doubleValue()).ifPresent(tiles::add);
             }
         }
 
@@ -260,9 +260,9 @@ public class TileService {
             try {
                 if (video.hasValidCoordinates()) {
                     // Get or create the correct tile for this video
-                    Integer longitude = video.getLongitude();
-                    Integer latitude = video.getLatitude();
-                    Tile correctTile = getOrCreateTile(longitude, latitude);
+                    Double longitude = video.getLongitude();
+                    Double latitude = video.getLatitude();
+                    Tile correctTile = getOrCreateTile(longitude.intValue(), latitude.intValue());
                     
                     // Add video to its correct tile
                     correctTile.addVideo(video);
@@ -300,9 +300,9 @@ public class TileService {
             try {
                 if (video.hasValidCoordinates()) {
                     // Get or create the correct tile for this video
-                    Integer longitude = video.getLongitude();
-                    Integer latitude = video.getLatitude();
-                    Tile correctTile = getOrCreateTile(longitude, latitude);
+                    Double longitude = video.getLongitude();
+                    Double latitude = video.getLatitude();
+                    Tile correctTile = getOrCreateTile(longitude.intValue(), latitude.intValue());
                     
                     // Add video to its correct tile if not already present
                     if (!correctTile.getVideos().contains(video)) {

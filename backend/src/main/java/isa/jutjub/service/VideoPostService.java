@@ -91,8 +91,8 @@ public class VideoPostService {
                     savedPost.getId(), videoPost.getUploadDurationMs());
             
             // Automatically add video to tiles if it has valid coordinates
-            Integer longitude = savedPost.getLongitude();
-            Integer latitude = savedPost.getLatitude();
+            Double longitude = savedPost.getLongitude();
+            Double latitude = savedPost.getLatitude();
             log.info("Video {} location: '{}', parsed coordinates: ({}, {})", 
                     savedPost.getId(), savedPost.getLocation(), longitude, latitude);
             

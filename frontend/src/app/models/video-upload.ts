@@ -21,6 +21,8 @@ export interface Video {
   thumbnailUrl: string;
   videoUrl: string;
   location?: GeographicLocation;
+  longitude?: number;
+  latitude?: number;
   createdAt: Date;
   userId: string;
   userName: string;

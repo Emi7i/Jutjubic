@@ -24,8 +24,8 @@ public class VideoTestDataSeeder implements CommandLineRunner {
     public void run(String... args) {
         if (videoPostRepository.count() > 0) return;
 
-        String sharedVideoPath = "/videos/sample.mp4";
-        String sharedThumbnail = "/thumbnails/sample.png";
+        String sharedVideoPath = "/uploads/videos/sample.mp4";
+        String sharedThumbnail = "./uploads/thumbnails/sample.png";
 
         Random rnd = new Random();
 
@@ -38,9 +38,9 @@ public class VideoTestDataSeeder implements CommandLineRunner {
             vp.setVideoFileSize(42_000_000L);
 
             // scatter them on the map
-            int lon = 20 + rnd.nextInt(10);
-            int lat = 44 + rnd.nextInt(10);
-            vp.setLocationFromCoordinates(lon, lat);
+            Double lon = 20 + rnd.nextDouble(10);
+            Double lat = 44 + rnd.nextDouble(10);
+            vp.setCoordinates(lon, lat);
 
             VideoPost savedPost = videoPostRepository.save(vp);
 

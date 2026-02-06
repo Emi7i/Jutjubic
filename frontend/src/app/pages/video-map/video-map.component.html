@@ -17,26 +17,6 @@
     <div class="video-card-container" [class.hidden]="!videoOpen" *ngIf="selectedVideo">
       <app-video-card [video]="selectedVideo"></app-video-card>
 
-      <!-- Likes -->
-      <div class="likes-section">
-        <button (click)="toggleLike(selectedVideo)">
-          {{ selectedVideo.isLiked ? '♥' : '♡' }} {{ selectedVideo.likes }}
-        </button>
-      </div>
-
-      <!-- Comments -->
-      <div class="comments-section">
-        <div *ngFor="let comment of comments" class="comment">
-          <strong>{{ comment.userName }}:</strong> {{ comment.text }}
-        </div>
-        <input
-          type="text"
-          placeholder="Add a comment..."
-          [(ngModel)]="newCommentText"
-          (keyup.enter)="addComment()">
-        <button (click)="addComment()">Send</button>
-      </div>
-
       <button class="close-card" (click)="closeVideoCard()">×</button>
     </div>
 
