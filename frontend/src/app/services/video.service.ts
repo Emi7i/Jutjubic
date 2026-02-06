@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { VideoUpload, Video, Comment, UploadProgress } from '../models/video-upload';
+import { VideoUpload, Video, Comment, UploadProgress, GeographicLocation } from '../models/video-upload';
 import { environment } from 'src/environments/environment';
+
+// for testing purposes
+import { FakeVideoService } from './fake-video.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +14,7 @@ import { environment } from 'src/environments/environment';
 export class VideoService {
  private apiUrl = environment.apiUrl + '/video-posts';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private fakeVideoService: FakeVideoService) { }
 
   uploadVideo(videoData: VideoUpload): Observable<UploadProgress> {
     const formData = new FormData();
@@ -26,7 +29,7 @@ export class VideoService {
 
     formData.append('videoPost', new Blob([JSON.stringify(videoPost)], { type: 'application/json' }));
     formData.append('videoFile', videoData.video, videoData.video.name);
-    
+
     if (videoData.thumbnail) {
       formData.append('thumbnailFile', videoData.thumbnail, videoData.thumbnail.name);
     }
@@ -186,5 +189,45 @@ export class VideoService {
 
   deleteVideo(videoId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${videoId}`);
+  }
+
+  // --- Fetch videos in bounding box, optional date filtering ---
+  getVideosInBoundingBox(
+    minLon: number,
+    minLat: number,
+    maxLon: number,
+    maxLat: number,
+    from?: Date,
+    to?: Date
+  ): Observable<Video[]> {
+    let params = new HttpParams()
+      .set('minLon', minLon)
+      .set('minLat', minLat)
+      .set('maxLon', maxLon)
+      .set('maxLat', maxLat);
+
+    if (from) {
+      params = params.set('from', from.toISOString());
+    }
+    if (to) {
+      params = params.set('to', to.toISOString());
+    }
+
+    return this.http.get<Video[]>(`${environment.apiUrl}/tiles/videos`, { params });
+  }
+
+  getVideosInBoundingBoxTuples(
+    sw: [number, number],
+    ne: [number, number],
+    from?: Date,
+    to?: Date,
+    round = true
+  ): Observable<Video[]> {
+    const minLat = round ? Math.floor(sw[0]) : sw[0];
+    const minLon = round ? Math.floor(sw[1]) : sw[1];
+    const maxLat = round ? Math.ceil(ne[0]) : ne[0];
+    const maxLon = round ? Math.ceil(ne[1]) : ne[1];
+
+    return this.getVideosInBoundingBox(minLon, minLat, maxLon, maxLat, from, to);
   }
 }

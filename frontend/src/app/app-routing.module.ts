@@ -7,6 +7,7 @@ import { VideoDetailComponent } from './components/video-detail/video-detail.com
 import { RegisterComponent } from './pages/register/register.component';
 import { LoginComponent } from "./pages/login/login.component";
 import { ActivateComponent } from "./pages/activate/activate.component";
+import { SandboxComponent } from "./pages/sandbox/sandbox.component";
 
 
 const routes: Routes = [
@@ -18,6 +19,8 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'activate', component: ActivateComponent },
+  // sandbox
+  { path: 'sandbox', component: SandboxComponent },
 ];
 
 @NgModule({
