@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -389,5 +390,45 @@ public class VideoPostService {
         }
         
         return true;
+    }
+
+    /**
+     * Gets popular tags from video posts
+     * @return list of popular tags (top 10)
+     */
+    public List<String> getPopularTags() {
+        log.info("Fetching popular tags");
+
+        try {
+            // Get all video posts
+            List<VideoPost> allVideos = videoPostRepository.findAll();
+
+            // Count tag frequencies
+            Map<String, Integer> tagCounts = new java.util.HashMap<>();
+
+            for (VideoPost video : allVideos) {
+                Set<String> tags = video.getTags();
+                if (tags != null) {
+                    for (String tag : tags) {
+                        tagCounts.put(tag, tagCounts.getOrDefault(tag, 0) + 1);
+                    }
+                }
+            }
+
+            // Sort by frequency and get top 10
+            List<String> popularTags = tagCounts.entrySet().stream()
+                    .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                    .limit(10)
+                    .map(Map.Entry::getKey)
+                    .collect(java.util.stream.Collectors.toList());
+
+            log.info("Found {} popular tags: {}", popularTags.size(), popularTags);
+            return popularTags;
+
+        } catch (Exception e) {
+            log.error("Error fetching popular tags: {}", e.getMessage(), e);
+            // Return fallback tags
+            return java.util.Arrays.asList("music", "gaming", "education", "sports", "comedy", "entertainment", "news", "technology", "tutorial", "vlog");
+        }
     }
 }

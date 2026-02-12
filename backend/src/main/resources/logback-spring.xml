@@ -8,20 +8,18 @@
     </appender>
 
     <!-- Cache-specific Logger -->
-    <logger name="org.hibernate.cache" level="OFF" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+    <logger name="org.hibernate.cache" level="OFF" additivity="true">
     </logger>
 
-    <logger name="org.hibernate.stat" level="OFF" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+    <logger name="org.hibernate.stat" level="OFF" additivity="true">
     </logger>
 
     <!-- Application-specific Cache Services -->
-    <logger name="isa.jutjub.service" level="OFF" additivity="false">
-        <appender-ref ref="CONSOLE"/>
+    <logger name="isa.jutjub.service" level="OFF" additivity="true">
     </logger>
 
     <!-- Root Logger -->
-    <root level="OFF">
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>

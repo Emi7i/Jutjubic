@@ -84,26 +84,6 @@ public class VideoPost extends BaseEntity {
         }
     }
 
-    public void removeTag(String tag) {
-        if (tag != null) {
-            tags.remove(tag.trim().toLowerCase());
-        }
-    }
-
-    public String getTagsAsString() {
-        return String.join(", ", tags);
-    }
-
-    public void setTagsFromString(String tagsString) {
-        tags.clear();
-        if (tagsString != null && !tagsString.trim().isEmpty()) {
-            String[] tagArray = tagsString.split(",");
-            for (String tag : tagArray) {
-                addTag(tag);
-            }
-        }
-    }
-
     // --- Location helpers ---
     public void setCoordinates(Double longitude, Double latitude) {
         this.longitude = longitude;

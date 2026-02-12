@@ -32,7 +32,7 @@ public class ConcurrentViewDemo implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         System.out.println("\n" + "=".repeat(60));
-        System.out.println("🎬 CONCURRENT VIEW COUNT DEMONSTRATION");
+        System.out.println("CONCURRENT VIEW COUNT DEMONSTRATION");
         System.out.println("=".repeat(60));
         
         // Create a demo video
@@ -42,7 +42,7 @@ public class ConcurrentViewDemo implements CommandLineRunner {
         simulateConcurrentViews(demoVideo.getId());
         
         System.out.println("\n" + "=".repeat(60));
-        System.out.println("✅ DEMONSTRATION COMPLETED");
+        System.out.println("DEMONSTRATION COMPLETED");
         System.out.println("=".repeat(60));
     }
 
@@ -57,8 +57,8 @@ public class ConcurrentViewDemo implements CommandLineRunner {
         
         VideoPost saved = videoPostRepository.save(video);
         
-        System.out.println("✅ Demo video created with ID: " + saved.getId());
-        System.out.println("📊 Initial view count: " + saved.getViewsCount());
+        System.out.println("Demo video created with ID: " + saved.getId());
+        System.out.println("Initial view count: " + saved.getViewsCount());
         
         return saved;
     }
@@ -68,10 +68,10 @@ public class ConcurrentViewDemo implements CommandLineRunner {
         final int viewsPerThread = 5;
         final int totalExpectedViews = numberOfThreads * viewsPerThread;
         
-        System.out.println("\n🚀 Starting concurrent view simulation...");
-        System.out.println("👥 Simulating " + numberOfThreads + " concurrent users");
-        System.out.println("👁️  Each user will view the video " + viewsPerThread + " times");
-        System.out.println("📈 Total expected views: " + totalExpectedViews);
+        System.out.println("\nStarting concurrent view simulation...");
+        System.out.println("Simulating " + numberOfThreads + " concurrent users");
+        System.out.println("👁Each user will view the video " + viewsPerThread + " times");
+        System.out.println("Total expected views: " + totalExpectedViews);
         
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         List<CompletableFuture<Void>> futures = new ArrayList<>();
@@ -97,12 +97,12 @@ public class ConcurrentViewDemo implements CommandLineRunner {
                         
                         // Progress indicator
                         if (j == viewsPerThread - 1) {
-                            System.out.println("👤 User " + userId + " finished viewing " + viewsPerThread + " times");
+                            System.out.println("User " + userId + " finished viewing " + viewsPerThread + " times");
                         }
                         
                     } catch (Exception e) {
                         failedViews.incrementAndGet();
-                        System.err.println("❌ User " + userId + " view " + (j + 1) + " failed: " + e.getMessage());
+                        System.err.println("User " + userId + " view " + (j + 1) + " failed: " + e.getMessage());
                     }
                 }
             }, executorService);
@@ -111,7 +111,7 @@ public class ConcurrentViewDemo implements CommandLineRunner {
         }
         
         // Wait for all users to finish
-        System.out.println("\n⏳ Waiting for all users to complete...");
+        System.out.println("\nWaiting for all users to complete...");
         
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
             .get(60, TimeUnit.SECONDS);
@@ -126,14 +126,14 @@ public class ConcurrentViewDemo implements CommandLineRunner {
         long finalViewCount = finalVideo != null ? finalVideo.getViewsCount() : 0;
         
         // Display results
-        System.out.println("\n" + "📊 RESULTS");
+        System.out.println("\n" + "RESULTS");
         System.out.println("-".repeat(40));
-        System.out.println("⏱️  Total duration: " + duration + "ms");
-        System.out.println("✅ Successful views: " + successfulViews.get());
-        System.out.println("❌ Failed views: " + failedViews.get());
-        System.out.println("📈 Expected views: " + totalExpectedViews);
-        System.out.println("🎯 Actual views: " + finalViewCount);
-        System.out.println("📊 Views per second: " + String.format("%.2f", (double) finalViewCount / (duration / 1000.0)));
+        System.out.println("Total duration: " + duration + "ms");
+        System.out.println("Successful views: " + successfulViews.get());
+        System.out.println("Failed views: " + failedViews.get());
+        System.out.println("Expected views: " + totalExpectedViews);
+        System.out.println("Actual views: " + finalViewCount);
+        System.out.println("Views per second: " + String.format("%.2f", (double) finalViewCount / (duration / 1000.0)));
         
         // Verify correctness
         boolean testPassed = finalViewCount == totalExpectedViews && failedViews.get() == 0;
@@ -141,13 +141,13 @@ public class ConcurrentViewDemo implements CommandLineRunner {
         System.out.println("\n" + (testPassed ? "✅" : "❌") + " TEST " + (testPassed ? "PASSED" : "FAILED"));
         
         if (testPassed) {
-            System.out.println("🎉 All concurrent views were counted correctly!");
-            System.out.println("🔒 The thread-safe implementation works perfectly!");
+            System.out.println("All concurrent views were counted correctly!");
+            System.out.println("The thread-safe implementation works perfectly!");
         } else {
-            System.out.println("⚠️  There were issues with the concurrent view counting.");
+            System.out.println("There were issues with the concurrent view counting.");
         }
         
-        System.out.println("\n📹 Demo video final state:");
+        System.out.println("\nDemo video final state:");
         System.out.println("   ID: " + videoId);
         System.out.println("   Title: " + (finalVideo != null ? finalVideo.getTitle() : "N/A"));
         System.out.println("   Views: " + finalViewCount);

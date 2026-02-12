@@ -612,6 +612,36 @@ public class VideoPostController {
     }
 
     /**
+     * Gets popular tags
+     */
+    @Operation(summary = "Get popular tags", description = "Retrieve most popular tags from video posts")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Popular tags retrieved successfully"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/tags/popular")
+    public ResponseEntity<Map<String, Object>> getPopularTags() {
+        try {
+            List<String> popularTags = videoPostService.getPopularTags();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", popularTags);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Failed to retrieve popular tags: {}", e.getMessage(), e);
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Failed to retrieve popular tags: " + e.getMessage());
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    /**
      * Serves thumbnail images
      */
     @Operation(summary = "Serve thumbnail image", description = "Serve thumbnail image for video post")

@@ -63,8 +63,8 @@ public class DataInitializer {
         VideoPost video1 = new VideoPost();
         video1.setTitle("Amazing Nature Documentary");
         video1.setVideoDescription("Explore the breathtaking beauty of nature in this stunning documentary. From majestic mountains to serene oceans, witness the wonders of our planet.");
-        video1.setVideoPath("./uploads/videos/video_20260205_190754_09b0261e.mp4");
-        video1.setThumbnailPath("./uploads/thumbnails/nature_thumb.jpg");
+        video1.setVideoPath("./uploads/videos/sample.mp4");
+        video1.setThumbnailPath("./uploads/thumbnails/sample.png");
         video1.setVideoFileSize(102400000L); // ~100MB
         video1.setUploadDurationMs(5000L);
         video1.setLocation("Yellowstone National Park, Wyoming");
@@ -83,8 +83,8 @@ public class DataInitializer {
         VideoPost video2 = new VideoPost();
         video2.setTitle("Cooking Masterclass: Italian Pasta");
         video2.setVideoDescription("Learn to make authentic Italian pasta from scratch. Chef Marco shares his family's secret recipe passed down through generations.");
-        video2.setVideoPath("/videos/italian_pasta.mp4");
-        video2.setThumbnailPath("/thumbnails/pasta_thumb.jpg");
+        video2.setVideoPath("./uploads/videos/sample.mp4");
+        video2.setThumbnailPath("./uploads/thumbnails/sample.png");
         video2.setVideoFileSize(85000000L); // ~85MB
         video2.setUploadDurationMs(3500L);
         video2.setLocation("Rome, Italy");
@@ -103,8 +103,8 @@ public class DataInitializer {
         VideoPost video3 = new VideoPost();
         video3.setTitle("Tech Review: Latest Smartphone");
         video3.setVideoDescription("In-depth review of the latest flagship smartphone. We test the camera, battery life, performance, and more in this comprehensive review.");
-        video3.setVideoPath("/videos/smartphone_review.mp4");
-        video3.setThumbnailPath("/thumbnails/phone_thumb.jpg");
+        video3.setVideoPath("./uploads/videos/sample.mp4");
+        video3.setThumbnailPath("./uploads/thumbnails/sample.png");
         video3.setVideoFileSize(120000000L); // ~120MB
         video3.setUploadDurationMs(4200L);
         video3.setLocation("San Francisco, CA");
@@ -123,8 +123,8 @@ public class DataInitializer {
         VideoPost video4 = new VideoPost();
         video4.setTitle("Yoga for Beginners");
         video4.setVideoDescription("Start your yoga journey with this beginner-friendly session. Perfect for those new to yoga or looking to refresh their practice.");
-        video4.setVideoPath("/videos/yoga_beginners.mp4");
-        video4.setThumbnailPath("/thumbnails/yoga_thumb.jpg");
+        video4.setVideoPath("./uploads/videos/sample.mp4");
+        video4.setThumbnailPath("./uploads/thumbnails/sample.png");
         video4.setVideoFileSize(95000000L); // ~95MB
         video4.setUploadDurationMs(2800L);
         video4.setLocation("Bali, Indonesia");
@@ -143,8 +143,8 @@ public class DataInitializer {
         VideoPost video5 = new VideoPost();
         video5.setTitle("Urban Exploration: Hidden City Gems");
         video5.setVideoDescription("Join us as we explore hidden gems in the city. From secret cafes to underground art scenes, discover the urban landscape like never before.");
-        video5.setVideoPath("/videos/urban_exploration.mp4");
-        video5.setThumbnailPath("/thumbnails/urban_thumb.jpg");
+        video5.setVideoPath("./uploads/videos/sample.mp4");
+        video5.setThumbnailPath("./uploads/thumbnails/sample.png");
         video5.setVideoFileSize(110000000L); // ~110MB
         video5.setUploadDurationMs(4500L);
         video5.setLocation("New York City, NY");
