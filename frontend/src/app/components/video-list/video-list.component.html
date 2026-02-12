@@ -1,49 +1,52 @@
-<!-- src/app/components/video-list/video-list.component.html -->
+<div class="youtube-layout">
+  <main class="main-content">
+    <!-- Tags Bar -->
+    <div class="tags-bar">
+      <button class="tag-btn" [class.active]="selectedTag === ''" (click)="filterByTag('')">All</button>
+      <button class="tag-btn" *ngFor="let tag of popularTags" [class.active]="selectedTag === tag" (click)="filterByTag(tag)">
+        #{{ tag }}
+      </button>
+    </div>
 
-<div class="container">
-  <div class="header">
-    <h2>Videos</h2>
-  </div>
+    <!-- Loading State -->
+    <div class="loading" *ngIf="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading videos...</p>
+    </div>
 
-  <div class="loading" *ngIf="loading">
-    <div class="spinner"></div>
-    <p>Loading videos...</p>
-  </div>
+    <!-- Error State -->
+    <div class="error-box" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
 
-  <div class="error-box" *ngIf="errorMessage">
-    {{ errorMessage }}
-  </div>
-
-  <div class="empty-state" *ngIf="!loading && videos.length === 0">
-    <h3>No videos yet</h3>
-    <p>Be the first to upload a video</p>
-    <a routerLink="/upload" class="upload-btn">Upload Video</a>
-  </div>
-
-  <div class="video-grid">
-    <div *ngFor="let video of videos" class="video-card" (click)="viewVideo(video.id)">
-      <div class="thumbnail-wrapper">
-        <img [src]="video.thumbnailUrl" [alt]="video.title" class="thumbnail">
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!loading && filteredVideos.length === 0">
+      <div class="empty-content">
+        <div class="empty-icon">📹</div>
+        <h3>{{ selectedTag ? 'No videos found for #' + selectedTag : 'No videos yet' }}</h3>
+        <p>{{ selectedTag ? 'Try selecting a different tag' : 'Be the first to upload a video' }}</p>
+        <a routerLink="/upload" class="upload-btn">Upload Video</a>
       </div>
+    </div>
 
-      <div class="video-info">
-        <h3 class="video-title">{{ video.title }}</h3>
-        <p class="video-description">{{ video.description }}</p>
-
-        <div class="video-meta">
-          <span class="author">{{ video.userName }}</span>
-          <span class="date">{{ video.createdAt | date:'short' }}</span>
+    <!-- Video Grid -->
+    <div class="video-grid" *ngIf="!loading && filteredVideos.length > 0">
+      <div *ngFor="let video of filteredVideos" class="video-card" (click)="viewVideo(video.id)">
+        <div class="thumbnail-container">
+          <img [src]="video.thumbnailUrl" [alt]="video.title" class="thumbnail">
+          <div class="video-duration">{{ formatDuration(video.duration || 0) }}</div>
         </div>
-
-        <div class="video-stats">
-          <span class="views">{{ video.viewsCount }} views</span>
-          <span class="likes">♥ {{ video.likes }} likes</span>
-        </div>
-
-        <div class="tags-container">
-          <span *ngFor="let tag of video.tags" class="tag">{{ tag }}</span>
+        <div class="video-info">
+          <div class="channel-avatar">
+            <img [src]="video.userAvatar || 'https://via.placeholder.com/36x36/cccccc/666666?text=' + (video.userName?.charAt(0) || 'U')" [alt]="video.userName" class="avatar">
+          </div>
+          <div class="video-details">
+            <h3 class="video-title">{{ video.title }}</h3>
+            <p class="channel-name">{{ video.userName }}</p>
+            <p class="video-stats">{{ formatViews(video.viewsCount) }} views • {{ formatDate(video.createdAt) }}</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </div>

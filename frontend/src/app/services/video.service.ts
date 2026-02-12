@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpEventType, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { VideoUpload, Video, Comment, UploadProgress, GeographicLocation } from '../models/video-upload';
 import { environment } from 'src/environments/environment';
 
@@ -268,5 +269,38 @@ export class VideoService {
       longitude: video.longitude ?? null,
       address: video.location ?? ''
     };
+  }
+
+  // --- Get Popular Tags ---
+  getPopularTags(): Observable<string[]> {
+    return this.http.get<any>(`${this.apiUrl}/tags/popular`).pipe(
+      map(response => {
+        // Handle different response formats
+        let tags: string[] = [];
+        
+        if (Array.isArray(response)) {
+          tags = response;
+        } else if (response.data && Array.isArray(response.data)) {
+          tags = response.data;
+        } else {
+          // Fallback: extract tags from all videos
+          tags = this.extractTagsFromVideos();
+        }
+        
+        return tags;
+      }),
+      catchError(error => {
+        console.error('Failed to fetch popular tags:', error);
+        // Return fallback tags as observable
+        return of(['music', 'gaming', 'education', 'sports', 'comedy', 'entertainment', 'news', 'technology', 'tutorial', 'vlog']);
+      })
+    );
+  }
+
+  // Fallback method to extract tags from existing videos
+  private extractTagsFromVideos(): string[] {
+    // This would require caching videos or making another call
+    // For now, return common tags as fallback
+    return ['music', 'gaming', 'education', 'sports', 'comedy', 'entertainment', 'news', 'technology', 'tutorial', 'vlog'];
   }
 }
