@@ -1,4 +1,4 @@
-/*package isa.jutjub.config;
+package isa.jutjub.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,4 +32,3 @@ public class MailConfig {
         return mailSender;
     }
 }
-*/
