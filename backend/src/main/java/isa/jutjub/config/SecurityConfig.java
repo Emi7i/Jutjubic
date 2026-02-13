@@ -54,6 +54,7 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("http://localhost:4200");
         config.addAllowedOriginPattern("http://127.0.0.1:4200");
+        config.addAllowedOriginPattern("http://192.168.*:*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setMaxAge(3600L);
