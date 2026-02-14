@@ -5,7 +5,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import isa.jutjub.annotation.RateLimit;
 import isa.jutjub.model.Videos;
+import isa.jutjub.service.RateLimitingService;
 import isa.jutjub.service.VideoPostService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +45,12 @@ import java.time.format.DateTimeParseException;
 public class VideoPostController {
 
     private final VideoPostService videoPostService;
+    private final RateLimitingService rateLimitingService;
 
     @Autowired
-    public VideoPostController(VideoPostService videoPostService) {
+    public VideoPostController(VideoPostService videoPostService, RateLimitingService rateLimitingService) {
         this.videoPostService = videoPostService;
+        this.rateLimitingService = rateLimitingService;
     }
 
     /**
@@ -61,6 +65,7 @@ public class VideoPostController {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RateLimit(type = RateLimitingService.RateLimitType.VIDEO_UPLOAD, weight = 1)
     public ResponseEntity<Map<String, Object>> createVideoPost(
             @Parameter(description = "Video post metadata", required = true)
             @RequestPart("videos") @Valid Videos videos,
@@ -101,6 +106,7 @@ public class VideoPostController {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
+    @RateLimit(type = RateLimitingService.RateLimitType.VIDEO_SEARCH, weight = 1)
     public ResponseEntity<Map<String, Object>> getAllVideoPosts(
             @Parameter(description = "Page number (0-based)") 
             @RequestParam(defaultValue = "0") int page,
@@ -210,6 +216,7 @@ public class VideoPostController {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}")
+    @RateLimit(type = RateLimitingService.RateLimitType.VIDEO_VIEW, weight = 1)
     public ResponseEntity<Map<String, Object>> getVideoPostById(
             @Parameter(description = "Video post ID", required = true)
             @PathVariable Long id) {
@@ -242,6 +249,7 @@ public class VideoPostController {
      */
     @Operation(summary = "Get most recent video posts", description = "Retrieve recently uploaded video posts")
     @GetMapping("/recent")
+    @RateLimit(type = RateLimitingService.RateLimitType.VIDEO_SEARCH, weight = 1)
     public ResponseEntity<Map<String, Object>> getRecentVideoPosts(
             @Parameter(description = "Page number (0-based)") 
             @RequestParam(defaultValue = "0") int page,
@@ -278,6 +286,7 @@ public class VideoPostController {
      */
     @Operation(summary = "Get most popular video posts", description = "Retrieve video posts sorted by likes")
     @GetMapping("/popular")
+    @RateLimit(type = RateLimitingService.RateLimitType.VIDEO_SEARCH, weight = 1)
     public ResponseEntity<Map<String, Object>> getPopularVideoPosts(
             @Parameter(description = "Page number (0-based)") 
             @RequestParam(defaultValue = "0") int page,
@@ -314,6 +323,7 @@ public class VideoPostController {
      */
     @Operation(summary = "Search video posts", description = "Search video posts by keyword in title, description, tags, or location")
     @GetMapping("/search")
+    @RateLimit(type = RateLimitingService.RateLimitType.VIDEO_SEARCH, weight = 1)
     public ResponseEntity<Map<String, Object>> searchVideoPosts(
             @Parameter(description = "Search keyword", required = true)
             @RequestParam String keyword,
@@ -354,6 +364,7 @@ public class VideoPostController {
      */
     @Operation(summary = "Get video posts by tag", description = "Retrieve video posts with specific tag")
     @GetMapping("/tag/{tag}")
+    @RateLimit(type = RateLimitingService.RateLimitType.VIDEO_SEARCH, weight = 1)
     public ResponseEntity<Map<String, Object>> getVideoPostsByTag(
             @Parameter(description = "Tag to search for", required = true)
             @PathVariable String tag,
@@ -394,6 +405,7 @@ public class VideoPostController {
      */
     @Operation(summary = "Like a video post", description = "Increment like count for a video post")
     @PostMapping("/{id}/like")
+    @RateLimit(type = RateLimitingService.RateLimitType.VIDEO_LIKE, weight = 1)
     public ResponseEntity<Map<String, Object>> likeVideoPost(
             @Parameter(description = "Video post ID", required = true)
             @PathVariable Long id) {
@@ -617,6 +629,7 @@ public class VideoPostController {
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/tags/popular")
+    @RateLimit(type = RateLimitingService.RateLimitType.VIDEO_SEARCH, weight = 1)
     public ResponseEntity<Map<String, Object>> getPopularTags() {
         try {
             List<String> popularTags = videoPostService.getPopularTags();
