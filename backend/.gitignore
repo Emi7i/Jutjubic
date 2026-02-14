@@ -1,2 +1,3 @@
 # ignore ffmpeg folder - manual installation only
 /ffmpeg/
+/target/
