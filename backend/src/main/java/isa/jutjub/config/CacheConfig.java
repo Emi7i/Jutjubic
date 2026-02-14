@@ -5,7 +5,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
-import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.Videos;
 import isa.jutjub.repository.VideoPostRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
@@ -57,7 +57,7 @@ public class CacheConfig {
      * LoadingCache for individual video posts with circuit breaker protection
      */
     @Bean
-    public LoadingCache<Long, VideoPost> videoPostLoadingCache(CircuitBreakerRegistry circuitBreakerRegistry) {
+    public LoadingCache<Long, Videos> videoPostLoadingCache(CircuitBreakerRegistry circuitBreakerRegistry) {
         CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("videoPostCache");
 
         return getLoadingCacheConfig()

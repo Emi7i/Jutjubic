@@ -19,8 +19,8 @@
         <heap unit="entries">500</heap>
     </cache-template>
 
-    <!-- VideoPost entity cache -->
-    <cache alias="isa.jutjub.model.VideoPost" uses-template="default-entity-cache">
+    <!-- Videos entity cache -->
+    <cache alias="isa.jutjub.model.Videos" uses-template="default-entity-cache">
         <expiry>
             <ttl unit="minutes">5</ttl>
         </expiry>

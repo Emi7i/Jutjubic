@@ -49,8 +49,7 @@ Write-Host "Using psql: $pgExe" -ForegroundColor DarkGray
 # ============================================
 $SQL_RESET = @"
 DROP TABLE IF EXISTS tile_videos CASCADE;
-DROP TABLE IF EXISTS video_post_tags CASCADE;
-DROP TABLE IF EXISTS video_posts CASCADE;
+DROP TABLE IF EXISTS videos CASCADE;
 DROP TABLE IF EXISTS tiles CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 SELECT 'Reset complete - all tables dropped.' AS status;
@@ -67,65 +66,50 @@ VALUES (
     null, null, null, null
 );
 
-INSERT INTO video_posts (title, video_description, video_path, thumbnail_path, video_file_size, upload_duration_ms, location, likes_count, comments_count, views_count, deleted, created_at, updated_at, latitude, longitude)
+INSERT INTO videos (title, video_description, video_path, thumbnail_path, video_file_size, upload_duration_ms, location, likes_count, comments_count, views_count, deleted, created_at, updated_at, latitude, longitude, tags)
 VALUES
 (
     'Amazing Nature Documentary',
     'Explore the breathtaking beauty of nature in this stunning documentary. From majestic mountains to serene oceans, witness the wonders of our planet.',
     './uploads/videos/sample.mp4', './uploads/thumbnails/sample.png',
     102400000, 5000, 'Yellowstone National Park, Wyoming',
-    1250, 89, 5432, false, NOW(), NOW(), NULL, NULL
+    1250, 89, 5432, false, NOW(), NOW(), NULL, NULL,
+    ARRAY['nature','documentary','wildlife','travel']
 ),
 (
     'Cooking Masterclass: Italian Pasta',
     'Learn to make authentic Italian pasta from scratch. Chef Marco shares his family''s secret recipe passed down through generations.',
     './uploads/videos/sample.mp4', './uploads/thumbnails/sample.png',
     85000000, 3500, 'Rome, Italy',
-    892, 156, 3210, false, NOW(), NOW(), NULL, NULL
+    892, 156, 3210, false, NOW(), NOW(), NULL, NULL,
+    ARRAY['cooking','italian','pasta','recipe']
 ),
 (
     'Tech Review: Latest Smartphone',
     'In-depth review of the latest flagship smartphone. We test the camera, battery life, performance, and more in this comprehensive review.',
     './uploads/videos/sample.mp4', './uploads/thumbnails/sample.png',
     120000000, 4200, 'San Francisco, CA',
-    2103, 234, 8765, false, NOW(), NOW(), NULL, NULL
+    2103, 234, 8765, false, NOW(), NOW(), NULL, NULL,
+    ARRAY['technology','smartphone','review','tech']
 ),
 (
     'Yoga for Beginners',
     'Start your yoga journey with this beginner-friendly session. Perfect for those new to yoga or looking to refresh their practice.',
     './uploads/videos/sample.mp4', './uploads/thumbnails/sample.png',
     95000000, 2800, 'Bali, Indonesia',
-    567, 78, 2341, false, NOW(), NOW(), NULL, NULL
+    567, 78, 2341, false, NOW(), NOW(), NULL, NULL,
+    ARRAY['yoga','fitness','wellness','beginners']
 ),
 (
     'Urban Exploration: Hidden City Gems',
     'Join us as we explore hidden gems in the city. From secret cafes to underground art scenes, discover the urban landscape like never before.',
     './uploads/videos/sample.mp4', './uploads/thumbnails/sample.png',
     110000000, 4500, 'New York City, NY',
-    1834, 198, 6543, false, NOW(), NOW(), NULL, NULL
+    1834, 198, 6543, false, NOW(), NOW(), NULL, NULL,
+    ARRAY['urban','exploration','travel','city']
 );
 
-INSERT INTO video_post_tags (video_post_id, tag)
-SELECT id, unnest(ARRAY['nature','documentary','wildlife','travel'])
-FROM video_posts WHERE title = 'Amazing Nature Documentary';
-
-INSERT INTO video_post_tags (video_post_id, tag)
-SELECT id, unnest(ARRAY['cooking','italian','pasta','recipe'])
-FROM video_posts WHERE title = 'Cooking Masterclass: Italian Pasta';
-
-INSERT INTO video_post_tags (video_post_id, tag)
-SELECT id, unnest(ARRAY['technology','smartphone','review','tech'])
-FROM video_posts WHERE title = 'Tech Review: Latest Smartphone';
-
-INSERT INTO video_post_tags (video_post_id, tag)
-SELECT id, unnest(ARRAY['yoga','fitness','wellness','beginners'])
-FROM video_posts WHERE title = 'Yoga for Beginners';
-
-INSERT INTO video_post_tags (video_post_id, tag)
-SELECT id, unnest(ARRAY['urban','exploration','travel','city'])
-FROM video_posts WHERE title = 'Urban Exploration: Hidden City Gems';
-
-SELECT 'Seed complete - ' || COUNT(*) || ' video posts inserted.' AS status FROM video_posts;
+SELECT 'Seed complete - ' || COUNT(*) || ' video posts inserted.' AS status FROM videos;
 "@
 
 # ============================================
@@ -189,8 +173,8 @@ if ($doAll) {
   }
   Run-Sql $SQL_RESET "Dropping all tables"
   Write-Host ""
-  Write-Host "    Start/Restart your Spring Boot app now so Hibernate recreates the tables." -ForegroundColor Yellow
-  if (-not (Prompt-Confirm "Have you started/restarted the app?")) {
+  Write-Host "    Restart your Spring Boot app now so Hibernate recreates the tables." -ForegroundColor Yellow
+  if (-not (Prompt-Confirm "Have you restarted the app?")) {
     Write-Host "Seed skipped. Run .\reset_databases.ps1 -Seed when ready." -ForegroundColor Yellow; exit 0
   }
   Run-Sql $SQL_SEED "Seeding data"

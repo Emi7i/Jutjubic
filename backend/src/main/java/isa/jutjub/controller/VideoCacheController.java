@@ -1,6 +1,6 @@
 package isa.jutjub.controller;
 
-import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.Videos;
 import isa.jutjub.service.VideoPostCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +24,8 @@ public class VideoCacheController {
      * Get video post - throws exception if circuit is open
      */
     @GetMapping("/{id}")
-    public ResponseEntity<VideoPost> getVideoPost(@PathVariable Long id) {
-        VideoPost video = cacheService.getVideoPost(id);
+    public ResponseEntity<Videos> getVideoPost(@PathVariable Long id) {
+        Videos video = cacheService.getVideoPost(id);
         return ResponseEntity.ok(video);
     }
 
@@ -34,8 +34,8 @@ public class VideoCacheController {
      * Returns 503 if circuit is open instead of throwing exception
      */
     @GetMapping("/{id}/safe")
-    public ResponseEntity<VideoPost> getVideoPostSafe(@PathVariable Long id) {
-        Optional<VideoPost> video = cacheService.getVideoPostSafe(id);
+    public ResponseEntity<Videos> getVideoPostSafe(@PathVariable Long id) {
+        Optional<Videos> video = cacheService.getVideoPostSafe(id);
         return video
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(503).build());
@@ -45,7 +45,7 @@ public class VideoCacheController {
      * Get video post asynchronously
      */
     @GetMapping("/{id}/async")
-    public CompletableFuture<ResponseEntity<VideoPost>> getVideoPostAsync(@PathVariable Long id) {
+    public CompletableFuture<ResponseEntity<Videos>> getVideoPostAsync(@PathVariable Long id) {
         return cacheService.getVideoPostAsync(id)
                 .thenApply(ResponseEntity::ok)
                 .exceptionally(ex -> ResponseEntity.status(503).build());
