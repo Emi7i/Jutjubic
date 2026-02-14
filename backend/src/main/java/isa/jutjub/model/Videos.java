@@ -7,18 +7,19 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
-@Table(name = "video_posts")
+@Table(name = "videos")
 @Getter
 @Setter
 @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "isa.jutjub.model.VideoPost")
-public class VideoPost extends BaseEntity {
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "isa.jutjub.model.Videos")
+public class Videos extends BaseEntity {
 
     @NotBlank(message = "Title is required")
     @Size(max = 200, message = "Title must not exceed 200 characters")
@@ -30,11 +31,9 @@ public class VideoPost extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String videoDescription;
 
-    @ElementCollection
-    @CollectionTable(name = "video_post_tags", joinColumns = @JoinColumn(name = "video_post_id"))
-    @Column(name = "tag")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    private Set<String> tags = new HashSet<>();
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "tags", columnDefinition = "text[]")
+    private List<String> tags;
 
     @Column(name = "thumbnail_path")
     private String thumbnailPath;
@@ -81,6 +80,12 @@ public class VideoPost extends BaseEntity {
     public void addTag(String tag) {
         if (tag != null && !tag.trim().isEmpty()) {
             tags.add(tag.trim().toLowerCase());
+        }
+    }
+    
+    public void removeTag(String tag) {
+        if (tag != null) {
+            tags.remove(tag.trim().toLowerCase());
         }
     }
 

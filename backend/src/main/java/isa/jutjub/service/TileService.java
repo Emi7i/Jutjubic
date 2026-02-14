@@ -1,7 +1,7 @@
 package isa.jutjub.service;
 
 import isa.jutjub.model.Tile;
-import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.Videos;
 import isa.jutjub.repository.TileRepository;
 import isa.jutjub.repository.VideoPostRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -94,7 +94,7 @@ public class TileService {
      * Rounds coordinates and finds/creates the appropriate tile
      */
     @CacheEvict(value = "tiles", allEntries = true)
-    public Tile addVideoToTile(VideoPost video) {
+    public Tile addVideoToTile(Videos video) {
         if (!video.hasValidCoordinates()) {
             throw new IllegalArgumentException("Video must have valid location coordinates");
         }
@@ -128,7 +128,7 @@ public class TileService {
      */
     @CacheEvict(value = "tiles", allEntries = true)
     public Tile addVideoToTileById(Long videoId) {
-        VideoPost video = videoPostRepository.findById(videoId)
+        Videos video = videoPostRepository.findById(videoId)
                 .orElseThrow(() -> new RuntimeException("Video not found with ID: " + videoId));
 
         log.info("Loaded video {} with coordinates: ({}, {})",
@@ -141,7 +141,7 @@ public class TileService {
      * Remove video from tile
      */
     @CacheEvict(value = "tiles", allEntries = true)
-    public Tile removeVideoFromTile(Long tileId, VideoPost video) {
+    public Tile removeVideoFromTile(Long tileId, Videos video) {
         Tile tile = tileRepository.findById(tileId)
                 .orElseThrow(() -> new RuntimeException("Tile not found: " + tileId));
 
@@ -156,7 +156,7 @@ public class TileService {
      * Remove video from its tile by coordinates
      */
     @CacheEvict(value = "tiles", allEntries = true)
-    public Tile removeVideoFromTile(VideoPost video) {
+    public Tile removeVideoFromTile(Videos video) {
         if (!video.hasValidCoordinates()) {
             throw new IllegalArgumentException("Video must have valid location coordinates");
         }
@@ -253,10 +253,10 @@ public class TileService {
         }
         
         // Get all videos and redistribute them to correct tiles
-        List<VideoPost> allVideos = videoPostRepository.findAll();
+        List<Videos> allVideos = videoPostRepository.findAll();
         int redistributedCount = 0;
         
-        for (VideoPost video : allVideos) {
+        for (Videos video : allVideos) {
             try {
                 if (video.hasValidCoordinates()) {
                     // Get or create the correct tile for this video
@@ -293,10 +293,10 @@ public class TileService {
         log.info("Starting inactive tile cleanup - reassigning all videos");
         
         // Get all videos and reassign them to correct tiles
-        List<VideoPost> allVideos = videoPostRepository.findAll();
+        List<Videos> allVideos = videoPostRepository.findAll();
         int reassignedCount = 0;
         
-        for (VideoPost video : allVideos) {
+        for (Videos video : allVideos) {
             try {
                 if (video.hasValidCoordinates()) {
                     // Get or create the correct tile for this video

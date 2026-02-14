@@ -1,6 +1,6 @@
 package isa.jutjub.service;
 
-import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.Videos;
 import isa.jutjub.repository.VideoPostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -36,7 +36,7 @@ public class ConcurrentViewDemo implements CommandLineRunner {
         System.out.println("=".repeat(60));
         
         // Create a demo video
-        VideoPost demoVideo = createDemoVideo();
+        Videos demoVideo = createDemoVideo();
         
         // Run concurrent view simulation
         simulateConcurrentViews(demoVideo.getId());
@@ -46,16 +46,16 @@ public class ConcurrentViewDemo implements CommandLineRunner {
         System.out.println("=".repeat(60));
     }
 
-    private VideoPost createDemoVideo() {
+    private Videos createDemoVideo() {
         System.out.println("\n📹 Creating demo video...");
         
-        VideoPost video = new VideoPost();
+        Videos video = new Videos();
         video.setTitle("Demo Video for Concurrent Views");
         video.setVideoDescription("This video demonstrates thread-safe view counting");
         video.setVideoPath("./uploads/videos/demo_concurrent.mp4");
         video.setViewsCount(0L);
         
-        VideoPost saved = videoPostRepository.save(video);
+        Videos saved = videoPostRepository.save(video);
         
         System.out.println("Demo video created with ID: " + saved.getId());
         System.out.println("Initial view count: " + saved.getViewsCount());
@@ -122,7 +122,7 @@ public class ConcurrentViewDemo implements CommandLineRunner {
         long duration = endTime - startTime;
         
         // Get final results
-        VideoPost finalVideo = videoPostRepository.findById(videoId).orElse(null);
+        Videos finalVideo = videoPostRepository.findById(videoId).orElse(null);
         long finalViewCount = finalVideo != null ? finalVideo.getViewsCount() : 0;
         
         // Display results

@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import isa.jutjub.model.Tile;
-import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.Videos;
 import isa.jutjub.service.TileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/api/tiles")
@@ -137,7 +131,7 @@ public class TileController {
     })
     public ResponseEntity<Tile> addVideoToTile(
             @Parameter(description = "Video to add to tile")
-            @RequestBody VideoPost video) {
+            @RequestBody Videos video) {
 
         log.info("Adding video {} with coordinates ({}, {})",
                 video.getId(), video.getLongitude(), video.getLatitude());
@@ -199,7 +193,7 @@ public class TileController {
 
         log.info("Removing video {} from tile {}", videoId, tileId);
         try {
-            VideoPost video = new VideoPost();
+            Videos video = new Videos();
             video.setId(videoId);
 
             Tile tile = tileService.removeVideoFromTile(tileId, video);
@@ -219,7 +213,7 @@ public class TileController {
             @ApiResponse(responseCode = "200", description = "Videos retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "Tile not found")
     })
-    public ResponseEntity<Set<VideoPost>> getVideosInTile(
+    public ResponseEntity<Set<Videos>> getVideosInTile(
             @Parameter(description = "Tile ID")
             @PathVariable Long tileId) {
 
@@ -264,7 +258,7 @@ public class TileController {
             @ApiResponse(responseCode = "400", description = "Invalid date format or parameters"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<List<VideoPost>> getVideosInBoundingBoxFiltered(
+    public ResponseEntity<List<Videos>> getVideosInBoundingBoxFiltered(
             @Parameter(description = "Minimum longitude (integer degree)")
             @RequestParam Integer minLon,
             @Parameter(description = "Minimum latitude (integer degree)")
@@ -284,12 +278,12 @@ public class TileController {
 
             // Collect all videos from these tiles into a Set to avoid duplicates
             // (in case a video service logic ever allowed a video in multiple tiles)
-            Set<VideoPost> allVideos = new java.util.HashSet<>();
+            Set<Videos> allVideos = new java.util.HashSet<>();
             for (Tile tile : tiles) {
                 allVideos.addAll(tile.getVideos());
             }
 
-            List<VideoPost> filteredVideos = new ArrayList<>(allVideos);
+            List<Videos> filteredVideos = new ArrayList<>(allVideos);
 
             // Apply date filtering if parameters are provided
             if (from != null || to != null) {
