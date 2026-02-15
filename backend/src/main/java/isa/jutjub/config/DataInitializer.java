@@ -38,8 +38,12 @@ public class DataInitializer {
                 System.out.println("Video posts already exist, skipping sample data creation");
             }
             
-            // Always create admin user for H2 in-memory database
-            createAdminUser(userRepository);
+            // Create admin user if it doesn't exist
+            if (!userRepository.existsByUsername("admin")) {
+                createAdminUser(userRepository);
+            } else {
+                System.out.println("Admin user already exists, skipping creation");
+            }
         };
     }
 

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://your-production-backend.com/api' // replace with your real API URL
+  apiUrl: 'http://localhost:8080/api'  // Point to Gateway
 };
