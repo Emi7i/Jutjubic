@@ -30,6 +30,7 @@ ehthumbs.db
 Thumbs.db
 
 # Spring Boot
+!application-docker.yml
 application-*.properties
 application-*.yml
 

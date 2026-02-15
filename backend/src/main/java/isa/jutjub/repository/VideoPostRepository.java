@@ -1,6 +1,6 @@
 package isa.jutjub.repository;
 
-import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.Videos;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,18 +12,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Repository
-public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
+public interface VideoPostRepository extends JpaRepository<Videos, Long> {
 
     /**
      * Find video posts by tags
-     * @param tags set of tags to search for
+     * @param tags list of tags to search for
      * @return list of video posts containing any of the specified tags
      */
-    @Query("SELECT vp FROM VideoPost vp JOIN vp.tags t WHERE t IN :tags")
-    List<VideoPost> findByTags(@Param("tags") Set<String> tags);
+    @Query(value = "SELECT DISTINCT vp.* FROM videos vp WHERE vp.tags && :tags", nativeQuery = true)
+    List<Videos> findByTags(@Param("tags") String[] tags);
 
     /**
      * Find video posts by title containing keyword
@@ -31,7 +30,7 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      * @param pageable pagination information
      * @return page of video posts with title containing keyword
      */
-    Page<VideoPost> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+    Page<Videos> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
     /**
      * Find video posts by location
@@ -39,7 +38,7 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      * @param pageable pagination information
      * @return page of video posts from specified location
      */
-    Page<VideoPost> findByLocationContainingIgnoreCase(String location, Pageable pageable);
+    Page<Videos> findByLocationContainingIgnoreCase(String location, Pageable pageable);
 
     /**
      * Find video posts created after specified date
@@ -47,7 +46,7 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      * @param pageable pagination information
      * @return page of video posts created after specified date
      */
-    Page<VideoPost> findByCreatedAtAfter(LocalDateTime date, Pageable pageable);
+    Page<Videos> findByCreatedAtAfter(LocalDateTime date, Pageable pageable);
 
     /**
      * Find video posts created before specified date
@@ -55,7 +54,7 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      * @param pageable pagination information
      * @return page of video posts created before specified date
      */
-    Page<VideoPost> findByCreatedAtBefore(LocalDateTime date, Pageable pageable);
+    Page<Videos> findByCreatedAtBefore(LocalDateTime date, Pageable pageable);
 
     /**
      * Find video posts created between two dates
@@ -64,26 +63,26 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      * @param pageable pagination information
      * @return page of video posts created within date range
      */
-    @Query("SELECT vp FROM VideoPost vp WHERE vp.createdAt BETWEEN :startDate AND :endDate")
-    Page<VideoPost> findByCreatedAtBetween(@Param("startDate") LocalDateTime startDate, 
-                                          @Param("endDate") LocalDateTime endDate, 
-                                          Pageable pageable);
+    @Query("SELECT vp FROM Videos vp WHERE vp.createdAt BETWEEN :startDate AND :endDate")
+    Page<Videos> findByCreatedAtBetween(@Param("startDate") LocalDateTime startDate,
+                                        @Param("endDate") LocalDateTime endDate,
+                                        Pageable pageable);
 
     /**
      * Find most popular video posts ordered by likes count
      * @param pageable pagination information
      * @return page of most popular video posts
      */
-    @Query("SELECT vp FROM VideoPost vp ORDER BY vp.likesCount DESC")
-    Page<VideoPost> findMostPopular(Pageable pageable);
+    @Query("SELECT vp FROM Videos vp ORDER BY vp.likesCount DESC")
+    Page<Videos> findMostPopular(Pageable pageable);
 
     /**
      * Find most recent video posts ordered by creation date
      * @param pageable pagination information
      * @return page of most recent video posts
      */
-    @Query("SELECT vp FROM VideoPost vp ORDER BY vp.createdAt DESC")
-    Page<VideoPost> findMostRecent(Pageable pageable);
+    @Query("SELECT vp FROM Videos vp ORDER BY vp.createdAt DESC")
+    Page<Videos> findMostRecent(Pageable pageable);
 
     /**
      * Find video posts by a specific tag
@@ -91,8 +90,8 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      * @param pageable pagination information
      * @return page of video posts with specified tag
      */
-    @Query("SELECT vp FROM VideoPost vp JOIN vp.tags t WHERE t = :tag")
-    Page<VideoPost> findByTag(@Param("tag") String tag, Pageable pageable);
+    @Query(value = "SELECT * FROM videos vp WHERE :tag = ANY(vp.tags)", nativeQuery = true)
+    Page<Videos> findByTag(@Param("tag") String tag, Pageable pageable);
 
     /**
      * Search video posts by multiple criteria (title, description, tags, location)
@@ -100,12 +99,13 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      * @param pageable pagination information
      * @return page of video posts matching search criteria
      */
-    @Query("SELECT vp FROM VideoPost vp WHERE " +
+    @Query(value = "SELECT * FROM videos vp WHERE " +
            "LOWER(vp.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(vp.videoDescription) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(vp.video_description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "LOWER(vp.location) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "EXISTS (SELECT 1 FROM vp.tags t WHERE LOWER(t) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    Page<VideoPost> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+           ":keyword = ANY(vp.tags)", 
+           nativeQuery = true)
+    Page<Videos> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     /**
      * Count video posts by user (assuming we add user relationship later)
@@ -122,7 +122,7 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      * @param pageable pagination information
      * @return page of video posts within file size range
      */
-    Page<VideoPost> findByVideoFileSizeBetween(Long minSize, Long maxSize, Pageable pageable);
+    Page<Videos> findByVideoFileSizeBetween(Long minSize, Long maxSize, Pageable pageable);
 
 
     // TODO: check if transaction is needed
@@ -134,6 +134,6 @@ public interface VideoPostRepository extends JpaRepository<VideoPost, Long> {
      */
     @Modifying
     @Transactional
-    @Query("UPDATE VideoPost vp SET vp.viewsCount = vp.viewsCount + 1 WHERE vp.id = :id")
+    @Query("UPDATE Videos vp SET vp.viewsCount = vp.viewsCount + 1 WHERE vp.id = :id")
     int incrementViewsCount(@Param("id") Long id);
 }

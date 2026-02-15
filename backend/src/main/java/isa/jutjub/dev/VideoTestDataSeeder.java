@@ -1,6 +1,6 @@
 package isa.jutjub.dev;
 
-import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.Videos;
 import isa.jutjub.repository.VideoPostRepository;
 import isa.jutjub.service.TileService;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +24,13 @@ public class VideoTestDataSeeder implements CommandLineRunner {
     public void run(String... args) {
         if (videoPostRepository.count() > 0) return;
 
-        String sharedVideoPath = "/videos/sample.mp4";
-        String sharedThumbnail = "/thumbnails/sample.png";
+        String sharedVideoPath = "./uploads/videos/sample.mp4";
+        String sharedThumbnail = "./uploads/thumbnails/sample.png";
 
         Random rnd = new Random();
 
         for (int i = 0; i < 5000; i++) {
-            VideoPost vp = new VideoPost();
+            Videos vp = new Videos();
             vp.setTitle("Test video #" + i);
             vp.setVideoDescription("Generated test video");
             vp.setVideoPath(sharedVideoPath);
@@ -38,11 +38,11 @@ public class VideoTestDataSeeder implements CommandLineRunner {
             vp.setVideoFileSize(42_000_000L);
 
             // scatter them on the map
-            int lon = 20 + rnd.nextInt(10);
-            int lat = 44 + rnd.nextInt(10);
-            vp.setLocationFromCoordinates(lon, lat);
+            Double lon = 20 + rnd.nextDouble(10);
+            Double lat = 44 + rnd.nextDouble(10);
+            vp.setCoordinates(lon, lat);
 
-            VideoPost savedPost = videoPostRepository.save(vp);
+            Videos savedPost = videoPostRepository.save(vp);
 
             if (savedPost.hasValidCoordinates()) {
                 try {

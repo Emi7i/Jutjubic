@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpEventType, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { VideoUpload, Video, Comment, UploadProgress, GeographicLocation } from '../models/video-upload';
 import { environment } from 'src/environments/environment';
 
@@ -24,7 +25,9 @@ export class VideoService {
       title: videoData.title,
       videoDescription: videoData.description,
       tags: videoData.tags,
-      location: videoData.location ? JSON.stringify(videoData.location) : null
+      longitude: videoData.location?.longitude,
+      latitude: videoData.location?.latitude
+
     };
 
     formData.append('videoPost', new Blob([JSON.stringify(videoPost)], { type: 'application/json' }));
@@ -73,32 +76,33 @@ export class VideoService {
     }
   }
 
+  // --- All videos ---
   getAllVideos(): Observable<Video[]> {
     return this.http.get<any>(this.apiUrl).pipe(
       map(response => {
-        console.log('Raw backend response:', response);
         const videos = response.data || [];
-        // Transform backend response to frontend Video model
-        return videos.map((video: any) => ({
-          id: video.id.toString(),
-          title: video.title,
-          description: video.videoDescription,
-          tags: Array.isArray(video.tags) ? video.tags : (video.tags ? Object.values(video.tags) : []),
-          thumbnailUrl: `${this.apiUrl}/${video.id}/thumbnail`,
-          videoUrl: `${this.apiUrl}/${video.id}/video`,
-          location: video.location ? this.parseLocation(video.location) : undefined,
-          createdAt: new Date(video.createdAt),
-          userId: video.userId?.toString() || '',
-          userName: video.userName || 'Anonymous',
-          likes: video.likesCount || 0,
-          commentsCount: video.commentsCount || 0,
-          viewsCount: video.viewsCount || 0,
-          isLiked: false
-        }));
+        return videos.map((video: any) => {
+          const transformed: Video = {
+            id: video.id.toString(),
+            title: video.title,
+            description: video.videoDescription,
+            tags: Array.isArray(video.tags) ? video.tags : (video.tags ? Object.values(video.tags) : []),
+            thumbnailUrl: `${this.apiUrl}/${video.id}/thumbnail`,
+            videoUrl: `${this.apiUrl}/${video.id}/video`,
+            location: this.generateGeographicLocation(video),
+            createdAt: new Date(video.createdAt),
+            userId: video.userId?.toString() || '',
+            userName: video.userName || 'Anonymous',
+            likes: video.likesCount || 0,
+            commentsCount: video.commentsCount || 0,
+            viewsCount: video.viewsCount || 0,
+            isLiked: false
+          };
+          return transformed;
+        });
       }),
       catchError(error => {
         console.error('Failed to fetch videos:', error);
-        console.error('Error response:', error.error);
         return throwError(() => error);
       })
     );
@@ -126,12 +130,11 @@ export class VideoService {
     }
   }
 
+  // --- Single video ---
   getVideoById(id: string): Observable<Video> {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
       map(response => {
-        console.log('Raw video response:', response);
         const video = response.data;
-        // Transform backend response to frontend Video model
         return {
           id: video.id.toString(),
           title: video.title,
@@ -139,7 +142,7 @@ export class VideoService {
           tags: Array.isArray(video.tags) ? video.tags : (video.tags ? Object.values(video.tags) : []),
           thumbnailUrl: `${this.apiUrl}/${video.id}/thumbnail`,
           videoUrl: `${this.apiUrl}/${video.id}/video`,
-          location: video.location ? this.parseLocation(video.location) : undefined,
+          location: this.generateGeographicLocation(video),
           createdAt: new Date(video.createdAt),
           userId: video.userId?.toString() || '',
           userName: video.userName || 'Anonymous',
@@ -151,7 +154,6 @@ export class VideoService {
       }),
       catchError(error => {
         console.error('Failed to fetch video:', error);
-        console.error('Error response:', error.error);
         return throwError(() => error);
       })
     );
@@ -175,10 +177,14 @@ export class VideoService {
   }
 
   getComments(videoId: string): Observable<Comment[]> {
-    return this.http.get<any>(`${this.apiUrl}/${videoId}/comments`).pipe(
-      map(response => {
-        console.log('Raw comments response:', response);
-        return response.data || [];
+    return this.http.get<Comment[]>(`${this.apiUrl}/${videoId}/comments`).pipe(
+      map(comments => {
+        // comments is already an array, just return it
+        return comments.map(comment => ({
+          ...comment,
+          // optional: parse createdAt to Date if needed
+          createdAt: new Date(comment.createdAt)
+        }));
       }),
       catchError(error => {
         console.error('Failed to fetch comments:', error);
@@ -187,11 +193,13 @@ export class VideoService {
     );
   }
 
+
+
+
   deleteVideo(videoId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${videoId}`);
   }
 
-  // --- Fetch videos in bounding box, optional date filtering ---
   getVideosInBoundingBox(
     minLon: number,
     minLat: number,
@@ -206,15 +214,38 @@ export class VideoService {
       .set('maxLon', maxLon)
       .set('maxLat', maxLat);
 
-    if (from) {
-      params = params.set('from', from.toISOString());
-    }
-    if (to) {
-      params = params.set('to', to.toISOString());
-    }
+    if (from) params = params.set('from', from.toISOString());
+    if (to) params = params.set('to', to.toISOString());
 
-    return this.http.get<Video[]>(`${environment.apiUrl}/tiles/videos`, { params });
+    return this.http.get<any>(`${environment.apiUrl}/tiles/videos`, { params }).pipe(
+      map(response => {
+        // Check if response is array or object
+        const videosArray: any[] = Array.isArray(response) ? response : response.data || [];
+
+        return videosArray.map(video => ({
+          id: video.id.toString(),
+          title: video.title,
+          description: video.videoDescription,
+          tags: Array.isArray(video.tags) ? video.tags : (video.tags ? Object.values(video.tags) : []),
+          thumbnailUrl: `${this.apiUrl}/${video.id}/thumbnail`,
+          videoUrl: `${this.apiUrl}/${video.id}/video`,
+          location: this.generateGeographicLocation(video),
+          createdAt: new Date(video.createdAt),
+          userId: video.userId?.toString() || '',
+          userName: video.userName || 'Anonymous',
+          likes: video.likesCount || 0,
+          commentsCount: video.commentsCount || 0,
+          viewsCount: video.viewsCount || 0,
+          isLiked: false
+        }));
+      }),
+      catchError(err => {
+        console.error('Failed to fetch bounding box videos', err);
+        return [];
+      })
+    );
   }
+
 
   getVideosInBoundingBoxTuples(
     sw: [number, number],
@@ -229,5 +260,47 @@ export class VideoService {
     const maxLon = round ? Math.ceil(ne[1]) : ne[1];
 
     return this.getVideosInBoundingBox(minLon, minLat, maxLon, maxLat, from, to);
+  }
+
+  // --- Generate location object ---
+  private generateGeographicLocation(video: any): GeographicLocation {
+    return {
+      latitude: video.latitude ?? null,
+      longitude: video.longitude ?? null,
+      address: video.location ?? ''
+    };
+  }
+
+  // --- Get Popular Tags ---
+  getPopularTags(): Observable<string[]> {
+    return this.http.get<any>(`${this.apiUrl}/tags/popular`).pipe(
+      map(response => {
+        // Handle different response formats
+        let tags: string[] = [];
+        
+        if (Array.isArray(response)) {
+          tags = response;
+        } else if (response.data && Array.isArray(response.data)) {
+          tags = response.data;
+        } else {
+          // Fallback: extract tags from all videos
+          tags = this.extractTagsFromVideos();
+        }
+        
+        return tags;
+      }),
+      catchError(error => {
+        console.error('Failed to fetch popular tags:', error);
+        // Return fallback tags as observable
+        return of(['music', 'gaming', 'education', 'sports', 'comedy', 'entertainment', 'news', 'technology', 'tutorial', 'vlog']);
+      })
+    );
+  }
+
+  // Fallback method to extract tags from existing videos
+  private extractTagsFromVideos(): string[] {
+    // This would require caching videos or making another call
+    // For now, return common tags as fallback
+    return ['music', 'gaming', 'education', 'sports', 'comedy', 'entertainment', 'news', 'technology', 'tutorial', 'vlog'];
   }
 }

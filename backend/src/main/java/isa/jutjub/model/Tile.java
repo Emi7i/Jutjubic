@@ -32,7 +32,7 @@ public class Tile extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "video_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    private Set<VideoPost> videos = new HashSet<>();
+    private Set<Videos> videos = new HashSet<>();
 
     @Column(name = "video_count")
     private Long videoCount = 0L;
@@ -47,14 +47,14 @@ public class Tile extends BaseEntity {
         this.videoCount = (long) videos.size();
     }
 
-    public void addVideo(VideoPost video) {
+    public void addVideo(Videos video) {
         if (video != null) {
             videos.add(video);
             updateVideoCount();
         }
     }
 
-    public void removeVideo(VideoPost video) {
+    public void removeVideo(Videos video) {
         if (video != null) {
             videos.remove(video);
             updateVideoCount();

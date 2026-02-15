@@ -1,8 +1,7 @@
 package isa.jutjub.service;
 
-import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.Videos;
 import isa.jutjub.repository.VideoPostRepository;
-import isa.jutjub.service.TileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -16,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -38,18 +37,18 @@ public class VideoPostService {
 
     /**
      * Creates a new video post with transaction support
-     * @param videoPost the video post to create
+     * @param videos the video post to create
      * @param videoFile the video file to upload
      * @param thumbnailFile the thumbnail image file
      * @return the created video post
      * @throws RuntimeException if upload fails or transaction needs rollback
      */
     @Transactional(rollbackFor = Exception.class)
-    public VideoPost createVideoPost(VideoPost videoPost, MultipartFile videoFile, MultipartFile thumbnailFile) {
+    public Videos createVideoPost(Videos videos, MultipartFile videoFile, MultipartFile thumbnailFile) {
         long startTime = System.currentTimeMillis();
         
         try {
-            log.info("Starting video post creation for title: {}", videoPost.getTitle());
+            log.info("Starting video post creation for title: {}", videos.getTitle());
             
             // Validate video file
             if (videoFile == null || videoFile.isEmpty()) {
@@ -68,31 +67,31 @@ public class VideoPostService {
             
             // Upload video file with timeout monitoring
             String videoPath = fileUploadService.uploadVideoFile(videoFile);
-            videoPost.setVideoPath(videoPath);
-            videoPost.setVideoFileSize(videoFile.getSize());
+            videos.setVideoPath(videoPath);
+            videos.setVideoFileSize(videoFile.getSize());
             
             // Upload thumbnail if provided
             if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
                 String thumbnailPath = fileUploadService.uploadThumbnailFile(thumbnailFile);
-                videoPost.setThumbnailPath(thumbnailPath);
+                videos.setThumbnailPath(thumbnailPath);
             }
             
             // Set creation timestamp
-            videoPost.setCreatedAt(LocalDateTime.now());
+            videos.setCreatedAt(LocalDateTime.now());
             
             // Calculate upload duration
             long endTime = System.currentTimeMillis();
-            videoPost.setUploadDurationMs(endTime - startTime);
+            videos.setUploadDurationMs(endTime - startTime);
             
             // Save video post to database
-            VideoPost savedPost = videoPostRepository.save(videoPost);
+            Videos savedPost = videoPostRepository.save(videos);
             
             log.info("Successfully created video post with ID: {}, upload duration: {}ms", 
-                    savedPost.getId(), videoPost.getUploadDurationMs());
+                    savedPost.getId(), videos.getUploadDurationMs());
             
             // Automatically add video to tiles if it has valid coordinates
-            Integer longitude = savedPost.getLongitude();
-            Integer latitude = savedPost.getLatitude();
+            Double longitude = savedPost.getLongitude();
+            Double latitude = savedPost.getLatitude();
             log.info("Video {} location: '{}', parsed coordinates: ({}, {})", 
                     savedPost.getId(), savedPost.getLocation(), longitude, latitude);
             
@@ -116,11 +115,11 @@ public class VideoPostService {
             log.error("Failed to create video post: {}", e.getMessage(), e);
             
             // Cleanup uploaded files if transaction fails
-            if (videoPost.getVideoPath() != null) {
-                fileUploadService.deleteFile(videoPost.getVideoPath());
+            if (videos.getVideoPath() != null) {
+                fileUploadService.deleteFile(videos.getVideoPath());
             }
-            if (videoPost.getThumbnailPath() != null) {
-                fileUploadService.deleteFile(videoPost.getThumbnailPath());
+            if (videos.getThumbnailPath() != null) {
+                fileUploadService.deleteFile(videos.getThumbnailPath());
             }
             
             throw new RuntimeException("Failed to create video post: " + e.getMessage(), e);
@@ -130,22 +129,22 @@ public class VideoPostService {
     /**
      * Updates an existing video post
      * @param id the video post ID
-     * @param videoPost the updated video post data
+     * @param videos the updated video post data
      * @return the updated video post
      */
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = "videoPosts", key = "#id")
-    public VideoPost updateVideoPost(Long id, VideoPost videoPost) {
+    public Videos updateVideoPost(Long id, Videos videos) {
         log.debug("Updating video post {} and invalidating cache", id);
         
-        VideoPost existingPost = videoPostRepository.findById(id)
+        Videos existingPost = videoPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Video post not found with ID: " + id));
         
         // Update allowed fields
-        existingPost.setTitle(videoPost.getTitle());
-        existingPost.setVideoDescription(videoPost.getVideoDescription());
-        existingPost.setLocation(videoPost.getLocation());
-        existingPost.setTags(videoPost.getTags());
+        existingPost.setTitle(videos.getTitle());
+        existingPost.setVideoDescription(videos.getVideoDescription());
+        existingPost.setLocation(videos.getLocation());
+        existingPost.setTags(videos.getTags());
         
         // Also invalidate the LoadingCache
         videoPostCacheService.invalidateVideoPost(id);
@@ -162,19 +161,19 @@ public class VideoPostService {
     public void deleteVideoPost(Long id) {
         log.debug("Deleting video post {} and invalidating cache", id);
         
-        VideoPost videoPost = videoPostRepository.findById(id)
+        Videos videos = videoPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Video post not found with ID: " + id));
         
         // Delete associated files
-        if (videoPost.getVideoPath() != null) {
-            fileUploadService.deleteFile(videoPost.getVideoPath());
+        if (videos.getVideoPath() != null) {
+            fileUploadService.deleteFile(videos.getVideoPath());
         }
-        if (videoPost.getThumbnailPath() != null) {
-            fileUploadService.deleteFile(videoPost.getThumbnailPath());
+        if (videos.getThumbnailPath() != null) {
+            fileUploadService.deleteFile(videos.getThumbnailPath());
         }
         
         // Delete from database
-        videoPostRepository.delete(videoPost);
+        videoPostRepository.delete(videos);
         
         // Also invalidate the LoadingCache
         videoPostCacheService.invalidateVideoPost(id);
@@ -189,7 +188,7 @@ public class VideoPostService {
      */
     @Transactional(readOnly = true)
     // @Cacheable(value = "videoPosts", key = "#id")
-    public VideoPost getVideoPostById(Long id) {
+    public Videos getVideoPostById(Long id) {
         log.debug("Fetching video post by ID: {} without cache", id);
         
         return videoPostRepository.findById(id)
@@ -203,7 +202,7 @@ public class VideoPostService {
      */
     @Transactional(readOnly = true)
     @Cacheable(value = "videoPostsPage", key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort.toString()")
-    public Page<VideoPost> getAllVideoPosts(Pageable pageable) {
+    public Page<Videos> getAllVideoPosts(Pageable pageable) {
         log.debug("Fetching all video posts with pagination: page {}, size {}", pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findAll(pageable);
     }
@@ -215,7 +214,7 @@ public class VideoPostService {
      */
     @Transactional(readOnly = true)
     @Cacheable(value = "recentVideoPosts", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
-    public Page<VideoPost> getMostRecentVideoPosts(Pageable pageable) {
+    public Page<Videos> getMostRecentVideoPosts(Pageable pageable) {
         log.debug("Fetching most recent video posts: page {}, size {}", pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findMostRecent(pageable);
     }
@@ -227,7 +226,7 @@ public class VideoPostService {
      */
     @Transactional(readOnly = true)
     @Cacheable(value = "popularVideoPosts", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
-    public Page<VideoPost> getMostPopularVideoPosts(Pageable pageable) {
+    public Page<Videos> getMostPopularVideoPosts(Pageable pageable) {
         log.debug("Fetching most popular video posts: page {}, size {}", pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findMostPopular(pageable);
     }
@@ -240,7 +239,7 @@ public class VideoPostService {
      */
     @Transactional(readOnly = true)
     @Cacheable(value = "videoSearch", key = "#keyword + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
-    public Page<VideoPost> searchVideoPosts(String keyword, Pageable pageable) {
+    public Page<Videos> searchVideoPosts(String keyword, Pageable pageable) {
         log.debug("Searching video posts with keyword '{}': page {}, size {}", keyword, pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.searchByKeyword(keyword, pageable);
     }
@@ -253,7 +252,7 @@ public class VideoPostService {
      */
     @Transactional(readOnly = true)
     @Cacheable(value = "videoPostsByTag", key = "#tag + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
-    public Page<VideoPost> getVideoPostsByTag(String tag, Pageable pageable) {
+    public Page<Videos> getVideoPostsByTag(String tag, Pageable pageable) {
         log.debug("Fetching video posts by tag '{}': page {}, size {}", tag, pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findByTag(tag, pageable);
     }
@@ -265,7 +264,7 @@ public class VideoPostService {
      * @return page of video posts from specified location
      */
     @Transactional(readOnly = true)
-    public Page<VideoPost> getVideoPostsByLocation(String location, Pageable pageable) {
+    public Page<Videos> getVideoPostsByLocation(String location, Pageable pageable) {
         return videoPostRepository.findByLocationContainingIgnoreCase(location, pageable);
     }
 
@@ -277,7 +276,7 @@ public class VideoPostService {
      */
     @Transactional(readOnly = true)
     @Cacheable(value = "videoPostsAfterDate", key = "#fromDate + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
-    public Page<VideoPost> getVideoPostsAfterDate(LocalDateTime fromDate, Pageable pageable) {
+    public Page<Videos> getVideoPostsAfterDate(LocalDateTime fromDate, Pageable pageable) {
         log.debug("Fetching video posts after date '{}': page {}, size {}", fromDate, pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findByCreatedAtAfter(fromDate, pageable);
     }
@@ -290,7 +289,7 @@ public class VideoPostService {
      */
     @Transactional(readOnly = true)
     @Cacheable(value = "videoPostsBeforeDate", key = "#toDate + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
-    public Page<VideoPost> getVideoPostsBeforeDate(LocalDateTime toDate, Pageable pageable) {
+    public Page<Videos> getVideoPostsBeforeDate(LocalDateTime toDate, Pageable pageable) {
         log.debug("Fetching video posts before date '{}': page {}, size {}", toDate, pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findByCreatedAtBefore(toDate, pageable);
     }
@@ -304,7 +303,7 @@ public class VideoPostService {
      */
     @Transactional(readOnly = true)
     @Cacheable(value = "videoPostsDateRange", key = "#fromDate + '-' + #toDate + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
-    public Page<VideoPost> getVideoPostsByDateRange(LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable) {
+    public Page<Videos> getVideoPostsByDateRange(LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable) {
         log.debug("Fetching video posts between dates '{}' and '{}': page {}, size {}", fromDate, toDate, pageable.getPageNumber(), pageable.getPageSize());
         return videoPostRepository.findByCreatedAtBetween(fromDate, toDate, pageable);
     }
@@ -333,9 +332,9 @@ public class VideoPostService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void incrementLikeCount(Long id) {
-        VideoPost videoPost = getVideoPostById(id);
-        videoPost.setLikesCount(videoPost.getLikesCount() + 1);
-        videoPostRepository.save(videoPost);
+        Videos videos = getVideoPostById(id);
+        videos.setLikesCount(videos.getLikesCount() + 1);
+        videoPostRepository.save(videos);
     }
 
     /**
@@ -344,10 +343,10 @@ public class VideoPostService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void decrementLikeCount(Long id) {
-        VideoPost videoPost = getVideoPostById(id);
-        if (videoPost.getLikesCount() > 0) {
-            videoPost.setLikesCount(videoPost.getLikesCount() - 1);
-            videoPostRepository.save(videoPost);
+        Videos videos = getVideoPostById(id);
+        if (videos.getLikesCount() > 0) {
+            videos.setLikesCount(videos.getLikesCount() - 1);
+            videoPostRepository.save(videos);
         }
     }
 
@@ -389,5 +388,45 @@ public class VideoPostService {
         }
         
         return true;
+    }
+
+    /**
+     * Gets popular tags from video posts
+     * @return list of popular tags (top 10)
+     */
+    public List<String> getPopularTags() {
+        log.info("Fetching popular tags");
+
+        try {
+            // Get all video posts
+            List<Videos> allVideos = videoPostRepository.findAll();
+
+            // Count tag frequencies
+            Map<String, Integer> tagCounts = new java.util.HashMap<>();
+
+            for (Videos video : allVideos) {
+                List<String> tags = video.getTags();
+                if (tags != null) {
+                    for (String tag : tags) {
+                        tagCounts.put(tag, tagCounts.getOrDefault(tag, 0) + 1);
+                    }
+                }
+            }
+
+            // Sort by frequency and get top 10
+            List<String> popularTags = tagCounts.entrySet().stream()
+                    .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                    .limit(10)
+                    .map(Map.Entry::getKey)
+                    .collect(java.util.stream.Collectors.toList());
+
+            log.info("Found {} popular tags: {}", popularTags.size(), popularTags);
+            return popularTags;
+
+        } catch (Exception e) {
+            log.error("Error fetching popular tags: {}", e.getMessage(), e);
+            // Return fallback tags
+            return java.util.Arrays.asList("music", "gaming", "education", "sports", "comedy", "entertainment", "news", "technology", "tutorial", "vlog");
+        }
     }
 }

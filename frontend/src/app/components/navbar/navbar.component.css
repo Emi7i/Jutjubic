@@ -30,14 +30,11 @@
   gap: 0.5rem;
 }
 
-.brand-text {
-  font-size: 1.5rem;
-  font-weight: 700;
-  background: linear-gradient(45deg, #6366f1, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
+.logo-image {
+  height: 50px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
 }
 
 /* Desktop Navigation */

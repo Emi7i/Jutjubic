@@ -54,20 +54,31 @@ export class VideoMapComponent implements AfterViewInit {
     this.zoom = newZoom;
   }
 
-  // --- Video selection ---
   onVideoSelected(video: Video) {
-    this.selectedVideo = video;
-    this.videoOpen = true;
-
-    if (video.location) {
-      this.mapComp.focusLocation(
-        video.location.latitude,
-        video.location.longitude
-      );
+    // If a video is already selected, close it first
+    if (this.videoOpen) {
+      this.videoOpen = false;
+      this.selectedVideo = undefined;
+      this.comments = [];
     }
 
-    this.loadComments(video.id);
+    // Slight delay ensures Angular refreshes the template
+    setTimeout(() => {
+      this.selectedVideo = { ...video }; // copy to ensure change detection
+      this.videoOpen = true;
+
+      if (video.location) {
+        this.mapComp.focusLocation(
+          video.location.latitude,
+          video.location.longitude
+        );
+      }
+
+      this.loadComments(video.id);
+    }, 0);
   }
+
+
 
   closeVideoCard(): void {
     this.videoOpen = false;

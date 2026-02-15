@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
-import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.Videos;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,12 +18,12 @@ import java.util.concurrent.Executor;
 @Slf4j
 public class VideoPostCacheService {
 
-    private final LoadingCache<Long, VideoPost> videoPostLoadingCache;
+    private final LoadingCache<Long, Videos> videoPostLoadingCache;
     private final CircuitBreaker circuitBreaker;
     private final Executor cacheAsyncExecutor;
 
     public VideoPostCacheService(
-            LoadingCache<Long, VideoPost> videoPostLoadingCache,
+            LoadingCache<Long, Videos> videoPostLoadingCache,
             CircuitBreakerRegistry circuitBreakerRegistry,
             @Qualifier("cacheAsyncExecutor") Executor cacheAsyncExecutor) {
         this.videoPostLoadingCache = videoPostLoadingCache;
@@ -40,7 +40,7 @@ public class VideoPostCacheService {
      * @throws EntityNotFoundException if video post not found
      * @throws CallNotPermittedException if circuit breaker is open
      */
-    public VideoPost getVideoPost(Long id) {
+    public Videos getVideoPost(Long id) {
         log.debug("Getting video post {} with cache protection and circuit breaker", id);
         return videoPostLoadingCache.get(id);
     }
@@ -52,7 +52,7 @@ public class VideoPostCacheService {
      * @param id the video post ID
      * @return Optional containing the video post, or empty if unavailable
      */
-    public Optional<VideoPost> getVideoPostSafe(Long id) {
+    public Optional<Videos> getVideoPostSafe(Long id) {
         log.debug("Getting video post {} with safe fallback", id);
 
         try {
@@ -76,7 +76,7 @@ public class VideoPostCacheService {
      * @param id the video post ID
      * @return CompletableFuture containing the video post
      */
-    public CompletableFuture<VideoPost> getVideoPostAsync(Long id) {
+    public CompletableFuture<Videos> getVideoPostAsync(Long id) {
         log.debug("Getting video post {} asynchronously with circuit breaker", id);
         return CompletableFuture.supplyAsync(() -> getVideoPost(id), cacheAsyncExecutor);
     }
@@ -87,7 +87,7 @@ public class VideoPostCacheService {
      * @param id the video post ID
      * @return CompletableFuture containing Optional of video post
      */
-    public CompletableFuture<Optional<VideoPost>> getVideoPostAsyncSafe(Long id) {
+    public CompletableFuture<Optional<Videos>> getVideoPostAsyncSafe(Long id) {
         log.debug("Getting video post {} asynchronously with safe fallback", id);
         return CompletableFuture.supplyAsync(() -> getVideoPostSafe(id), cacheAsyncExecutor);
     }

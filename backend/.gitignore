@@ -41,3 +41,7 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+
+# ignore ffmpeg folder - manual installation only
+/ffmpeg/
+/target/

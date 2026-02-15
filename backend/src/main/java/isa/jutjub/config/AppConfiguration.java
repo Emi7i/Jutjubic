@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * Svi bean-ovi koji ce biti automatski prepoznati od strane Spring kontejnera
  * moraju da se nalaze u podpaketima source direktorijuma, na bilo kojoj dubini.
  */
-@ComponentScan(value = { "isa.vezbe1.rest_example" })
+@ComponentScan(value = { "isa.jutjub" })
 public class AppConfiguration {
 
 	/*

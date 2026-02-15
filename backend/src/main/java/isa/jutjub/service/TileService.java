@@ -1,7 +1,7 @@
 package isa.jutjub.service;
 
 import isa.jutjub.model.Tile;
-import isa.jutjub.model.VideoPost;
+import isa.jutjub.model.Videos;
 import isa.jutjub.repository.TileRepository;
 import isa.jutjub.repository.VideoPostRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class TileService {
     @Cacheable(value = "tiles", key = "'coords-' + #longitude + '-' + #latitude")
     public Optional<Tile> getTileByCoordinates(Integer longitude, Integer latitude) {
         log.debug("Fetching tile by coordinates: ({}, {})", longitude, latitude);
-        return tileRepository.findByLongitudeAndLatitude(longitude, latitude);
+        return tileRepository.findByLongitudeAndLatitude(longitude.doubleValue(), latitude.doubleValue());
     }
 
     /**
@@ -55,7 +55,7 @@ public class TileService {
      */
     @CacheEvict(value = "tiles", allEntries = true)
     public Tile getOrCreateTile(Integer longitude, Integer latitude) {
-        return tileRepository.findByLongitudeAndLatitude(longitude, latitude)
+        return tileRepository.findByLongitudeAndLatitude(longitude.doubleValue(), latitude.doubleValue())
                 .orElseGet(() -> {
                     Tile newTile = new Tile();
                     newTile.setLongitude(longitude);
@@ -73,7 +73,7 @@ public class TileService {
      */
     @CacheEvict(value = "tiles", allEntries = true)
     public Tile createTile(Integer longitude, Integer latitude) {
-        if (tileRepository.findByLongitudeAndLatitude(longitude, latitude).isPresent()) {
+        if (tileRepository.findByLongitudeAndLatitude(longitude.doubleValue(), latitude.doubleValue()).isPresent()) {
             throw new IllegalArgumentException("Tile already exists for coordinates: " + longitude + ", " + latitude);
         }
 
@@ -94,20 +94,20 @@ public class TileService {
      * Rounds coordinates and finds/creates the appropriate tile
      */
     @CacheEvict(value = "tiles", allEntries = true)
-    public Tile addVideoToTile(VideoPost video) {
+    public Tile addVideoToTile(Videos video) {
         if (!video.hasValidCoordinates()) {
             throw new IllegalArgumentException("Video must have valid location coordinates");
         }
 
         // Round the video coordinates to integers
-        Integer longitude = video.getLongitude();
-        Integer latitude = video.getLatitude();
+        Double longitude = video.getLongitude();
+        Double latitude = video.getLatitude();
 
         log.debug("Adding video {} with coordinates ({}, {}) to tile",
                 video.getId(), longitude, latitude);
 
         // Get or create the tile for these rounded coordinates
-        Tile tile = getOrCreateTile(longitude, latitude);
+        Tile tile = getOrCreateTile(longitude.intValue(), latitude.intValue());
 
         // Add video to tile if not already present
         if (!tile.getVideos().contains(video)) {
@@ -128,7 +128,7 @@ public class TileService {
      */
     @CacheEvict(value = "tiles", allEntries = true)
     public Tile addVideoToTileById(Long videoId) {
-        VideoPost video = videoPostRepository.findById(videoId)
+        Videos video = videoPostRepository.findById(videoId)
                 .orElseThrow(() -> new RuntimeException("Video not found with ID: " + videoId));
 
         log.info("Loaded video {} with coordinates: ({}, {})",
@@ -141,7 +141,7 @@ public class TileService {
      * Remove video from tile
      */
     @CacheEvict(value = "tiles", allEntries = true)
-    public Tile removeVideoFromTile(Long tileId, VideoPost video) {
+    public Tile removeVideoFromTile(Long tileId, Videos video) {
         Tile tile = tileRepository.findById(tileId)
                 .orElseThrow(() -> new RuntimeException("Tile not found: " + tileId));
 
@@ -156,13 +156,13 @@ public class TileService {
      * Remove video from its tile by coordinates
      */
     @CacheEvict(value = "tiles", allEntries = true)
-    public Tile removeVideoFromTile(VideoPost video) {
+    public Tile removeVideoFromTile(Videos video) {
         if (!video.hasValidCoordinates()) {
             throw new IllegalArgumentException("Video must have valid location coordinates");
         }
 
-        Integer longitude = video.getLongitude();
-        Integer latitude = video.getLatitude();
+        Double longitude = video.getLongitude();
+        Double latitude = video.getLatitude();
 
         Tile tile = tileRepository.findByLongitudeAndLatitude(longitude, latitude)
                 .orElseThrow(() -> new RuntimeException("Tile not found for video coordinates"));
@@ -185,9 +185,9 @@ public class TileService {
         List<Tile> tiles = new ArrayList<>();
 
         // Iterate through all grid cells in the bounding box
-        for (int lon = minLon; lon <= maxLon; lon++) {
-            for (int lat = minLat; lat <= maxLat; lat++) {
-                tileRepository.findByLongitudeAndLatitude(lon, lat).ifPresent(tiles::add);
+        for (Integer lon = minLon; lon <= maxLon; lon++) {
+            for (Integer lat = minLat; lat <= maxLat; lat++) {
+                tileRepository.findByLongitudeAndLatitude(lon.doubleValue(), lat.doubleValue()).ifPresent(tiles::add);
             }
         }
 
@@ -234,5 +234,94 @@ public class TileService {
     @Cacheable(value = "tiles", key = "'count-with-videos'")
     public Long countTilesWithVideos() {
         return tileRepository.countTilesWithVideos();
+    }
+
+    /**
+     * Sift through all videos and assign them to their correct tiles based on location
+     * This function should ONLY be called by the scheduler at 3 AM
+     * Never called by the regular application
+     */
+    @CacheEvict(value = "tiles", allEntries = true)
+    public int SiftThroughVideos() {
+        log.info("Starting SiftThroughVideos - redistributing all videos to correct tiles");
+        
+        // Clear all existing tile-video associations
+        List<Tile> allTiles = tileRepository.findAll();
+        for (Tile tile : allTiles) {
+            tile.getVideos().clear();
+            tileRepository.save(tile);
+        }
+        
+        // Get all videos and redistribute them to correct tiles
+        List<Videos> allVideos = videoPostRepository.findAll();
+        int redistributedCount = 0;
+        
+        for (Videos video : allVideos) {
+            try {
+                if (video.hasValidCoordinates()) {
+                    // Get or create the correct tile for this video
+                    Double longitude = video.getLongitude();
+                    Double latitude = video.getLatitude();
+                    Tile correctTile = getOrCreateTile(longitude.intValue(), latitude.intValue());
+                    
+                    // Add video to its correct tile
+                    correctTile.addVideo(video);
+                    tileRepository.save(correctTile);
+                    redistributedCount++;
+                    
+                    log.debug("Redistributed video {} to tile ({}, {})", 
+                            video.getId(), longitude, latitude);
+                } else {
+                    log.warn("Video {} has invalid coordinates, skipping", video.getId());
+                }
+            } catch (Exception e) {
+                log.error("Error redistributing video {}: {}", video.getId(), e.getMessage());
+            }
+        }
+        
+        log.info("Completed SiftThroughVideos. Redistributed {} videos to {} tiles", 
+                redistributedCount, allTiles.size());
+        return redistributedCount;
+    }
+
+    /**
+     * Cleanup inactive tiles - used by scheduler for weekly maintenance
+     * Goes through each video and reassigns it to the correct tile
+     */
+    @CacheEvict(value = "tiles", allEntries = true)
+    public int cleanupInactiveTiles() {
+        log.info("Starting inactive tile cleanup - reassigning all videos");
+        
+        // Get all videos and reassign them to correct tiles
+        List<Videos> allVideos = videoPostRepository.findAll();
+        int reassignedCount = 0;
+        
+        for (Videos video : allVideos) {
+            try {
+                if (video.hasValidCoordinates()) {
+                    // Get or create the correct tile for this video
+                    Double longitude = video.getLongitude();
+                    Double latitude = video.getLatitude();
+                    Tile correctTile = getOrCreateTile(longitude.intValue(), latitude.intValue());
+                    
+                    // Add video to its correct tile if not already present
+                    if (!correctTile.getVideos().contains(video)) {
+                        correctTile.addVideo(video);
+                        tileRepository.save(correctTile);
+                        reassignedCount++;
+                        
+                        log.debug("Reassigned video {} to tile ({}, {})", 
+                                video.getId(), longitude, latitude);
+                    }
+                } else {
+                    log.warn("Video {} has invalid coordinates, skipping", video.getId());
+                }
+            } catch (Exception e) {
+                log.error("Error reassigning video {}: {}", video.getId(), e.getMessage());
+            }
+        }
+        
+        log.info("Completed inactive tile cleanup. Reassigned {} videos", reassignedCount);
+        return reassignedCount;
     }
 }
