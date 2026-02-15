@@ -9,10 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
+
+import javax.sql.DataSource;
 
 /**
  * Test Controller for demonstrating load balancing and failover
@@ -29,6 +31,9 @@ public class TestController {
 
     @Autowired(required = false)
     private DataSource dataSource;
+
+    // Executor for timeout handling
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     /**
      * Simple test endpoint to demonstrate load balancing
@@ -72,18 +77,14 @@ public class TestController {
             if (isDatabaseAvailable) {
                 response.put("message", "Database connection successful");
                 response.put("serverPort", serverPort);
-                response.put("instanceId", getContainerName()); // Use container name
-                response.put("containerName", getContainerName()); // Container name from Docker
-                response.put("eurekaInstanceId", getInstanceId()); // Eureka instance ID
+                response.put("instanceId", getContainerName());
                 response.put("database", "connected");
                 response.put("queryTime", "2ms");
                 response.put("timestamp", System.currentTimeMillis());
             } else {
                 response.put("message", "Database not available");
                 response.put("serverPort", serverPort);
-                response.put("instanceId", getContainerName()); // Use container name
-                response.put("containerName", getContainerName()); // Container name from Docker
-                response.put("eurekaInstanceId", getInstanceId()); // Eureka instance ID
+                response.put("instanceId", getContainerName());
                 response.put("database", "disconnected");
                 response.put("timestamp", System.currentTimeMillis());
             }
@@ -163,7 +164,7 @@ public class TestController {
     }
 
     /**
-     * Check if database is available by attempting to establish a connection
+     * Check if database is available by attempting to establish a connection with timeout
      * @return true if database connection is successful, false otherwise
      */
     private boolean checkDatabaseAvailability() {
@@ -171,9 +172,30 @@ public class TestController {
             return false;
         }
         
-        try (Connection connection = dataSource.getConnection()) {
-            return connection != null && !connection.isClosed();
+        Future<Boolean> future = executor.submit(() -> {
+            try (Connection connection = dataSource.getConnection()) {
+                if (connection != null && !connection.isClosed()) {
+                    // Quick test query to verify connection works
+                    try (var stmt = connection.createStatement();
+                         var rs = stmt.executeQuery("SELECT 1")) {
+                        return rs.next();
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Database connection failed: " + e.getMessage());
+            }
+            return false;
+        });
+        
+        try {
+            // Wait maximum 3 seconds for database connection
+            return future.get(3, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            System.err.println("Database connection timeout after 3 seconds");
+            future.cancel(true);
+            return false;
         } catch (Exception e) {
+            System.err.println("Database check error: " + e.getMessage());
             return false;
         }
     }
