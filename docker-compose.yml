@@ -51,6 +51,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/jutjubic_db
       - SPRING_DATASOURCE_USERNAME=jutjubic_user
       - SPRING_DATASOURCE_PASSWORD=banana
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -73,6 +75,7 @@ services:
       - POSTGRES_DB=jutjubic_db
       - POSTGRES_USER=jutjubic_user
       - POSTGRES_PASSWORD=banana
+      - POSTGRES_INITDB_ARGS=--auth-host=md5
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/src/main/resources/db/migration:/docker-entrypoint-initdb.d

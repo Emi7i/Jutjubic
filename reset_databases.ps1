@@ -15,7 +15,7 @@ param(
 # ============================================
 # CONFIG
 # ============================================
-$DB_HOST     = "localhost"
+$DB_HOST     = "127.0.0.1"
 $DB_PORT     = "5432"
 $DB_NAME     = "jutjubic_db"
 $DB_USER     = "jutjubic_user"
@@ -48,11 +48,11 @@ Write-Host "Using psql: $pgExe" -ForegroundColor DarkGray
 # SQL
 # ============================================
 $SQL_RESET = @"
-DROP TABLE IF EXISTS tile_videos CASCADE;
-DROP TABLE IF EXISTS videos CASCADE;
-DROP TABLE IF EXISTS tiles CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-SELECT 'Reset complete - all tables dropped.' AS status;
+
+TRUNCATE TABLE videos CASCADE;
+TRUNCATE TABLE tiles CASCADE;
+TRUNCATE TABLE users CASCADE;
+SELECT 'Reset complete - all data cleared.' AS status;
 "@
 
 $SQL_SEED = @"
@@ -119,12 +119,10 @@ function Run-Sql($sql, $description) {
   Write-Host ""
   Write-Host ">>> $description..." -ForegroundColor Cyan
 
-  $env:PGPASSWORD = $DB_PASSWORD
+  
+  $result = docker exec jutjubic-postgres-1 psql -U jutjubic_user -d jutjubic_db -c "$sql" 2>&1
 
-  $result = $sql | & "$pgExe" -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME 2>&1
-
-  Remove-Item Env:\PGPASSWORD -ErrorAction SilentlyContinue
-
+  
   $hasError = ($LASTEXITCODE -ne 0) -or ($result -match "ERROR:")
 
   if ($hasError) {
@@ -138,7 +136,7 @@ function Run-Sql($sql, $description) {
     }
     Write-Host ""
     if ($result -match "relation.*does not exist") {
-      Write-Host "HINT: Tables do not exist yet - make sure Spring Boot has started and Hibernate created the tables before seeding." -ForegroundColor Yellow
+      Write-Host "HINT: Tables do not exist yet " -ForegroundColor Yellow
     }
     Write-Host "!!!!! Operation failed - see errors above !!!!!" -ForegroundColor Red
     exit 1
@@ -173,10 +171,6 @@ if ($doAll) {
   }
   Run-Sql $SQL_RESET "Dropping all tables"
   Write-Host ""
-  Write-Host "    Restart your Spring Boot app now so Hibernate recreates the tables." -ForegroundColor Yellow
-  if (-not (Prompt-Confirm "Have you restarted the app?")) {
-    Write-Host "Seed skipped. Run .\reset_databases.ps1 -Seed when ready." -ForegroundColor Yellow; exit 0
-  }
   Run-Sql $SQL_SEED "Seeding data"
 }
 elseif ($doReset) {
