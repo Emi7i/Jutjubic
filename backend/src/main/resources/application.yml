@@ -34,6 +34,11 @@ spring:
       add-mappings: false
   main:
     allow-bean-definition-overriding: true
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: admin
+    password: admin123
 
 server:
   port: 8080

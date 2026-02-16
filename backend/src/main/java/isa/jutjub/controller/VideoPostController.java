@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import isa.jutjub.model.Videos;
+import isa.jutjub.service.VideoEventPublisher;
 import isa.jutjub.service.VideoPostService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -44,9 +45,12 @@ public class VideoPostController {
 
     private final VideoPostService videoPostService;
 
+    private final VideoEventPublisher videoEventPublisher;
+
     @Autowired
-    public VideoPostController(VideoPostService videoPostService) {
+    public VideoPostController(VideoPostService videoPostService, VideoEventPublisher videoEventPublisher) {
         this.videoPostService = videoPostService;
+        this.videoEventPublisher = videoEventPublisher;
     }
 
     /**
@@ -54,40 +58,51 @@ public class VideoPostController {
      */
     @Operation(summary = "Create a new video post", description = "Upload a video with thumbnail and metadata")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Video post created successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input or file format"),
-        @ApiResponse(responseCode = "413", description = "File too large"),
-        @ApiResponse(responseCode = "408", description = "Upload timeout"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "201", description = "Video post created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input or file format"),
+            @ApiResponse(responseCode = "413", description = "File too large"),
+            @ApiResponse(responseCode = "408", description = "Upload timeout"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> createVideoPost(
             @Parameter(description = "Video post metadata", required = true)
             @RequestPart("videos") @Valid Videos videos,
-            
+
             @Parameter(description = "Video file (MP4, max 200MB)", required = true)
             @RequestPart("videoFile") MultipartFile videoFile,
-            
+
             @Parameter(description = "Thumbnail image file (optional)")
             @RequestPart(value = "thumbnailFile", required = false) MultipartFile thumbnailFile) {
-        
+
         try {
             Videos createdPost = videoPostService.createVideoPost(videos, videoFile, thumbnailFile);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Video post created successfully");
             response.put("data", createdPost);
-            
+
+
+            try {
+                System.out.println("About to publish event for video ID: " + createdPost.getId());
+                videoEventPublisher.publishVideoUploadEvent(createdPost);
+                System.out.println("Video event published for video ID: " + createdPost.getId());
+            } catch (Exception e) {
+                // Log but don't fail the upload if messaging fails
+                System.out.println("Failed to publish video event to RabbitMQ: " + e.getMessage());
+                // You could also add this to response as a warning
+            }
+
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            
+
         } catch (Exception e) {
             log.error("Failed to create video post: {}", e.getMessage(), e);
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Failed to create video post: " + e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
@@ -97,43 +112,43 @@ public class VideoPostController {
      */
     @Operation(summary = "Get all video posts", description = "Retrieve paginated list of video posts with optional date filtering")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Video posts retrieved successfully"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "Video posts retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllVideoPosts(
-            @Parameter(description = "Page number (0-based)") 
+            @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
-            
-            @Parameter(description = "Page size") 
+
+            @Parameter(description = "Page size")
             @RequestParam(defaultValue = "10") int size,
-            
-            @Parameter(description = "Sort field") 
+
+            @Parameter(description = "Sort field")
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            
-            @Parameter(description = "Sort direction") 
+
+            @Parameter(description = "Sort direction")
             @RequestParam(defaultValue = "desc") String sortDir,
-            
-            @Parameter(description = "From date (ISO format: YYYY-MM-DDTHH:mm:ss.sssZ)") 
+
+            @Parameter(description = "From date (ISO format: YYYY-MM-DDTHH:mm:ss.sssZ)")
             @RequestParam(required = false) String from,
-            
-            @Parameter(description = "To date (ISO format: YYYY-MM-DDTHH:mm:ss.sssZ)") 
+
+            @Parameter(description = "To date (ISO format: YYYY-MM-DDTHH:mm:ss.sssZ)")
             @RequestParam(required = false) String to) {
-        
+
         try {
-            Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? 
-                Sort.Direction.DESC : Sort.Direction.ASC;
+            Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ?
+                    Sort.Direction.DESC : Sort.Direction.ASC;
             Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-            
+
             Page<Videos> videoPosts;
-            
+
             // Handle date filtering if parameters are provided
             if (from != null || to != null) {
                 LocalDateTime fromDate = null;
                 LocalDateTime toDate = null;
-                
+
                 DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-                
+
                 if (from != null && !from.trim().isEmpty()) {
                     try {
                         fromDate = LocalDateTime.parse(from, formatter);
@@ -144,7 +159,7 @@ public class VideoPostController {
                         return ResponseEntity.badRequest().body(error);
                     }
                 }
-                
+
                 if (to != null && !to.trim().isEmpty()) {
                     try {
                         toDate = LocalDateTime.parse(to, formatter);
@@ -155,7 +170,7 @@ public class VideoPostController {
                         return ResponseEntity.badRequest().body(error);
                     }
                 }
-                
+
                 if (fromDate != null && toDate != null) {
                     videoPosts = videoPostService.getVideoPostsByDateRange(fromDate, toDate, pageable);
                 } else if (fromDate != null) {
@@ -166,7 +181,7 @@ public class VideoPostController {
             } else {
                 videoPosts = videoPostService.getAllVideoPosts(pageable);
             }
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", videoPosts.getContent());
@@ -174,7 +189,7 @@ public class VideoPostController {
             response.put("totalItems", videoPosts.getTotalElements());
             response.put("totalPages", videoPosts.getTotalPages());
             response.put("pageSize", videoPosts.getSize());
-            
+
             // Add filter info if date filtering is applied
             if (from != null || to != null) {
                 Map<String, Object> filterInfo = new HashMap<>();
@@ -186,16 +201,16 @@ public class VideoPostController {
                 }
                 response.put("filter", filterInfo);
             }
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
             log.error("Failed to retrieve video posts: {}", e.getMessage(), e);
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Failed to retrieve video posts: " + e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -205,34 +220,34 @@ public class VideoPostController {
      */
     @Operation(summary = "Get video post by ID", description = "Retrieve a specific video post")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Video post retrieved successfully"),
-        @ApiResponse(responseCode = "404", description = "Video post not found"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "Video post retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Video post not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getVideoPostById(
             @Parameter(description = "Video post ID", required = true)
             @PathVariable Long id) {
-        
+
         try {
             Videos videos = videoPostService.getVideoPostById(id);
-            
+
             // Increment view count
             videoPostService.incrementViewCount(id);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", videos);
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (RuntimeException e) {
             log.error("Failed to retrieve video post with ID {}: {}", id, e.getMessage());
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
@@ -243,68 +258,32 @@ public class VideoPostController {
     @Operation(summary = "Get most recent video posts", description = "Retrieve recently uploaded video posts")
     @GetMapping("/recent")
     public ResponseEntity<Map<String, Object>> getRecentVideoPosts(
-            @Parameter(description = "Page number (0-based)") 
+            @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
-            
-            @Parameter(description = "Page size") 
+
+            @Parameter(description = "Page size")
             @RequestParam(defaultValue = "10") int size) {
-        
+
         try {
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
             Page<Videos> videoPosts = videoPostService.getMostRecentVideoPosts(pageable);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", videoPosts.getContent());
             response.put("currentPage", videoPosts.getNumber());
             response.put("totalItems", videoPosts.getTotalElements());
             response.put("totalPages", videoPosts.getTotalPages());
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
             log.error("Failed to retrieve recent video posts: {}", e.getMessage(), e);
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Failed to retrieve recent video posts: " + e.getMessage());
-            
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
 
-    /**
-     * Gets the most popular video posts
-     */
-    @Operation(summary = "Get most popular video posts", description = "Retrieve video posts sorted by likes")
-    @GetMapping("/popular")
-    public ResponseEntity<Map<String, Object>> getPopularVideoPosts(
-            @Parameter(description = "Page number (0-based)") 
-            @RequestParam(defaultValue = "0") int page,
-            
-            @Parameter(description = "Page size") 
-            @RequestParam(defaultValue = "10") int size) {
-        
-        try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Videos> videoPosts = videoPostService.getMostPopularVideoPosts(pageable);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", videoPosts.getContent());
-            response.put("currentPage", videoPosts.getNumber());
-            response.put("totalItems", videoPosts.getTotalElements());
-            response.put("totalPages", videoPosts.getTotalPages());
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            log.error("Failed to retrieve popular video posts: {}", e.getMessage(), e);
-            
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("message", "Failed to retrieve popular video posts: " + e.getMessage());
-            
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -317,17 +296,17 @@ public class VideoPostController {
     public ResponseEntity<Map<String, Object>> searchVideoPosts(
             @Parameter(description = "Search keyword", required = true)
             @RequestParam String keyword,
-            
-            @Parameter(description = "Page number (0-based)") 
+
+            @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
-            
-            @Parameter(description = "Page size") 
+
+            @Parameter(description = "Page size")
             @RequestParam(defaultValue = "10") int size) {
-        
+
         try {
             Pageable pageable = PageRequest.of(page, size);
             Page<Videos> videoPosts = videoPostService.searchVideoPosts(keyword, pageable);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", videoPosts.getContent());
@@ -335,16 +314,16 @@ public class VideoPostController {
             response.put("totalItems", videoPosts.getTotalElements());
             response.put("totalPages", videoPosts.getTotalPages());
             response.put("searchKeyword", keyword);
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
             log.error("Failed to search video posts with keyword '{}': {}", keyword, e.getMessage(), e);
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Failed to search video posts: " + e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -357,17 +336,17 @@ public class VideoPostController {
     public ResponseEntity<Map<String, Object>> getVideoPostsByTag(
             @Parameter(description = "Tag to search for", required = true)
             @PathVariable String tag,
-            
-            @Parameter(description = "Page number (0-based)") 
+
+            @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page,
-            
-            @Parameter(description = "Page size") 
+
+            @Parameter(description = "Page size")
             @RequestParam(defaultValue = "10") int size) {
-        
+
         try {
             Pageable pageable = PageRequest.of(page, size);
             Page<Videos> videoPosts = videoPostService.getVideoPostsByTag(tag, pageable);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", videoPosts.getContent());
@@ -375,16 +354,16 @@ public class VideoPostController {
             response.put("totalItems", videoPosts.getTotalElements());
             response.put("totalPages", videoPosts.getTotalPages());
             response.put("tag", tag);
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
             log.error("Failed to retrieve video posts by tag '{}': {}", tag, e.getMessage(), e);
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Failed to retrieve video posts by tag: " + e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -397,23 +376,52 @@ public class VideoPostController {
     public ResponseEntity<Map<String, Object>> likeVideoPost(
             @Parameter(description = "Video post ID", required = true)
             @PathVariable Long id) {
-        
+
         try {
             videoPostService.incrementLikeCount(id);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Video post liked successfully");
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (RuntimeException e) {
             log.error("Failed to like video post with ID {}: {}", id, e.getMessage());
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", e.getMessage());
-            
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+
+    /**
+     * Unlikes a video post
+     */
+    @Operation(summary = "Unlike a video post", description = "Decrement like count for a video post")
+    @PostMapping("/{id}/unlike")
+    public ResponseEntity<Map<String, Object>> unlikeVideoPost(
+            @Parameter(description = "Video post ID", required = true)
+            @PathVariable Long id) {
+
+        try {
+            videoPostService.decrementLikeCount(id);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Video post unliked successfully");
+
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            log.error("Failed to unlike video post with ID {}: {}", id, e.getMessage());
+
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
@@ -426,23 +434,23 @@ public class VideoPostController {
     public ResponseEntity<Map<String, Object>> getViewCount(@PathVariable Long id) {
         try {
             Videos videos = videoPostService.getVideoPostById(id);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("videoId", id);
             response.put("title", videos.getTitle());
             response.put("viewsCount", videos.getViewsCount());
             response.put("lastAccessed", videos.getUpdatedAt());
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (RuntimeException e) {
             log.error("Failed to get view count for video post ID {}: {}", id, e.getMessage());
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
@@ -456,22 +464,22 @@ public class VideoPostController {
             @PathVariable Long id,
             @RequestParam(defaultValue = "10") int threads,
             @RequestParam(defaultValue = "5") int viewsPerThread) {
-        
+
         try {
             Videos videos = videoPostService.getVideoPostById(id);
             long initialViews = videos.getViewsCount();
-            
+
             ExecutorService executorService = Executors.newFixedThreadPool(threads);
             List<CompletableFuture<Void>> futures = new ArrayList<>();
             AtomicInteger successfulIncrements = new AtomicInteger(0);
             AtomicInteger failedIncrements = new AtomicInteger(0);
-            
+
             long startTime = System.currentTimeMillis();
-            
+
             // Simulate concurrent view increments
             for (int i = 0; i < threads; i++) {
                 final int threadId = i;
-                
+
                 CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                     for (int j = 0; j < viewsPerThread; j++) {
                         try {
@@ -484,52 +492,52 @@ public class VideoPostController {
                         }
                     }
                 }, executorService);
-                
+
                 futures.add(future);
             }
-            
+
             // Wait for completion
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .get(30, TimeUnit.SECONDS);
-            
+                    .get(30, TimeUnit.SECONDS);
+
             executorService.shutdown();
-            
+
             long endTime = System.currentTimeMillis();
-            
+
             // Get final view count
             Videos updatedVideo = videoPostService.getVideoPostById(id);
             long finalViews = updatedVideo.getViewsCount();
             long expectedIncrement = (long) threads * viewsPerThread;
             long actualIncrement = finalViews - initialViews;
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("videoId", id);
             response.put("title", videos.getTitle());
             response.put("testParameters", Map.of(
-                "threads", threads,
-                "viewsPerThread", viewsPerThread,
-                "totalExpectedIncrements", expectedIncrement
+                    "threads", threads,
+                    "viewsPerThread", viewsPerThread,
+                    "totalExpectedIncrements", expectedIncrement
             ));
             response.put("results", Map.of(
-                "initialViews", initialViews,
-                "finalViews", finalViews,
-                "actualIncrement", actualIncrement,
-                "successfulIncrements", successfulIncrements.get(),
-                "failedIncrements", failedIncrements.get(),
-                "durationMs", endTime - startTime,
-                "testPassed", actualIncrement == expectedIncrement && failedIncrements.get() == 0
+                    "initialViews", initialViews,
+                    "finalViews", finalViews,
+                    "actualIncrement", actualIncrement,
+                    "successfulIncrements", successfulIncrements.get(),
+                    "failedIncrements", failedIncrements.get(),
+                    "durationMs", endTime - startTime,
+                    "testPassed", actualIncrement == expectedIncrement && failedIncrements.get() == 0
             ));
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
             log.error("Failed to simulate concurrent views for video post ID {}: {}", id, e.getMessage(), e);
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Failed to simulate concurrent views: " + e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -542,7 +550,7 @@ public class VideoPostController {
         try {
             Videos videos = videoPostService.getVideoPostById(id);
             Resource videoResource = videoPostService.getVideoFile(videos.getVideoPath());
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("videoId", id);
@@ -550,15 +558,15 @@ public class VideoPostController {
             response.put("resourceExists", videoResource.exists());
             response.put("resourceReadable", videoResource.isReadable());
             response.put("resourceFilename", videoResource.getFilename());
-            
+
             try {
                 response.put("fileSize", videoResource.contentLength());
             } catch (IOException e) {
                 response.put("fileSize", "Error: " + e.getMessage());
             }
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
@@ -575,11 +583,11 @@ public class VideoPostController {
     public ResponseEntity<Resource> serveVideo(
             @Parameter(description = "Video post ID", required = true)
             @PathVariable Long id) {
-        
+
         try {
             Videos videos = videoPostService.getVideoPostById(id);
             Resource videoResource = videoPostService.getVideoFile(videos.getVideoPath());
-            
+
             String contentType = "video/mp4";
             String filename = videoResource.getFilename();
             if (filename != null) {
@@ -593,12 +601,12 @@ public class VideoPostController {
                     contentType = "video/x-msvideo";
                 }
             }
-            
+
             return ResponseEntity.ok()
                     .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + videos.getTitle() + ".mp4\"")
                     .body(videoResource);
-            
+
         } catch (RuntimeException e) {
             log.error("Failed to serve video for post ID {}: {}", id, e.getMessage());
             return ResponseEntity.notFound().build();
@@ -610,27 +618,27 @@ public class VideoPostController {
      */
     @Operation(summary = "Get popular tags", description = "Retrieve most popular tags from video posts")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Popular tags retrieved successfully"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "200", description = "Popular tags retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/tags/popular")
     public ResponseEntity<Map<String, Object>> getPopularTags() {
         try {
             List<String> popularTags = videoPostService.getPopularTags();
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", popularTags);
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
             log.error("Failed to retrieve popular tags: {}", e.getMessage(), e);
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Failed to retrieve popular tags: " + e.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -643,27 +651,54 @@ public class VideoPostController {
     public ResponseEntity<Resource> serveThumbnail(
             @Parameter(description = "Video post ID", required = true)
             @PathVariable Long id) {
-        
+
         try {
             Videos videos = videoPostService.getVideoPostById(id);
-            
+
             if (videos.getThumbnailPath() == null) {
                 return ResponseEntity.notFound().build();
             }
-            
+
             Resource thumbnailResource = videoPostService.getThumbnailFile(videos.getThumbnailPath());
-            
+
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_JPEG)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"thumbnail_" + id + ".jpg\"")
                     .header("Access-Control-Allow-Origin", "*")
                     .header("Access-Control-Allow-Methods", "GET")
                     .header("Access-Control-Allow-Headers", "*")
+                    .header(HttpHeaders.CACHE_CONTROL, "public, max-age=3600") // Cache for 1 hour
                     .body(thumbnailResource);
-            
+
         } catch (RuntimeException e) {
             log.error("Failed to serve thumbnail for post ID {}: {}", id, e.getMessage());
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * Gets the top 3 popular videos from the latest ETL run
+     */
+    @Operation(summary = "Get top popular videos", description = "Retrieve top 3 popular videos from the latest ETL pipeline run")
+    @GetMapping("/top-popular")
+    public ResponseEntity<Map<String, Object>> getTopPopularVideos() {
+        try {
+            List<Map<String, Object>> popularVideos = videoPostService.getTopPopularVideos();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", popularVideos);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("Failed to retrieve top popular videos: {}", e.getMessage(), e);
+
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Failed to retrieve top popular videos: " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 }

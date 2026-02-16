@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package jutjubic.events;
+
+option java_package = "isa.jutjub.proto";
+option java_outer_classname = "VideoEventProtos";
+option java_multiple_files = true;
+
+// Video upload event message
+message VideoUploadEvent {
+  int64 video_id = 1;
+  string title = 2;
+  string description = 3;
+  string uploader_id = 4;
+  int64 file_size_bytes = 5;
+  double duration_seconds = 6;
+  string format = 7;
+  int64 upload_timestamp = 8;
+  repeated string tags = 9;
+  Location location = 10;
+  
+  // URLs instead of raw data
+  string video_url = 11;
+  string thumbnail_url = 12;
+  
+  // Paths for file system access
+  string video_path = 13;
+  string thumbnail_path = 14;
+  
+  // Counters
+  int64 views_count = 15;
+  int64 likes_count = 16;
+  int64 comments_count = 17;
+}
+
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+  string address = 3;
+}

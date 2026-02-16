@@ -22,7 +22,12 @@ export class MapComponent implements AfterViewInit, OnChanges {
   private markerLayer = L.layerGroup(); // holds all video markers
   private tileLayer!: L.TileLayer;
   private videoMarkers = new Map<string, L.Marker>(); // map video.id -> marker
-  icon = new L.Icon.Default();
+  icon = L.icon({
+    iconUrl: '/assets/ufo.png',
+    iconSize: [24, 24],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -24]
+  });
 
   ngAfterViewInit(): void {
     // Initialize map

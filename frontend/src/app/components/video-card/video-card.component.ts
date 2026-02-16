@@ -32,7 +32,7 @@ export class VideoCardComponent implements OnInit, AfterViewInit {
   toggleLike(): void {
     if (!this.video) return;
 
-    this.interactionService.toggleLike(this.video.id).subscribe({
+    this.interactionService.toggleLike(this.video.id, this.video.isLiked).subscribe({
       next: updatedVideo => {
         this.video.isLiked = updatedVideo.isLiked;
         this.video.likes = updatedVideo.likes;

@@ -134,7 +134,14 @@ export class VideoMapComponent implements AfterViewInit {
 
   // --- Likes ---
   toggleLike(video: Video) {
-    this.videoService.toggleLike(video.id).subscribe(() => {
+    // Check if user is logged in
+    const currentUser = localStorage.getItem('userId');
+    if (!currentUser) {
+      alert('You need to log in to like or comment on videos.');
+      return;
+    }
+
+    this.videoService.toggleLike(video.id, video.isLiked).subscribe(() => {
       video.isLiked = !video.isLiked;
       video.likes += video.isLiked ? 1 : -1;
     });

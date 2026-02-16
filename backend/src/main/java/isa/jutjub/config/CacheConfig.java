@@ -48,7 +48,7 @@ public class CacheConfig {
         return Caffeine.newBuilder()
                 .initialCapacity(100)
                 .maximumSize(1000)
-                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .expireAfterWrite(3, TimeUnit.MINUTES)
                 .refreshAfterWrite(3, TimeUnit.MINUTES)
                 .recordStats();
     }
@@ -79,7 +79,7 @@ public class CacheConfig {
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .initialCapacity(100)
                 .maximumSize(1000)
-                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .expireAfterWrite(3, TimeUnit.MINUTES)
                 .recordStats());
 
         cacheManager.setCacheNames(List.of(

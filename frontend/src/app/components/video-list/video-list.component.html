@@ -38,7 +38,7 @@
         </div>
         <div class="video-info">
           <div class="channel-avatar">
-            <img [src]="video.userAvatar || 'https://via.placeholder.com/36x36/cccccc/666666?text=' + (video.userName?.charAt(0) || 'U')" [alt]="video.userName" class="avatar">
+            <img [src]="video.userAvatar || 'https://via.placeholder.com/36x36/cccccc/666666?text=' + (video.userName.charAt(0) || 'U')" [alt]="video.userName" class="avatar">
           </div>
           <div class="video-details">
             <h3 class="video-title">{{ video.title }}</h3>

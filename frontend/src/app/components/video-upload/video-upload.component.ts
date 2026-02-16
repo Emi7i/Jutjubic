@@ -46,10 +46,15 @@ export class VideoUploadComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]]
     });
 
-    // Set minimum datetime to now
+    // Set minimum datetime to now in local time
     const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    this.minDateTime = now.toISOString().slice(0, 16);
+    this.minDateTime = now.toLocaleString('sv-SE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).replace(' ', 'T');
   }
 
   onSubmit(): void {
@@ -237,11 +242,16 @@ export class VideoUploadComponent implements OnInit {
 
   togglePremiere(): void {
     if (this.isPremiere && !this.scheduledStartTime) {
-      // Set default to 1 hour from now
+      // Set default to 15mins from now
       const future = new Date();
-      future.setHours(future.getHours() + 1);
-      future.setMinutes(future.getMinutes() - future.getTimezoneOffset());
-      this.scheduledStartTime = future.toISOString().slice(0, 16);
+      future.setMinutes(future.getMinutes() + 15);
+      this.scheduledStartTime = future.toLocaleString('sv-SE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).replace(' ', 'T');
     }
   }
 

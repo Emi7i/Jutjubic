@@ -1,7 +1,11 @@
 package isa.jutjub.service;
 
 import isa.jutjub.model.Videos;
+import isa.jutjub.model.ViewEvent;
 import isa.jutjub.repository.VideoPostRepository;
+import isa.jutjub.model.PopularVideos;
+import isa.jutjub.repository.PopularVideosRepository;
+import isa.jutjub.repository.ViewEventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -19,6 +23,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,13 +37,17 @@ public class VideoPostService {
     private final FileUploadService fileUploadService;
     private final VideoPostCacheService videoPostCacheService;
     private final TileService tileService;
+    private final ViewEventRepository viewEventRepository;
+    private final PopularVideosRepository popularVideosRepository;
 
     @Autowired
-    public VideoPostService(VideoPostRepository videoPostRepository, FileUploadService fileUploadService, VideoPostCacheService videoPostCacheService, TileService tileService) {
+    public VideoPostService(VideoPostRepository videoPostRepository, FileUploadService fileUploadService, VideoPostCacheService videoPostCacheService, TileService tileService, ViewEventRepository viewEventRepository, PopularVideosRepository popularVideosRepository) {
         this.videoPostRepository = videoPostRepository;
         this.fileUploadService = fileUploadService;
         this.videoPostCacheService = videoPostCacheService;
         this.tileService = tileService;
+        this.viewEventRepository = viewEventRepository;
+        this.popularVideosRepository = popularVideosRepository;
     }
 
     /**
@@ -226,17 +236,6 @@ public class VideoPostService {
         return videoPostRepository.findMostRecent(pageable);
     }
 
-    /**
-     * Gets most popular video posts
-     * @param pageable pagination information
-     * @return page of most popular video posts
-     */
-    @Transactional(readOnly = true)
-    @Cacheable(value = "popularVideoPosts", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
-    public Page<Videos> getMostPopularVideoPosts(Pageable pageable) {
-        log.debug("Fetching most popular video posts: page {}, size {}", pageable.getPageNumber(), pageable.getPageSize());
-        return videoPostRepository.findMostPopular(pageable);
-    }
 
     /**
      * Searches video posts by keyword
@@ -321,6 +320,7 @@ public class VideoPostService {
      * @param id the video post ID
      */
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = {"videoPostsPage", "videoPosts"}, key = "#id")
     public void incrementViewCount(Long id) {
         // Use native SQL update for atomic operation - this handles concurrent access safely
         int updated = videoPostRepository.incrementViewsCount(id);
@@ -330,6 +330,11 @@ public class VideoPostService {
             throw new RuntimeException("Video post not found with ID: " + id);
         }
         
+        // Log the view event
+        ViewEvent viewEvent = new ViewEvent();
+        viewEvent.setVideoId(id);
+        viewEventRepository.save(viewEvent);
+        
         log.info("Incremented view count for video post ID: {}", id);
     }
 
@@ -338,6 +343,7 @@ public class VideoPostService {
      * @param id the video post ID
      */
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = {"videoPostsPage", "videoPosts"}, key = "#id")
     public void incrementLikeCount(Long id) {
         Videos videos = getVideoPostById(id);
         videos.setLikesCount(videos.getLikesCount() + 1);
@@ -349,6 +355,7 @@ public class VideoPostService {
      * @param id the video post ID
      */
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = {"videoPostsPage", "videoPosts"}, key = "#id")
     public void decrementLikeCount(Long id) {
         Videos videos = getVideoPostById(id);
         if (videos.getLikesCount() > 0) {
@@ -472,5 +479,54 @@ public class VideoPostService {
         process.waitFor();
 
         return output != null ? Double.parseDouble(output) : 0.0;
+    }
+
+    /**
+     * Gets the top 3 popular videos from the latest ETL run
+     * @return list of maps containing video and score (ETL calculated score)
+     */
+    public List<Map<String, Object>> getTopPopularVideos() {
+        List<Map<String, Object>> result = new ArrayList<>();
+        PopularVideos latest = popularVideosRepository.findTopByOrderByRunTimeDesc();
+        
+        if (latest == null) {
+            log.info("No popular videos records found - ETL may not have run yet");
+            return result;
+        }
+        
+        log.info("Found latest popular videos!");
+        if (latest != null) {
+            // Add video1 if exists
+            if (latest.getVideo1Id() != null) {
+                Videos v = videoPostRepository.findById(latest.getVideo1Id()).orElse(null);
+                if (v != null) {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("video", v);
+                    item.put("score", latest.getVideo1Score());
+                    result.add(item);
+                }
+            }
+            // Add video2
+            if (latest.getVideo2Id() != null) {
+                Videos v = videoPostRepository.findById(latest.getVideo2Id()).orElse(null);
+                if (v != null) {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("video", v);
+                    item.put("score", latest.getVideo2Score());
+                    result.add(item);
+                }
+            }
+            // Add video3
+            if (latest.getVideo3Id() != null) {
+                Videos v = videoPostRepository.findById(latest.getVideo3Id()).orElse(null);
+                if (v != null) {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("video", v);
+                    item.put("score", latest.getVideo3Score());
+                    result.add(item);
+                }
+            }
+        }
+        return result;
     }
 }

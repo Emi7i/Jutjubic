@@ -23,4 +23,21 @@
       </div>
     </div>
   </div>
+
+  <!-- Popular Videos Section -->
+  <div class="popular-videos-section" style="background: white;">
+    <div class="container">
+      <div *ngIf="popularVideos.length === 0" class="no-videos">
+        <p>No popular videos yet. Check back later!</p>
+      </div>
+      <div *ngIf="popularVideos.length > 0" class="carousel">
+        <button class="carousel-btn prev" (click)="prevVideo()" *ngIf="popularVideos.length > 1">&lt;</button>
+        <div class="video-display">
+          <img [ngClass]="{'animating': animating}" [src]="popularVideos[currentIndex].thumbnailUrl" [alt]="popularVideos[currentIndex].title" class="video-thumbnail" (click)="goToVideo(popularVideos[currentIndex].id)">
+          <h3>{{ popularVideos[currentIndex].title }}</h3>
+        </div>
+        <button class="carousel-btn next" (click)="nextVideo()" *ngIf="popularVideos.length > 1">&gt;</button>
+      </div>
+    </div>
+  </div>
 </div>

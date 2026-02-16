@@ -90,13 +90,13 @@ export class VideoListComponent implements OnInit {
     event.stopPropagation();
     
     // Check if user is logged in (simple check - you can enhance this later)
-    const currentUser = localStorage.getItem('currentUser');
+    const currentUser = localStorage.getItem('userId');
     if (!currentUser) {
       alert('You need to log in to like or comment on videos.');
       return;
     }
     
-    this.videoService.toggleLike(video.id).subscribe({
+    this.videoService.toggleLike(video.id, video.isLiked).subscribe({
       next: () => {
         video.isLiked = !video.isLiked;
         video.likes += video.isLiked ? 1 : -1;

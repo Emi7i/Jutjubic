@@ -30,6 +30,7 @@ export interface Video {
   commentsCount: number;
   viewsCount: number;
   isLiked?: boolean;
+  score?: number;
 }
 
 export interface Comment {

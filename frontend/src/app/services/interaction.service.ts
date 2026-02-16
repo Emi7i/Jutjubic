@@ -12,13 +12,13 @@ export class InteractionService {
   constructor(private videoService: VideoService) { }
 
   /** Toggle like for a video by ID */
-  toggleLike(videoId: string): Observable<Video> {
+  toggleLike(videoId: string, isLiked?: boolean): Observable<Video> {
     const currentUser = localStorage.getItem('userId');
     if (!currentUser) {
       return throwError(() => new Error('User not logged in'));
     }
 
-    return this.videoService.toggleLike(videoId).pipe(
+    return this.videoService.toggleLike(videoId, isLiked).pipe(
       catchError(err => {
         console.error('Error toggling like:', err);
         throw err;

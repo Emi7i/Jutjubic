@@ -390,7 +390,7 @@ export class PremierePlayerComponent implements OnInit, OnDestroy {
 
     this.countdownInterval = setInterval(() => {
       const now = new Date().getTime();
-      const start = new Date(this.premiere!.scheduledStartTime).getTime();
+      const start = new Date(this.premiere!.scheduledStartTime + 'Z').getTime();
       const distance = start - now;
 
       if (distance < 0) {

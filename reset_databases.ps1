@@ -52,6 +52,8 @@ $SQL_RESET = @"
 TRUNCATE TABLE videos CASCADE;
 TRUNCATE TABLE tiles CASCADE;
 TRUNCATE TABLE users CASCADE;
+TRUNCATE TABLE view_events CASCADE;
+TRUNCATE TABLE popular_videos CASCADE;
 SELECT 'Reset complete - all data cleared.' AS status;
 "@
 
@@ -109,7 +111,26 @@ VALUES
     ARRAY['urban','exploration','travel','city']
 );
 
-SELECT 'Seed complete - ' || COUNT(*) || ' video posts inserted.' AS status FROM videos;
+-- Insert view events for ETL (2-6 random views per video over last 7 days)
+INSERT INTO view_events (video_id, viewed_at, deleted)
+SELECT 
+    v.id,
+    NOW() - INTERVAL '1 day' * (floor(random() * 7)::int) - INTERVAL '1 hour' * (floor(random() * 24)::int),
+    false
+FROM videos v
+CROSS JOIN generate_series(1, (2 + floor(random() * 5)::int)) AS gs(series)
+ORDER BY v.id;
+
+-- Update view counts to match the actual number of view events
+UPDATE videos 
+SET views_count = (
+    SELECT COUNT(*) 
+    FROM view_events 
+    WHERE view_events.video_id = videos.id 
+    AND view_events.deleted = false
+);
+
+SELECT 'Seed complete - ' || COUNT(*) || ' video posts and view events inserted.' AS status FROM videos;
 '@
 
 # ============================================

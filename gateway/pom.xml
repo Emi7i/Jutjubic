@@ -124,7 +124,7 @@
 
         <!-- H2 Database (keeping for development/testing) -->
         <dependency>
-            <groupId>com.h2database</groupId>
+            <groupId>com.h2database</groupId> <!--hi-->
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>

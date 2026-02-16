@@ -5,7 +5,13 @@
 
   <div *ngIf="video">
     <div class="video-player-wrapper">
-      <video [src]="video.videoUrl" controls style="width: 100%; display: block;"></video>
+      <video
+        [src]="video.videoUrl"
+        controls
+        style="width: 100%; display: block;"
+        class="video-player"
+        preload="metadata">
+      </video>
     </div>
 
     <div class="video-content">

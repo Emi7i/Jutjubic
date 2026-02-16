@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpEventType, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { VideoUpload, Video, Comment, UploadProgress, GeographicLocation } from '../models/video-upload';
 import { environment } from 'src/environments/environment';
@@ -166,8 +166,20 @@ export class VideoService {
     );
   }
 
-  toggleLike(videoId: string): Observable<any> {
+  toggleLike(videoId: string, isLiked?: boolean): Observable<any> {
+    if (isLiked) {
+      return this.unlike(videoId);
+    } else {
+      return this.like(videoId);
+    }
+  }
+
+  like(videoId: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/${videoId}/like`, {});
+  }
+
+  unlike(videoId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${videoId}/unlike`, {});
   }
 
   addComment(videoId: string, text: string): Observable<Comment> {
@@ -187,7 +199,7 @@ export class VideoService {
     return this.http.get<Comment[]>(`${this.apiUrl}/${videoId}/comments`).pipe(
       map(comments => {
         // comments is already an array, just return it
-        return comments.map(comment => ({
+        return comments.filter(comment => comment).map(comment => ({
           ...comment,
           // optional: parse createdAt to Date if needed
           createdAt: new Date(comment.createdAt)
@@ -281,7 +293,7 @@ export class VideoService {
   // --- Get Popular Tags ---
   getPopularTags(): Observable<string[]> {
     return this.http.get<any>(`${this.apiUrl}/tags/popular`).pipe(
-      map(response => {
+      switchMap((response: any) => {
         // Handle different response formats
         let tags: string[] = [];
 
@@ -290,11 +302,27 @@ export class VideoService {
         } else if (response.data && Array.isArray(response.data)) {
           tags = response.data;
         } else {
-          // Fallback: extract tags from all videos
-          tags = this.extractTagsFromVideos();
+          // Fallback: extract tags from all videos using real implementation
+          return this.getAllVideos().pipe(
+            map(videos => {
+              const tagCounts = new Map<string, number>();
+              videos.forEach(video => {
+                if (video.tags) {
+                  video.tags.forEach(tag => {
+                    tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+                  });
+                }
+              });
+              // Sort by frequency descending and take top 10
+              return Array.from(tagCounts.entries())
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10)
+                .map(([tag]) => tag);
+            })
+          );
         }
 
-        return tags;
+        return of(tags);
       }),
       catchError(error => {
         console.error('Failed to fetch popular tags:', error);
@@ -304,10 +332,36 @@ export class VideoService {
     );
   }
 
-  // Fallback method to extract tags from existing videos
-  private extractTagsFromVideos(): string[] {
-    // This would require caching videos or making another call
-    // For now, return common tags as fallback
-    return ['music', 'gaming', 'education', 'sports', 'comedy', 'entertainment', 'news', 'technology', 'tutorial', 'vlog'];
+  // --- Get Top Popular Videos ---
+  getTopPopularVideos(): Observable<Video[]> {
+    return this.http.get<any>(`${this.apiUrl}/top-popular`).pipe(
+      map(response => {
+        const items = response.data || [];
+        return items.map((item: any) => {
+          const video = item.video;
+          return {
+            id: video.id.toString(),
+            title: video.title,
+            description: video.videoDescription,
+            tags: Array.isArray(video.tags) ? video.tags : (video.tags ? Object.values(video.tags) : []),
+            thumbnailUrl: `${this.apiUrl}/${video.id}/thumbnail`,
+            videoUrl: `${this.apiUrl}/${video.id}/video`,
+            location: this.generateGeographicLocation(video),
+            createdAt: new Date(video.createdAt),
+            userId: video.userId?.toString() || '',
+            userName: video.userName || 'Anonymous',
+            likes: video.likesCount || 0,
+            commentsCount: video.commentsCount || 0,
+            viewsCount: video.viewsCount || 0,
+            isLiked: false,
+            score: item.score
+          };
+        });
+      }),
+      catchError(error => {
+        console.error('Failed to fetch top popular videos:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }

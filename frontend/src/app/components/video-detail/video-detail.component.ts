@@ -65,7 +65,7 @@ export class VideoDetailComponent implements OnInit {
       return;
     }
 
-    this.videoService.toggleLike(this.video.id).subscribe({
+    this.videoService.toggleLike(this.video.id, this.video.isLiked).subscribe({
       next: () => {
         if (this.video) {
           this.video.isLiked = !this.video.isLiked;

@@ -68,13 +68,6 @@ public interface VideoPostRepository extends JpaRepository<Videos, Long> {
                                         @Param("endDate") LocalDateTime endDate,
                                         Pageable pageable);
 
-    /**
-     * Find most popular video posts ordered by likes count
-     * @param pageable pagination information
-     * @return page of most popular video posts
-     */
-    @Query("SELECT vp FROM Videos vp ORDER BY vp.likesCount DESC")
-    Page<Videos> findMostPopular(Pageable pageable);
 
     /**
      * Find most recent video posts ordered by creation date
@@ -125,7 +118,6 @@ public interface VideoPostRepository extends JpaRepository<Videos, Long> {
     Page<Videos> findByVideoFileSizeBetween(Long minSize, Long maxSize, Pageable pageable);
 
 
-    // TODO: check if transaction is needed
     /**
      * Atomically increments the view count for a video post
      * This method is thread-safe and handles concurrent access correctly
@@ -136,4 +128,5 @@ public interface VideoPostRepository extends JpaRepository<Videos, Long> {
     @Transactional
     @Query("UPDATE Videos vp SET vp.viewsCount = vp.viewsCount + 1 WHERE vp.id = :id")
     int incrementViewsCount(@Param("id") Long id);
+
 }
