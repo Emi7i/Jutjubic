@@ -1,10 +1,55 @@
-spring:
-  application:
-    name: video-posts-service
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:local}  # Default to 'local' if not specified
 
-# Common configuration (applies to all profiles)
+
+spring:
+  profiles:
+    active: docker
+  datasource:
+    url: jdbc:postgresql://postgres:5432/jutjubic_db
+    username: jutjubic_user
+    password: banana
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+        javax:
+          cache:
+            provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
+        generate_statistics: false
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+  web:
+    resources:
+      add-mappings: false
+  main:
+    allow-bean-definition-overriding: true
+
+server:
+  port: 8080
+
+# Eureka configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    hostname: ${HOSTNAME:video-posts-service}
+
+# Common configuration
 resilience4j:
   circuitbreaker:
     configs:
@@ -21,75 +66,27 @@ resilience4j:
           - java.lang.Exception
         ignore-exceptions:
           - jakarta.persistence.EntityNotFoundException
-    
     instances:
       videoPostCache:
         base-config: default
 
-# Eureka client configuration (common)
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
-    register-with-eureka: true
-    fetch-registry: true
+# SpringDoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
 
----
-# ===================================
-# LOCAL DEVELOPMENT PROFILE
-# ===================================
-spring:
-  config:
-    activate:
-      on-profile: local
-
-server:
-  port: 8080
-
-# Local Eureka (disabled for local dev)
-eureka:
-  client:
-    enabled: false
-    register-with-eureka: false
-    fetch-registry: false
-
-  # Local database connection (adjust as needed)
-  datasource:
-    url: jdbc:postgresql://localhost:5432/yourdb
-    username: postgres
-    password: postgres
-
-logging:
-  level:
-    isa.jutjub: DEBUG
-    org.springframework.web: DEBUG
-
----
-# ===================================
-# DOCKER/PRODUCTION PROFILE
-# ===================================
-spring:
-  config:
-    activate:
-      on-profile: docker
-
-server:
-  port: 8080
-
-# Docker Eureka (use service name)
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
-  instance:
-    prefer-ip-address: true
-    hostname: ${HOSTNAME:video-posts-service}
-
-  # Docker database connection (adjust as needed)
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://postgres:5432/yourdb}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+# Frontend url
+app:
+  frontend:
+    url: http://localhost:4200
+  upload:
+    dir: ./uploads
+    video:
+      max-size-mb: 200
+    timeout-minutes: 30
 
 logging:
   level:

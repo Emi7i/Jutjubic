@@ -597,9 +597,6 @@ public class VideoPostController {
             return ResponseEntity.ok()
                     .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + videos.getTitle() + ".mp4\"")
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
-                    .header("Access-Control-Allow-Headers", "Range, Content-Type")
                     .body(videoResource);
             
         } catch (RuntimeException e) {
@@ -659,9 +656,6 @@ public class VideoPostController {
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_JPEG)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"thumbnail_" + id + ".jpg\"")
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Access-Control-Allow-Methods", "GET")
-                    .header("Access-Control-Allow-Headers", "*")
                     .body(thumbnailResource);
             
         } catch (RuntimeException e) {
