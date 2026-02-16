@@ -30,7 +30,7 @@ export class VideoService {
 
     };
 
-    formData.append('videoPost', new Blob([JSON.stringify(videoPost)], { type: 'application/json' }));
+    formData.append('videos', new Blob([JSON.stringify(videoPost)], { type: 'application/json' }));
     formData.append('videoFile', videoData.video, videoData.video.name);
 
     if (videoData.thumbnail) {

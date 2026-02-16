@@ -62,7 +62,7 @@ public class VideoPostService {
             
             // Check video file format
             if (!isVideoFileValid(videoFile)) {
-                throw new RuntimeException("Invalid video file format. Only MP4 files are allowed");
+                throw new RuntimeException("Invalid video file format. Only MP4, WebM, OGG, QuickTime, and AVI files are allowed");
             }
             
             // Upload video file with timeout monitoring
@@ -377,17 +377,28 @@ public class VideoPostService {
         String contentType = videoFile.getContentType();
         String originalFilename = videoFile.getOriginalFilename();
         
-        // Check content type
-        if (contentType == null || !contentType.equals("video/mp4")) {
+        // Check content type - accept multiple video formats
+        if (contentType == null || (!contentType.equals("video/mp4") && 
+            !contentType.equals("video/webm") && 
+            !contentType.equals("video/ogg") && 
+            !contentType.equals("video/quicktime") && 
+            !contentType.equals("video/x-msvideo"))) {
             return false;
         }
         
-        // Check file extension
-        if (originalFilename == null || !originalFilename.toLowerCase().endsWith(".mp4")) {
+        // Check file extension - accept multiple video formats
+        if (originalFilename == null) {
             return false;
         }
         
-        return true;
+        String lowerCaseFilename = originalFilename.toLowerCase();
+        return lowerCaseFilename.endsWith(".mp4") || 
+               lowerCaseFilename.endsWith(".webm") || 
+               lowerCaseFilename.endsWith(".ogg") || 
+               lowerCaseFilename.endsWith(".ogv") || 
+               lowerCaseFilename.endsWith(".mov") || 
+               lowerCaseFilename.endsWith(".qt") || 
+               lowerCaseFilename.endsWith(".avi");
     }
 
     /**
