@@ -59,7 +59,7 @@ public class PremiereWebSocketController {
         log.info("User {} (session: {}) joining premiere {}", userId, sessionId, premiereId);
 
         try {
-            premiereService.joinPremiere(premiereId, userId);
+            premiereService.joinPremiere(premiereId, Long.getLong(userId, -1));
 
             // Store user info in session attributes for disconnect handling
             headerAccessor.getSessionAttributes().put("premiereId", premiereId);
@@ -111,6 +111,42 @@ public class PremiereWebSocketController {
     @SendTo("/topic/premiere/{premiereId}/playback")
     public PlaybackStateDTO requestState(@DestinationVariable Long premiereId) {
         return premiereService.getPlaybackState(premiereId);
+    }
+
+    /**
+     * Handle chat message from user
+     */
+    @MessageMapping("/premiere/{premiereId}/chat")
+    public void handleChatMessage(
+            @DestinationVariable Long premiereId,
+            @Payload Map<String, Object> payload,
+            Principal principal,
+            SimpMessageHeaderAccessor headerAccessor) {
+
+        String userId = extractUserId(principal, payload);
+        String message = (String) payload.get("message");
+        String username = (String) payload.getOrDefault("username", userId);
+
+        log.info("💬 Chat message from {} in premiere {}: {}", userId, premiereId, message);
+
+        try {
+            // Validate message
+            if (message == null || message.trim().isEmpty()) {
+                log.warn("Empty chat message from user {}", userId);
+                return;
+            }
+
+            if (message.length() > 500) {
+                log.warn("Chat message too long from user {}: {} chars", userId, message.length());
+                return;
+            }
+
+            // Broadcast chat message
+            premiereService.broadcastChatMessage(premiereId, userId, username, message);
+
+        } catch (Exception e) {
+            log.error("Error handling chat message for premiere {}: {}", premiereId, e.getMessage());
+        }
     }
 
     // ---- Helper Methods ----

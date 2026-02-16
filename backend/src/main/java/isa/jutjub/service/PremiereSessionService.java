@@ -237,7 +237,7 @@ public class PremiereSessionService {
 
     // ---- Viewer Management ----
 
-    public void joinPremiere(Long premiereId, String userId) {
+    public void joinPremiere(Long premiereId, Long userId) {
         log.debug("User {} joining premiere {}", userId, premiereId);
 
         PremiereSession premiere = getPremiereById(premiereId);
@@ -254,6 +254,12 @@ public class PremiereSessionService {
         // Broadcast updated viewer count
         PlaybackStateDTO state = getPlaybackState(premiereId);
         broadcastPlaybackState(premiereId, state);
+
+
+        if (premiere.isChatEnabled()) {
+            String username = extractUsername(userId);
+            broadcastSystemMessage(premiereId, username + " joined the premiere");
+        }
 
         log.debug("User {} joined premiere {}. Current viewers: {}",
                 userId, premiereId, state.getViewerCount());
@@ -273,6 +279,15 @@ public class PremiereSessionService {
                     userId, premiereId, state.getViewerCount());
         } catch (Exception e) {
             log.warn("Could not broadcast viewer count after user {} left: {}", userId, e.getMessage());
+        }
+        try {
+            PremiereSession premiere = getPremiereById(premiereId);
+            if (premiere.isChatEnabled()) {
+                String username = extractUsername(Long.getLong(userId));
+                broadcastSystemMessage(premiereId, username + " left the premiere");
+            }
+        } catch (Exception e) {
+            log.warn("Could not send leave message", e);
         }
     }
 
@@ -410,6 +425,48 @@ public class PremiereSessionService {
         log.debug("Broadcasted event {} to: {}", eventType, destination);
     }
 
+    /**
+     * Broadcast chat message to all premiere viewers
+     */
+    public void broadcastChatMessage(Long premiereId, String userId, String username, String message) {
+        log.debug("💬 Broadcasting chat message to premiere {}", premiereId);
+
+        // Create chat message DTO
+        PremiereChatMessageDTO chatMessage = PremiereChatMessageDTO.builder()
+                .premiereId(premiereId)
+                .userId(userId)
+                .username(username)
+                .message(message)
+                .timestamp(System.currentTimeMillis())
+                .type(ChatMessageType.USER)
+                .build();
+
+        // Broadcast to chat topic
+        String destination = String.format("/topic/premiere/%d/chat", premiereId);
+        messagingTemplate.convertAndSend(destination, chatMessage);
+
+        log.debug("📤 Sent chat message to {}", destination);
+    }
+
+    /**
+     * Broadcast system message (user joined/left)
+     */
+    public void broadcastSystemMessage(Long premiereId, String message) {
+        log.debug("📢 Broadcasting system message to premiere {}", premiereId);
+
+        PremiereChatMessageDTO systemMessage = PremiereChatMessageDTO.builder()
+                .premiereId(premiereId)
+                .userId("system")
+                .username("System")
+                .message(message)
+                .timestamp(System.currentTimeMillis())
+                .type(ChatMessageType.SYSTEM)
+                .build();
+
+        String destination = String.format("/topic/premiere/%d/chat", premiereId);
+        messagingTemplate.convertAndSend(destination, systemMessage);
+    }
+
     // ---- DTO Conversion ----
 
     private PremiereSessionDTO toDTO(PremiereSession premiere) {
@@ -429,5 +486,9 @@ public class PremiereSessionService {
                 .createdAt(premiere.getCreatedAt())
                 .updatedAt(premiere.getUpdatedAt())
                 .build();
+    }
+
+    private String extractUsername(long userId){
+        return "Anonymous";
     }
 }

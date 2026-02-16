@@ -1,0 +1,94 @@
+<div class="premiere-list-container">
+  <div class="header">
+    <h1>🎬 Premieres</h1>
+    <p class="subtitle">Watch live with others in real-time</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading premieres...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error" class="content">
+
+    <!-- Live Premieres Section -->
+    <section class="section" *ngIf="livePremieres.length > 0">
+      <div class="section-header">
+        <h2>
+          <span class="live-indicator"></span>
+          Live Now
+        </h2>
+        <span class="count">{{ livePremieres.length }}</span>
+      </div>
+
+      <div class="premiere-grid">
+        <div *ngFor="let premiere of livePremieres" class="premiere-card live">
+          <div class="card-thumbnail">
+            <img [src]="getThumbnailUrl(premiere.videoId)" [alt]="premiere.videoTitle">
+            <div class="live-badge">
+              <span class="pulse"></span>
+              LIVE
+            </div>
+            <div class="viewer-count">
+              👥 {{ premiere.viewerCount }} watching
+            </div>
+          </div>
+
+          <div class="card-content">
+            <h3>{{ premiere.videoTitle }}</h3>
+            <div class="card-meta">
+              <span class="time">Started {{ premiere.actualStartTime | date:'short' }}</span>
+            </div>
+            <button class="btn-watch" (click)="watchPremiere(premiere.id)">
+              Watch Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Upcoming Premieres Section -->
+    <section class="section">
+      <div class="section-header">
+        <h2>Upcoming Premieres</h2>
+        <span class="count">{{ upcomingPremieres.length }}</span>
+      </div>
+
+      <div *ngIf="upcomingPremieres.length === 0" class="empty-state">
+        <div class="empty-icon">📅</div>
+        <p>No upcoming premieres scheduled</p>
+      </div>
+
+      <div class="premiere-grid" *ngIf="upcomingPremieres.length > 0">
+        <div *ngFor="let premiere of upcomingPremieres" class="premiere-card">
+          <div class="card-thumbnail">
+            <img [src]="getThumbnailUrl(premiere.videoId)" [alt]="premiere.videoTitle">
+            <div class="upcoming-badge">UPCOMING</div>
+          </div>
+
+          <div class="card-content">
+            <h3>{{ premiere.videoTitle }}</h3>
+            <div class="card-meta">
+              <span class="time">{{ getTimeUntil(premiere.scheduledStartTime) }}</span>
+              <span class="date">{{ premiere.scheduledStartTime | date:'MMM d, h:mm a' }}</span>
+            </div>
+            <div class="waiting-count" *ngIf="premiere.viewerCount > 0">
+              {{ premiere.viewerCount }} waiting
+            </div>
+            <button class="btn-remind" (click)="watchPremiere(premiere.id)">
+              Set Reminder
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

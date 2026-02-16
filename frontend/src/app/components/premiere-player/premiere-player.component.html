@@ -1,0 +1,183 @@
+<div class="premiere-container">
+  <!-- Header -->
+  <div class="premiere-header">
+    <button class="back-btn" (click)="goBack()">← Back</button>
+    <div class="connection-status" [class.connected]="isConnected">
+      {{ isConnected ? '● Connected' : '○ Connecting...' }}
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading premiere...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <div class="error-icon">⚠️</div>
+    <h2>{{ error }}</h2>
+    <button class="btn-primary" (click)="goBack()">Go Back</button>
+  </div>
+
+  <!-- Premiere Content -->
+  <div *ngIf="!loading && !error && premiere" class="premiere-content">
+
+    <div class="premiere-layout">
+      <!-- Countdown (for scheduled premieres) -->
+      <div *ngIf="premiere.status === PremiereStatus.SCHEDULED" class="countdown-container">
+        <div class="countdown-content">
+          <h1>{{ premiere.videoTitle }}</h1>
+          <div class="countdown-timer">
+            <div class="countdown-label">Premiere starts in</div>
+            <div class="countdown-display">{{ countdown }}</div>
+          </div>
+          <div class="viewer-count">
+            <span class="viewer-icon">👥</span>
+            {{ premiere.viewerCount }} waiting
+          </div>
+        </div>
+        <div class="countdown-thumbnail">
+          <img [src]="'http://localhost:8080/api/video-posts/' + premiere.videoId + '/thumbnail'"
+               [alt]="premiere.videoTitle">
+          <div class="premiere-badge">UPCOMING PREMIERE</div>
+        </div>
+      </div>
+      <!-- Video Player (for live/paused/finished) -->
+      <div *ngIf="premiere.status !== PremiereStatus.SCHEDULED" class="video-section">
+        <div class="video-wrapper">
+          <video
+            #videoPlayer
+            [src]="videoUrl"
+            class="premiere-video"
+            [muted]="isMuted"
+
+            playsinline
+            (loadedmetadata)="onVideoLoaded()"
+            (play)="onVideoPlay()"
+            (pause)="onVideoPause()"
+            (error)="onVideoError($event)">
+          </video>
+
+          <!-- Mute Toggle Button -->
+          <button class="mute-toggle" (click)="toggleMute()" *ngIf="premiere.status === PremiereStatus.LIVE">
+            {{ isMuted ? '🔇' : '🔊' }}
+          </button>
+
+          <!-- Status Overlays -->
+          <div *ngIf="premiere.status === PremiereStatus.PAUSED" class="overlay-message">
+            <div class="overlay-icon">⏸️</div>
+            <div>Premiere Paused</div>
+          </div>
+
+          <div *ngIf="premiere.status === PremiereStatus.FINISHED" class="overlay-message">
+            <div class="overlay-icon">✓</div>
+            <div>Premiere Ended</div>
+          </div>
+        </div>
+
+        <!-- Video Info -->
+        <div class="video-info">
+          <div class="info-row">
+            <h2>{{ premiere.videoTitle }}</h2>
+            <div class="live-badge" *ngIf="premiere.status === PremiereStatus.LIVE">
+              <span class="pulse"></span>
+              LIVE
+            </div>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat">
+              <span class="stat-icon">👥</span>
+              <span class="stat-value">{{ premiere.viewerCount }}</span>
+              <span class="stat-label">watching</span>
+            </div>
+
+            <div class="stat" *ngIf="playbackState">
+              <span class="stat-icon">⏱️</span>
+              <span class="stat-value">{{ formatTime(playbackState.currentPosition) }}</span>
+              <span class="stat-label">elapsed</span>
+            </div>
+          </div>
+
+          <!-- Sync Status -->
+          <div class="sync-status" *ngIf="isSyncing">
+            <span class="sync-icon">🔄</span>
+            Syncing...
+          </div>
+
+          <!-- Video Load Status -->
+          <div class="video-status" *ngIf="!videoLoaded && premiere.status === PremiereStatus.LIVE">
+            <span>📹 Loading video...</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="chat-section" *ngIf="premiere.chatEnabled && showChat">
+        <div class="chat-header">
+          <h3>💬 Live Chat</h3>
+          <button class="chat-toggle" (click)="toggleChat()">×</button>
+        </div>
+
+        <div class="chat-messages">
+          <div *ngFor="let msg of chatMessages"
+               class="chat-message"
+               [ngClass]="{
+             'system-message': msg.type === ChatMessageType.SYSTEM,
+             'admin-message': msg.type === ChatMessageType.ADMIN,
+             'own-message': msg.userId === userId
+           }">
+
+            <!-- System Message -->
+            <div *ngIf="msg.type === ChatMessageType.SYSTEM" class="message-system">
+              <span class="message-text">{{ msg.message }}</span>
+              <span class="message-time">{{ getMessageTime(msg.timestamp) }}</span>
+            </div>
+
+            <!-- User/Admin Message -->
+            <div *ngIf="msg.type !== ChatMessageType.SYSTEM" class="message-user">
+              <div class="message-header">
+            <span class="message-username"
+                  [class.admin]="msg.type === ChatMessageType.ADMIN">
+              {{ msg.username }}
+              <span *ngIf="msg.type === ChatMessageType.ADMIN" class="badge-admin">MOD</span>
+            </span>
+                <span class="message-time">{{ getMessageTime(msg.timestamp) }}</span>
+              </div>
+              <div class="message-text">{{ msg.message }}</div>
+            </div>
+          </div>
+
+          <div *ngIf="chatMessages.length === 0" class="chat-empty">
+            No messages yet. Be the first to say hi! 👋
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <input
+            type="text"
+            [(ngModel)]="chatInput"
+            (keyup.enter)="sendMessage()"
+            placeholder="Type a message..."
+            maxlength="500"
+            [disabled]="!isConnected">
+          <button
+            (click)="sendMessage()"
+            [disabled]="!isConnected || !chatInput.trim()">
+            Send
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Toggle Button (when hidden) -->
+      <button
+        *ngIf="premiere.chatEnabled && !showChat"
+        class="chat-show-btn"
+        (click)="toggleChat()">
+        💬 Show Chat
+      </button>
+    </div>
+
+  </div>
+</div>
