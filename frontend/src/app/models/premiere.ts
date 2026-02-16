@@ -62,3 +62,18 @@ export interface CreatePremiereRequest {
   allowReplay?: boolean;
   chatEnabled?: boolean;
 }
+
+export interface ChatMessage {
+  premiereId: number;
+  userId: string;
+  username: string;
+  message: string;
+  timestamp: number;
+  type: ChatMessageType;
+}
+
+export enum ChatMessageType {
+  USER = 'USER',
+  SYSTEM = 'SYSTEM',
+  ADMIN = 'ADMIN'
+}
