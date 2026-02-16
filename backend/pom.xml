@@ -169,7 +169,17 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-
+        <!-- Micrometer Prometheus for monitoring -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        
+        <!-- Micrometer Core for custom metrics -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
 
     </dependencies>
     

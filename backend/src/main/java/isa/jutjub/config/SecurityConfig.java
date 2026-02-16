@@ -45,6 +45,8 @@ public class SecurityConfig {
                         // Test endpoints
                         .requestMatchers(HttpMethod.GET, "/api/test/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/actuator/health").permitAll()
+                        // Actuator endpoints for monitoring
+                        .requestMatchers("/actuator/**").permitAll()
                         // WebSocket endpoints - MUST be permitted
                         .requestMatchers("/ws/**", "/app/**", "/topic/**", "/queue/**").permitAll()
                         // Authenticated endpoints (temporarily allow upload for testing)
