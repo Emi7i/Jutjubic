@@ -1,6 +1,5 @@
 package isa.jutjub.config;
 
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,7 +22,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -41,9 +39,14 @@ public class SecurityConfig {
                         // Public video endpoints (GET only)
                         .requestMatchers(HttpMethod.GET, "/api/video-posts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tiles/**").permitAll()
+                        // Public premiere endpoints (GET only)
+                        .requestMatchers(HttpMethod.GET, "/api/premieres/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/premieres").permitAll()
                         // Test endpoints
                         .requestMatchers(HttpMethod.GET, "/api/test/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/actuator/health").permitAll()
+                        // WebSocket endpoints - MUST be permitted
+                        .requestMatchers("/ws/**", "/app/**", "/topic/**", "/queue/**").permitAll()
                         // Authenticated endpoints (temporarily allow upload for testing)
                         .requestMatchers(HttpMethod.POST, "/api/video-posts/upload").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/video-posts").authenticated()

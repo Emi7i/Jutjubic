@@ -13,24 +13,24 @@ import { FakeVideoService } from './fake-video.service';
   providedIn: 'root'
 })
 export class VideoService {
- private apiUrl = environment.apiUrl + '/video-posts';
+  private apiUrl = environment.apiUrl + '/video-posts';
 
   constructor(private http: HttpClient, private fakeVideoService: FakeVideoService) { }
 
   uploadVideo(videoData: VideoUpload): Observable<UploadProgress> {
     const formData = new FormData();
 
-    // Create VideoPost object for the backend
-    const videoPost = {
+    // Create Videos object for the backend (note: backend expects 'videos' not 'videoPost')
+    const videos = {
       title: videoData.title,
       videoDescription: videoData.description,
       tags: videoData.tags,
       longitude: videoData.location?.longitude,
       latitude: videoData.location?.latitude
-
     };
 
-    formData.append('videos', new Blob([JSON.stringify(videoPost)], { type: 'application/json' }));
+    // IMPORTANT: Backend expects 'videos' as the field name
+    formData.append('videos', new Blob([JSON.stringify(videos)], { type: 'application/json' }));
     formData.append('videoFile', videoData.video, videoData.video.name);
 
     if (videoData.thumbnail) {
@@ -42,6 +42,13 @@ export class VideoService {
       observe: 'events'
     }).pipe(
       map((event: HttpEvent<any>) => {
+        // Store video ID when upload completes
+        if (event.type === HttpEventType.Response) {
+          const videoId = event.body?.data?.id || event.body?.id;
+          if (videoId) {
+            localStorage.setItem('lastUploadedVideoId', videoId.toString());
+          }
+        }
         return this.getEventProgress(event);
       }),
       catchError(error => {
@@ -277,7 +284,7 @@ export class VideoService {
       map(response => {
         // Handle different response formats
         let tags: string[] = [];
-        
+
         if (Array.isArray(response)) {
           tags = response;
         } else if (response.data && Array.isArray(response.data)) {
@@ -286,7 +293,7 @@ export class VideoService {
           // Fallback: extract tags from all videos
           tags = this.extractTagsFromVideos();
         }
-        
+
         return tags;
       }),
       catchError(error => {
