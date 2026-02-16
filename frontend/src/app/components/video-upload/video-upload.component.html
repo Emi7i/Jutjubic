@@ -1,11 +1,11 @@
 <div class="container">
   <h2>Upload Video</h2>
 
-  <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="uploadForm" (ngSubmit)="$event.preventDefault()">
 
     <div class="form-group">
       <label for="title">Title *</label>
-      <input type="text" id="title" formControlName="title">
+      <input type="text" id="title" formControlName="title" (keydown.enter)="$event.preventDefault()">
       <small *ngIf="uploadForm.get('title')?.invalid && uploadForm.get('title')?.touched">
         Title is required (3-100 characters)
       </small>
@@ -13,7 +13,7 @@
 
     <div class="form-group">
       <label for="description">Description *</label>
-      <textarea id="description" formControlName="description" rows="4"></textarea>
+      <textarea id="description" formControlName="description" rows="4" (keydown.enter)="$event.preventDefault()"></textarea>
       <small *ngIf="uploadForm.get('description')?.invalid && uploadForm.get('description')?.touched">
         Description is required (10-1000 characters)
       </small>
@@ -60,6 +60,48 @@
       </div>
     </div>
 
+    <!-- Premiere Section -->
+    <div class="premiere-section">
+      <div class="form-group">
+        <div class="checkbox-group premiere-toggle">
+          <input type="checkbox" [(ngModel)]="isPremiere" [ngModelOptions]="{standalone: true}"
+                 (change)="togglePremiere()" id="isPremiere">
+          <label for="isPremiere">
+            <span class="premiere-icon">🎬</span>
+            Schedule as Premiere
+          </label>
+        </div>
+        <small class="premiere-hint">Premieres let you watch together with your audience in real-time</small>
+      </div>
+
+      <div class="premiere-settings" *ngIf="isPremiere">
+        <div class="form-group">
+          <label for="scheduledStartTime">Premiere Start Time *</label>
+          <input
+            type="datetime-local"
+            id="scheduledStartTime"
+            [(ngModel)]="scheduledStartTime"
+            [ngModelOptions]="{standalone: true}"
+            [min]="minDateTime"
+            class="datetime-input"
+            (keydown.enter)="$event.preventDefault()">
+          <small>Select when your premiere should start</small>
+        </div>
+
+        <div class="premiere-options">
+          <div class="checkbox-group">
+            <input type="checkbox" [(ngModel)]="allowReplay" [ngModelOptions]="{standalone: true}" id="allowReplay">
+            <label for="allowReplay">Allow replay after premiere ends</label>
+          </div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" [(ngModel)]="chatEnabled" [ngModelOptions]="{standalone: true}" id="chatEnabled">
+            <label for="chatEnabled">Enable live chat during premiere</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="form-group">
       <div class="checkbox-group">
         <input type="checkbox" [(ngModel)]="useLocation" [ngModelOptions]="{standalone: true}" (change)="toggleLocation()" id="location">
@@ -83,14 +125,16 @@
     <div *ngIf="showSuccessMessage" class="success-toast">
       <div class="toast-content">
         <span class="toast-icon">✓</span>
-        <span class="toast-message">Video uploaded successfully!</span>
+        <span class="toast-message">
+          {{ isPremiere ? 'Premiere scheduled successfully!' : 'Video uploaded successfully!' }}
+        </span>
         <button type="button" class="toast-close" (click)="hideSuccessMessage()">×</button>
       </div>
     </div>
 
     <div class="button-group">
-      <button type="submit" class="btn btn-primary" [disabled]="isUploading || uploadForm.invalid">
-        {{ isUploading ? 'Uploading...' : 'Upload Video' }}
+      <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="isUploading || uploadForm.invalid">
+        {{ isUploading ? 'Uploading...' : (isPremiere ? 'Schedule Premiere' : 'Upload Video') }}
       </button>
       <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="isUploading">Reset</button>
     </div>

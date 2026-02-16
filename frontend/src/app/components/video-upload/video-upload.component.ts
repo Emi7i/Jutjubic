@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { VideoService } from '../../services/video.service';
+import { PremiereService } from '../../services/premiere.service';
 import { VideoUpload } from '../../models/video-upload';
 
 @Component({
@@ -20,18 +21,35 @@ export class VideoUploadComponent implements OnInit {
   errorMessage: string | null = null;
   uploadProgress: { message: string; percentage: number } | null = null;
   showSuccessMessage = false;
-  
+
+  // Premiere-specific fields
+  isPremiere = false;
+  scheduledStartTime: string = '';
+  allowReplay = false;
+  chatEnabled = true;
+  minDateTime: string = '';
+
   // File references for upload
   thumbnailFile: File | null = null;
   videoFile: File | null = null;
+  uploadedVideoId: number | null = null;
 
-  constructor(private fb: FormBuilder, private videoService: VideoService) {}
+  constructor(
+    private fb: FormBuilder,
+    private videoService: VideoService,
+    private premiereService: PremiereService
+  ) {}
 
   ngOnInit(): void {
     this.uploadForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]]
     });
+
+    // Set minimum datetime to now
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    this.minDateTime = now.toISOString().slice(0, 16);
   }
 
   onSubmit(): void {
@@ -45,9 +63,15 @@ export class VideoUploadComponent implements OnInit {
       return;
     }
 
+    // Validate premiere fields if enabled
+    if (this.isPremiere && !this.scheduledStartTime) {
+      this.errorMessage = 'Please select a start time for the premiere.';
+      return;
+    }
+
     this.isUploading = true;
     this.errorMessage = null;
-    
+
     // Prepare video upload data
     const videoData: VideoUpload = {
       title: this.uploadForm.value.title,
@@ -58,22 +82,25 @@ export class VideoUploadComponent implements OnInit {
       location: this.useLocation ? this.currentLocation : null
     };
 
-    // Call the actual upload service
+    // Upload the video first
     this.videoService.uploadVideo(videoData).subscribe({
       next: (progress) => {
         this.uploadProgress = {
           message: progress.message || 'Uploading...',
           percentage: progress.percentage
         };
-        
+
         if (progress.status === 'complete') {
-          this.isUploading = false;
-          this.showSuccessMessage = true;
-          // Auto-hide success message after 5 seconds
-          setTimeout(() => {
-            this.hideSuccessMessage();
-          }, 5000);
-          this.resetForm();
+          // Get the uploaded video ID from localStorage
+          const videoIdStr = localStorage.getItem('lastUploadedVideoId');
+          this.uploadedVideoId = videoIdStr ? parseInt(videoIdStr, 10) : null;
+
+          // If premiere is enabled, create premiere session
+          if (this.isPremiere) {
+            this.createPremiereSession();
+          } else {
+            this.finishUpload();
+          }
         }
       },
       error: (error) => {
@@ -83,6 +110,49 @@ export class VideoUploadComponent implements OnInit {
         this.uploadProgress = null;
       }
     });
+  }
+
+  createPremiereSession(): void {
+    if (!this.uploadedVideoId) {
+      this.errorMessage = 'Video uploaded but video ID not found. Cannot create premiere. Please try uploading again.';
+      this.isUploading = false;
+      this.uploadProgress = null;
+      // Clean up localStorage
+      localStorage.removeItem('lastUploadedVideoId');
+      return;
+    }
+
+    const premiereRequest = {
+      videoId: this.uploadedVideoId,
+      scheduledStartTime: new Date(this.scheduledStartTime),
+      allowReplay: this.allowReplay,
+      chatEnabled: this.chatEnabled
+    };
+
+    this.premiereService.createPremiere(premiereRequest).subscribe({
+      next: (premiere) => {
+        console.log('Premiere created:', premiere);
+        localStorage.removeItem('lastUploadedVideoId'); // Clean up
+        this.finishUpload();
+      },
+      error: (error) => {
+        console.error('Premiere creation error:', error);
+        this.errorMessage = 'Video uploaded but failed to create premiere: ' + (error.error?.message || error.message);
+        this.isUploading = false;
+        this.uploadProgress = null;
+        localStorage.removeItem('lastUploadedVideoId'); // Clean up
+      }
+    });
+  }
+
+  finishUpload(): void {
+    this.isUploading = false;
+    this.showSuccessMessage = true;
+    // Auto-hide success message after 5 seconds
+    setTimeout(() => {
+      this.hideSuccessMessage();
+    }, 5000);
+    this.resetForm();
   }
 
   addTag(): void {
@@ -100,10 +170,8 @@ export class VideoUploadComponent implements OnInit {
   onThumbnailSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      // Store the file reference for upload
       this.thumbnailFile = file;
-      
-      // Generate preview
+
       const reader = new FileReader();
       reader.onload = (e) => {
         this.thumbnailPreview = e.target?.result as string;
@@ -115,25 +183,22 @@ export class VideoUploadComponent implements OnInit {
   onVideoSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      // Validate that the file is a video
       if (!file.type.startsWith('video/')) {
         this.errorMessage = 'Please select a valid video file. Images are not allowed.';
-        event.target.value = ''; // Clear the input
+        event.target.value = '';
         return;
       }
-      
-      // Check for specific video formats
+
       const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'];
       if (!allowedTypes.includes(file.type)) {
         this.errorMessage = 'Unsupported video format. Please use MP4, WebM, OGG, QuickTime, or AVI files.';
-        event.target.value = ''; // Clear the input
+        event.target.value = '';
         return;
       }
-      
-      // Store the file reference for upload
+
       this.videoFile = file;
-      
-      this.errorMessage = null; // Clear any previous errors
+      this.errorMessage = null;
+
       const reader = new FileReader();
       reader.onload = (e) => {
         this.videoPreview = e.target?.result as string;
@@ -170,6 +235,16 @@ export class VideoUploadComponent implements OnInit {
     }
   }
 
+  togglePremiere(): void {
+    if (this.isPremiere && !this.scheduledStartTime) {
+      // Set default to 1 hour from now
+      const future = new Date();
+      future.setHours(future.getHours() + 1);
+      future.setMinutes(future.getMinutes() - future.getTimezoneOffset());
+      this.scheduledStartTime = future.toISOString().slice(0, 16);
+    }
+  }
+
   resetForm(): void {
     this.uploadForm.reset();
     this.tags = [];
@@ -182,6 +257,13 @@ export class VideoUploadComponent implements OnInit {
     this.currentLocation = null;
     this.errorMessage = null;
     this.uploadProgress = null;
+    this.isPremiere = false;
+    this.scheduledStartTime = '';
+    this.allowReplay = false;
+    this.chatEnabled = true;
+    this.uploadedVideoId = null;
+    // Clean up localStorage
+    localStorage.removeItem('lastUploadedVideoId');
   }
 
   hideSuccessMessage(): void {

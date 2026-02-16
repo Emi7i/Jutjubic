@@ -30,6 +30,9 @@ import { VideoCardComponent } from './components/video-card/video-card.component
 import { ExpandableDirective } from './shared/expandable.directive';
 import { TimeframeSelectorComponent } from './shared/timeframe-selector/timeframe-selector.component';
 import { VideoMapComponent } from './pages/video-map/video-map.component';
+import { PremierePlayerComponent } from './components/premiere-player/premiere-player.component';
+import { PremiereListComponent } from './components/premiere-list/premiere-list.component';
+import { PremiereService } from './services/premiere.service';
 
 @NgModule({
   declarations: [
@@ -50,6 +53,8 @@ import { VideoMapComponent } from './pages/video-map/video-map.component';
     ExpandableDirective,
     TimeframeSelectorComponent,
     VideoMapComponent,
+    PremierePlayerComponent,
+    PremiereListComponent,
   ],
   imports: [
     BrowserModule,
@@ -70,7 +75,10 @@ import { VideoMapComponent } from './pages/video-map/video-map.component';
       registrationStrategy: 'registerWhenStable:30000'
     }),
   ],
-  providers: [VideoService],
+  providers: [
+    VideoService,
+    PremiereService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

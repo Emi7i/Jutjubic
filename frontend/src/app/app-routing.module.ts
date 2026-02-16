@@ -9,6 +9,8 @@ import { LoginComponent } from "./pages/login/login.component";
 import { ActivateComponent } from "./pages/activate/activate.component";
 import { SandboxComponent } from "./pages/sandbox/sandbox.component";
 import { VideoMapComponent } from "./pages/video-map/video-map.component";
+import { PremierePlayerComponent } from './components/premiere-player/premiere-player.component';
+import { PremiereListComponent } from './components/premiere-list/premiere-list.component';
 
 
 const routes: Routes = [
@@ -21,6 +23,8 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'activate', component: ActivateComponent },
+  { path: 'premiere/:id', component: PremierePlayerComponent},
+  { path: 'premieres', component: PremiereListComponent},
   // sandbox
   { path: 'sandbox', component: SandboxComponent },
 ];
