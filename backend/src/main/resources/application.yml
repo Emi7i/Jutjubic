@@ -1,3 +1,10 @@
+spring:
+  application:
+    name: video-posts-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}  # Default to 'local' if not specified
+
+# Common configuration (applies to all profiles)
 resilience4j:
   circuitbreaker:
     configs:
@@ -18,3 +25,73 @@ resilience4j:
     instances:
       videoPostCache:
         base-config: default
+
+# Eureka client configuration (common)
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+
+---
+# ===================================
+# LOCAL DEVELOPMENT PROFILE
+# ===================================
+spring:
+  config:
+    activate:
+      on-profile: local
+
+server:
+  port: 8080
+
+# Local Eureka (disabled for local dev)
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+  # Local database connection (adjust as needed)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/yourdb
+    username: postgres
+    password: postgres
+
+logging:
+  level:
+    isa.jutjub: DEBUG
+    org.springframework.web: DEBUG
+
+---
+# ===================================
+# DOCKER/PRODUCTION PROFILE
+# ===================================
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+server:
+  port: 8080
+
+# Docker Eureka (use service name)
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+    hostname: ${HOSTNAME:video-posts-service}
+
+  # Docker database connection (adjust as needed)
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://postgres:5432/yourdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+logging:
+  level:
+    isa.jutjub: INFO
+    org.springframework.web: INFO

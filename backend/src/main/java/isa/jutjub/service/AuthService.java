@@ -84,6 +84,16 @@ public class AuthService {
         System.out.println("Input password: " + password);
         System.out.println("Password matches: " + passwordEncoder.matches(password, existingUser.getPassword()));
 
+        // Check if input is a BCrypt hash (starts with $2a$)
+        if (password.startsWith("$2a$")) {
+            System.out.println("Input appears to be BCrypt hash, doing direct comparison");
+            if (password.equals(existingUser.getPassword())) {
+                String token = jwtUtil.generateToken(existingUser.getUsername());
+                System.out.println("Hash-to-hash comparison successful for user: " + existingUser.getUsername());
+                return token;
+            }
+        }
+        
         if (!passwordEncoder.matches(password, existingUser.getPassword())) {
             System.out.println("Password mismatch for user: " + existingUser.getUsername());
             throw new IllegalArgumentException("Invalid username/email or password");

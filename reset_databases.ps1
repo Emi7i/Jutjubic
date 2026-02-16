@@ -55,12 +55,12 @@ TRUNCATE TABLE users CASCADE;
 SELECT 'Reset complete - all data cleared.' AS status;
 "@
 
-$SQL_SEED = @"
+$SQL_SEED = @'
 INSERT INTO users (username, email, password, role, active, activation_token, name, surname, address)
 VALUES (
     'admin',
     'admin@email.com',
-    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+    '$2a$10$D1HCbkFz3yQrEkHOcfuG4e5lFDpq675jdi/Z9yx5n4taX9mlkS9m2',
     'ADMIN',
     true,
     null, null, null, null
@@ -110,7 +110,7 @@ VALUES
 );
 
 SELECT 'Seed complete - ' || COUNT(*) || ' video posts inserted.' AS status FROM videos;
-"@
+'@
 
 # ============================================
 # HELPERS
