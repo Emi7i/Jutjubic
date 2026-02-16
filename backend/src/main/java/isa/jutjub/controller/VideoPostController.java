@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import isa.jutjub.model.Videos;
+import isa.jutjub.service.VideoEventPublisher;
 import isa.jutjub.service.VideoPostService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -44,9 +45,12 @@ public class VideoPostController {
 
     private final VideoPostService videoPostService;
 
+    private final VideoEventPublisher videoEventPublisher;
+
     @Autowired
-    public VideoPostController(VideoPostService videoPostService) {
+    public VideoPostController(VideoPostService videoPostService, VideoEventPublisher videoEventPublisher) {
         this.videoPostService = videoPostService;
+        this.videoEventPublisher = videoEventPublisher;
     }
 
     /**
@@ -78,6 +82,16 @@ public class VideoPostController {
             response.put("success", true);
             response.put("message", "Video post created successfully");
             response.put("data", createdPost);
+
+
+            try {
+                videoEventPublisher.publishVideoUploadEvent(createdPost);
+                log.info("Video event published for video ID: {}", createdPost.getId());
+            } catch (Exception e) {
+                // Log but don't fail the upload if messaging fails
+                log.warn("Failed to publish video event to RabbitMQ: {}", e.getMessage());
+                // You could also add this to response as a warning
+            }
             
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
             

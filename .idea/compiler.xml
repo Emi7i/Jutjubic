@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="jutjubic" />
+        <module name="video-event-consumer" />
       </profile>
     </annotationProcessing>
   </component>
