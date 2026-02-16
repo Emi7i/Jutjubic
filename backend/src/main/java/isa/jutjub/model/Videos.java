@@ -44,6 +44,9 @@ public class Videos extends BaseEntity {
     @Column(name = "video_file_size")
     private Long videoFileSize;
 
+    @Column(name = "video_duration")
+    private Double videoDuration = 3600.0;
+
     @Column(name = "upload_duration_ms")
     private Long uploadDurationMs;
 

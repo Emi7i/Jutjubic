@@ -13,6 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +87,8 @@ public class VideoPostService {
             // Calculate upload duration
             long endTime = System.currentTimeMillis();
             videos.setUploadDurationMs(endTime - startTime);
+
+            videos.setVideoDuration(getVideoDuration(videos.getVideoPath()));
             
             // Save video post to database
             Videos savedPost = videoPostRepository.save(videos);
@@ -428,5 +435,31 @@ public class VideoPostService {
             // Return fallback tags
             return java.util.Arrays.asList("music", "gaming", "education", "sports", "comedy", "entertainment", "news", "technology", "tutorial", "vlog");
         }
+    }
+
+
+    private double getVideoDuration(String url) throws IOException, InterruptedException {
+
+        Path absPath = Paths.get(url).toAbsolutePath().normalize();
+
+        ProcessBuilder pb = new ProcessBuilder(
+                "ffprobe",
+                "-v", "error",
+                "-select_streams", "v:0",
+                "-show_entries", "format=duration",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                absPath.toString()
+        );
+        log.info("ffprobe call: " + pb.toString());
+        Process process = pb.start();
+
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getInputStream())
+        );
+
+        String output = reader.readLine();
+        process.waitFor();
+
+        return output != null ? Double.parseDouble(output) : 0.0;
     }
 }

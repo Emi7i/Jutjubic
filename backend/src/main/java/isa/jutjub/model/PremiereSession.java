@@ -87,10 +87,12 @@ public class PremiereSession extends BaseEntity {
     }
 
     public void finish() {
+        this.currentPositionSeconds = computeCurrentPosition();
         this.status = PremiereStatus.FINISHED;
         this.endedAt = LocalDateTime.now();
         this.playing = false;
     }
+
 
     /**
      * Compute authoritative playback position safely.

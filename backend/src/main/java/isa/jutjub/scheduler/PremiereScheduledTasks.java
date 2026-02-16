@@ -42,4 +42,17 @@ public class PremiereScheduledTasks {
             log.error("Error in cleanupOldPremieres task: {}", e.getMessage(), e);
         }
     }
+
+    @Scheduled(fixedDelay =  300000, initialDelay = 10000)
+    public void autoFinishLivePremieres() {
+        log.debug("Checking for live premieres to finish");
+        try {
+            premiereService.autoFinishLivePremieres();
+        } catch (Exception e) {
+            log.error("Error in autoFinishLivePremieres task: {}", e.getMessage(), e);
+        }
+    }
+
+
+
 }

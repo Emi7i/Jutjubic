@@ -335,6 +335,23 @@ public class PremiereSessionService {
         }
     }
 
+
+    public void autoFinishLivePremieres() {
+        List<PremiereSession> live = premiereRepository.findByStatus(PremiereStatus.LIVE);
+
+        for (PremiereSession premiere : live) {
+
+            double position = premiere.computeCurrentPosition();
+            Videos video = premiere.getVideo();
+            double duration = premiere.getVideo().getVideoDuration();
+
+            if (position >= duration) {
+                finishPremiere(premiere.getId());
+            }
+        }
+    }
+
+
     public void cleanupOldPremieres(int daysOld) {
         LocalDateTime cutoffDate = LocalDateTime.now().minusDays(daysOld);
         List<PremiereSession> oldPremieres = premiereRepository
